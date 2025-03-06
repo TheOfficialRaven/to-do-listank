@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Heti Teendőlista + Bevásárló lista</title>
+  
+  <!-- Google Material Icons -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+
+  <link rel="icon"
+      type="image/png"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAtUlEQVR4nGN4l3n4TwMnQMDyEwCEsZjHuHln8n+/RskJBJ6BcYGBgYGBWbXFgYGxv9m9/8OsEVNBrAXtI88b2CWFYGBgcnNy80DnQMDw+Ph5EJow4/QkikM2NTY3/x9/Vihke3TQaQ2BiS3wB/Hm2Zh3DKP/79O2igAVlsNFiZSswfIbgNh+DaE+DkPDESn/M0AP0FzAiwLSv0QAAAABJRU5ErkJggg=="
+/>
+
+  <!-- Saját stíluslap -->
+  <link rel="stylesheet" href="index.css">
+
+</head>
+<body>
+
+  <!-- HERO RÉSZ: heti teendő -->
+  <section class="hero">
+    <div class="innertext">
+      <h1>Heti Teendőlista</h1>
+      <input type="text" id="task-input" placeholder="Írd be a teendődet...">
+      <button id="task-add-btn">Hozzáadás</button>
+    </div>
+  </section>
+
+  <section class="conversions">
+    <!-- E heti teendők -->
+    <div class="box">
+      <h2>E heti teendők</h2>
+      <ul id="tasks-ul"></ul>
+    </div>
+  </section>
+
+  <!-- Külön bevásárlólista szekció -->
+  <section class="hero">
+    <div class="innertext">
+      <h1>Bevásárlólista</h1>
+      <input type="text" id="shop-input" placeholder="Mit kell venni?">
+      <button id="shop-add-btn">Hozzáadás</button>
+    </div>
+  </section>
+
+  <section class="conversions">
+    <div class="box">
+      <h2>Vásárolandók</h2>
+      <ul id="shop-ul"></ul>
+    </div>
+  </section>
+
+  <!-- type="module", ha Firebase modulokat importálsz -->
+  <script type="module" src="index.js"></script>
+</body>
+</html>
