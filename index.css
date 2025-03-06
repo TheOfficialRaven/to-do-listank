@@ -1,124 +1,132 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    margin: 0;
-    padding: 0;
-    background-color: #1F2937;
-    color: #F8FAFC;
-    font-family: Arial, sans-serif;
-    font-size: 18px; /* alapértelmezett betűméret növelése */
-  }
-  
-  h1, h2 {
-    margin: 0;
-  }
-  
-  /* HERO (fejléc, input, gomb) */
-  .hero {
-    text-align: center;
-    padding: 2rem 1rem;
-  }
-  .hero .innertext {
-    max-width: 600px;
-    margin: 0 auto;
+  background-color: #1F2937;
+  color: #F8FAFC;
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  padding: 1rem;
+}
+
+/* HERO rész – nagyobb elemek mobilon */
+.hero {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.hero .innertext {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.hero input[type="text"] {
+  width: 80%;
+  max-width: 350px;
+  padding: 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+.hero input[type="text"]:focus {
+  outline: 2px solid #10B981;
+}
+.hero button {
+  background-color: #10B981;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+.hero button:hover {
+  opacity: 0.9;
+}
+
+/* Lista szekció */
+.list-section {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 1rem;
+}
+.box {
+  background-color: #2B3849;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+.box h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #10B981;
+}
+
+/* Lista stílusok */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #374151;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  font-size: 1.3rem;
+}
+li.done span.item-text {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+/* Ikonok */
+.icons {
+  display: flex;
+  gap: 1.5rem;
+}
+.icons .material-icons {
+  cursor: pointer;
+  color: #10B981;
+  font-size: 2rem;
+}
+.icons .material-icons:hover {
+  color: #14eaa6;
+}
+
+/* Extra mobil optimalizáció, ha szükséges */
+@media (max-width: 480px) {
+  body {
+    font-size: 24px;
+    padding: 0.5rem;
   }
   .hero h1 {
-    font-size: 2.5rem; /* nagyobb fejléc */
-    margin-bottom: 1rem;
-    color: #F8FAFC;
+    font-size: 2.8rem;
   }
-  
-  input[type="text"] {
-    padding: 0.75rem;
-    border: none;
-    border-radius: 5px;
-    margin-right: 0.5rem;
-    width: 80%; /* szélesebb, mobilbarát */
-    max-width: 300px;
-    font-size: 1.1rem; /* nagyobb betűméret az inputban */
+  .hero input[type="text"] {
+    width: 90%;
   }
-  input[type="text"]:focus {
-    outline: 2px solid #10B981;
-  }
-  
-  button {
-    background-color: #10B981;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem; /* nagyobb gomb */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1rem;
-  }
-  button:hover {
-    opacity: 0.9;
-  }
-  
-  /* A "conversions" szekció (most: teendők doboza) */
-  .conversions {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  .box {
-    background-color: #2B3849;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
+  .hero button {
+    padding: 1rem 2.5rem;
+    font-size: 1.4rem;
   }
   .box h2 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    color: #10B981;
-  }
-  
-  /* Lista stílusok */
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    font-size: 1.6rem;
   }
   li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #374151;
-    margin-bottom: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-size: 1.1rem;
-  }
-  
-  li.done span.item-text {
-    text-decoration: line-through;
-    opacity: 0.8;
-  }
-  
-  /* Ikonok (pipa és kuka) a jobb oldalon */
-  .icons {
-    display: flex;
-    gap: 1rem;
+    font-size: 1.2rem;
+    padding: 0.75rem;
   }
   .icons .material-icons {
-    cursor: pointer;
-    color: #10B981;
-    font-size: 1.5rem; /* nagyobb ikonok */
+    font-size: 1.8rem;
   }
-  .icons .material-icons:hover {
-    color: #14eaa6;
-  }
-  
-  /* Mobilra optimalizálás: opcionális, de itt a feliratok és elemek jobban nagyíthatók */
-  @media (max-width: 600px) {
-    body {
-      font-size: 20px;
-    }
-    .hero h1 {
-      font-size: 2.8rem;
-    }
-    input[type="text"] {
-      width: 90%;
-    }
-    button {
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-    }
-  }
+}
