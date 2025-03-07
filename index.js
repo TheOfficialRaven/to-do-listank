@@ -1,4 +1,3 @@
-// Import Firebase modulokat
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"
 import {
   getDatabase,
@@ -18,15 +17,20 @@ import {
 
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
+  apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
   databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app/",
-  apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0"
+  projectId: "leads-tracker-app-78b83",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "1:907489703312:web:c4138807d8a7aa96512f15"
 }
 
 const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 const auth = getAuth(app)
 
-// DOM elemek – Autentikációs rész
+// DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section")
 const emailInput = document.getElementById("email-input")
 const passwordInput = document.getElementById("password-input")
@@ -51,26 +55,16 @@ const shopUl = document.getElementById("shop-ul")
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("Bejelentkezett:", user.email)
-    // Felhasználó be van jelentkezve: rejtjük az auth részt, megjelenítjük a to‑do és bevásárló UI-t
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
     logoutBtn.style.display = "inline-block"
-  } else {
-    console.log("Nincs bejelentkezett felhasználó")
-    // Nincs bejelentkezve: megjelenítjük az auth UI-t, elrejtjük a to‑do UI-t
-    authSection.style.display = "block"
-    todoSection.style.display = "none"
-    shopSection.style.display = "none"
-    logoutBtn.style.display = "none"
-  }
-});
+    authMessageEl.textContent = ""
 
-    // Beállítjuk a felhasználó saját feladatait a DB-ben
+    // Felhasználó saját feladatai és bevásárló tételei a DB-ben
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
     const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
 
-    // Teendők figyelése
     onValue(userTasksRef, (snapshot) => {
       if (snapshot.exists()) {
         const dataObj = snapshot.val()
@@ -85,7 +79,6 @@ onAuthStateChanged(auth, (user) => {
       }
     })
 
-    // Bevásárlólista figyelése
     onValue(userShoppingRef, (snapshot) => {
       if (snapshot.exists()) {
         const dataObj = snapshot.val()
@@ -180,7 +173,7 @@ shopAddBtn.addEventListener("click", () => {
   }
 })
 
-// Közös renderelő függvény (lista kirajzolása)
+// Lista renderelés
 function renderList(arr, ulElement) {
   let html = ""
   for (let i = 0; i < arr.length; i++) {
@@ -203,21 +196,22 @@ function renderList(arr, ulElement) {
   ulElement.innerHTML = html
 }
 
-// Közös kattintáskezelés az ikonokra (event delegation)
+// Közös kattintáskezelés az ikonokra
 document.addEventListener("click", (e) => {
-  // Teendő lista elemein belül
+  // Ha a "done" ikonra kattintanak
   if (e.target.matches(".done-icon")) {
     const itemId = e.target.dataset.id
     const currentDone = e.target.dataset.done === "true"
     set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
   }
+  // Ha a "delete" ikonra kattintanak
   if (e.target.matches(".delete-icon")) {
     const itemId = e.target.dataset.id
-    // Meg kell határozni, hogy a teendő- vagy bevásárlólista eleme
-    if (e.target.closest("ul").id === "tasks-ul") {
+    // Határozd meg, melyik lista eleme: teendők vagy bevásárló
+    const parentUl = e.target.closest("ul").id
+    if (parentUl === "tasks-ul") {
       remove(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}`))
-    }
-    if (e.target.closest("ul").id === "shop-ul") {
+    } else if (parentUl === "shop-ul") {
       remove(ref(db, `users/${auth.currentUser.uid}/shopping/${itemId}`))
     }
   }
