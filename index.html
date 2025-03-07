@@ -2,61 +2,64 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
-  <title>Heti Teendőlista + Bevásárló lista</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privát Teendőlista</title>
   
   <!-- Google Material Icons -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  />
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-
-  <link rel="icon"
-      type="image/png"
-      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAtUlEQVR4nGN4l3n4TwMnQMDyEwCEsZjHuHln8n+/RskJBJ6BcYGBgYGBWbXFgYGxv9m9/8OsEVNBrAXtI88b2CWFYGBgcnNy80DnQMDw+Ph5EJow4/QkikM2NTY3/x9/Vihke3TQaQ2BiS3wB/Hm2Zh3DKP/79O2igAVlsNFiZSswfIbgNh+DaE+DkPDESn/M0AP0FzAiwLSv0QAAAABJRU5ErkJggg=="
-/>
-
-  <!-- Saját stíluslap -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  
+  <!-- Saját stílus -->
   <link rel="stylesheet" href="index.css">
-
 </head>
 <body>
-
-  <!-- HERO RÉSZ: heti teendő -->
-  <section class="hero">
-    <div class="innertext">
-      <h1>Heti Teendőlista</h1>
-      <input type="text" id="task-input" placeholder="Írd be a teendődet...">
-      <button id="task-add-btn">Hozzáadás</button>
+  <!-- Autentikációs szekció -->
+  <section id="auth-section">
+    <h1>Regisztráció / Bejelentkezés</h1>
+    <input type="email" id="email-input" placeholder="Email cím" required>
+    <input type="password" id="password-input" placeholder="Jelszó" required>
+    <div class="auth-buttons">
+      <button id="register-btn">Regisztráció</button>
+      <button id="login-btn">Bejelentkezés</button>
     </div>
+    <button id="logout-btn" style="display:none;">Kijelentkezés</button>
   </section>
 
-  <section class="conversions">
-    <!-- E heti teendők -->
-    <div class="box">
-      <h2>E heti teendők</h2>
-      <ul id="tasks-ul"></ul>
+  <!-- Teendőlista szekció (csak bejelentkezés után jelenik meg) -->
+  <section id="todo-section" style="display:none;">
+    <div class="hero">
+      <div class="innertext">
+        <h1>Teendőlista</h1>
+        <input type="text" id="task-input" placeholder="Írd be a feladatot...">
+        <button id="task-add-btn">Hozzáadás</button>
+      </div>
     </div>
+    <section class="list-section">
+      <div class="box">
+        <h2>Feladataid</h2>
+        <ul id="tasks-ul"></ul>
+      </div>
+    </section>
   </section>
 
-  <!-- Külön bevásárlólista szekció -->
-  <section class="hero">
-    <div class="innertext">
-      <h1>Bevásárlólista</h1>
-      <input type="text" id="shop-input" placeholder="Mit kell venni?">
-      <button id="shop-add-btn">Hozzáadás</button>
+  <!-- Bevásárlólista szekció (csak bejelentkezés után) -->
+  <section id="shop-section" style="display:none;">
+    <div class="hero">
+      <div class="innertext">
+        <h1>Bevásárlólista</h1>
+        <input type="text" id="shop-input" placeholder="Mit kell venni?">
+        <button id="shop-add-btn">Hozzáadás</button>
+      </div>
     </div>
+    <section class="list-section">
+      <div class="box">
+        <h2>Bevásárló tételek</h2>
+        <ul id="shop-ul"></ul>
+      </div>
+    </section>
   </section>
 
-  <section class="conversions">
-    <div class="box">
-      <h2>Vásárolandók</h2>
-      <ul id="shop-ul"></ul>
-    </div>
-  </section>
-
-  <!-- type="module", ha Firebase modulokat importálsz -->
+  <!-- Firebase modulokat importáló script, type="module" szükséges -->
   <script type="module" src="index.js"></script>
 </body>
 </html>
+
