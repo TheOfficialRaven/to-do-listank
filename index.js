@@ -51,12 +51,20 @@ const shopUl = document.getElementById("shop-ul")
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("Bejelentkezett:", user.email)
-    // Elrejti az autentikációs szekciót, megjeleníti a listákat
+    // Felhasználó be van jelentkezve: rejtjük az auth részt, megjelenítjük a to‑do és bevásárló UI-t
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
     logoutBtn.style.display = "inline-block"
-    authMessageEl.textContent = ""
+  } else {
+    console.log("Nincs bejelentkezett felhasználó")
+    // Nincs bejelentkezve: megjelenítjük az auth UI-t, elrejtjük a to‑do UI-t
+    authSection.style.display = "block"
+    todoSection.style.display = "none"
+    shopSection.style.display = "none"
+    logoutBtn.style.display = "none"
+  }
+});
 
     // Beállítjuk a felhasználó saját feladatait a DB-ben
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
