@@ -18,7 +18,8 @@ import {
 
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
-  databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app/"
+  databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app/",
+  apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0"
 }
 
 const app = initializeApp(firebaseConfig)
