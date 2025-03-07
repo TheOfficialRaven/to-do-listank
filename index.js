@@ -15,7 +15,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
 
-// Firebase konfiguráció – cseréld ki a saját adataidra!
+// Firebase konfiguráció 
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
   authDomain: "leads-tracker-app-78b83.firebaseapp.com",
@@ -98,7 +98,7 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "block"
     todoSection.style.display = "none"
     shopSection.style.display = "none"
-    logoutBtn.style.display = "inline-block"
+    logoutBtn.style.display = "none"
   }
 })
 
