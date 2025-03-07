@@ -58,7 +58,7 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
-    logoutBtn.style.display = "inline-block"
+    logoutBtn.style.display = "block"
     authMessageEl.textContent = ""
 
     // Felhasználó saját feladatai és bevásárló tételei a DB-ben
@@ -145,7 +145,7 @@ logoutBtn.addEventListener("click", () => {
       authSection.style.display = "block"
       todoSection.style.display = "none"
       shopSection.style.display = "none"
-      logoutBtn.style.display = "none"
+      logoutBtn.style.display = "inline-block"
     })
     .catch((error) => {
       console.error("Kijelentkezési hiba:", error.message)
