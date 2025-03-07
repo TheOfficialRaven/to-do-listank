@@ -58,10 +58,10 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
-    logoutBtn.style.display = "block"
+    logoutBtn.style.display = "inline-block"
     authMessageEl.textContent = ""
 
-    // Felhasználó saját teendői és bevásárló tételei
+    // Felhasználó saját feladatai és bevásárló tételei a DB-ben
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
     const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
 
@@ -136,11 +136,16 @@ loginBtn.addEventListener("click", () => {
   }
 })
 
-// Kijelentkezés
+// Kijelentkezés – ez a rész teljesen külön kezeli a logout gombot
 logoutBtn.addEventListener("click", () => {
   signOut(auth)
     .then(() => {
       console.log("Sikeres kijelentkezés")
+      // Az auth UI visszaállítása, a fő UI elrejtése
+      authSection.style.display = "block"
+      todoSection.style.display = "none"
+      shopSection.style.display = "none"
+      logoutBtn.style.display = "none"
     })
     .catch((error) => {
       console.error("Kijelentkezési hiba:", error.message)
