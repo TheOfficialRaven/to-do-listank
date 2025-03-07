@@ -58,7 +58,7 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
-    logoutBtn.style.display = "inline-block"
+    logoutBtn.style.display = "block"
     authMessageEl.textContent = ""
 
     // Felhasználó saját teendői és bevásárló tételei
