@@ -18,10 +18,10 @@ import {
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  authDomain: "leads-tracker-app-78b83.firebaseapp.com",
   databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app/",
   projectId: "leads-tracker-app-78b83",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  storageBucket: "leads-tracker-app-78b83.appspot.com",
   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
   appId: "1:907489703312:web:c4138807d8a7aa96512f15"
 }
@@ -30,7 +30,7 @@ const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 const auth = getAuth(app)
 
-// DOM elemek – Autentikáció
+// DOM elemek – Autentikációs szekció
 const authSection = document.getElementById("auth-section")
 const emailInput = document.getElementById("email-input")
 const passwordInput = document.getElementById("password-input")
@@ -61,7 +61,7 @@ onAuthStateChanged(auth, (user) => {
     logoutBtn.style.display = "inline-block"
     authMessageEl.textContent = ""
 
-    // Felhasználó saját feladatai és bevásárló tételei a DB-ben
+    // Felhasználó saját teendői és bevásárló tételei
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
     const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
 
@@ -173,7 +173,7 @@ shopAddBtn.addEventListener("click", () => {
   }
 })
 
-// Lista renderelés
+// Lista renderelése
 function renderList(arr, ulElement) {
   let html = ""
   for (let i = 0; i < arr.length; i++) {
@@ -196,18 +196,17 @@ function renderList(arr, ulElement) {
   ulElement.innerHTML = html
 }
 
-// Közös kattintáskezelés az ikonokra
+// Közös kattintáskezelés az ikonokra (event delegation)
 document.addEventListener("click", (e) => {
-  // Ha a "done" ikonra kattintanak
+  // Pipa ikon kezelése
   if (e.target.matches(".done-icon")) {
     const itemId = e.target.dataset.id
     const currentDone = e.target.dataset.done === "true"
     set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
   }
-  // Ha a "delete" ikonra kattintanak
+  // Kuka ikon kezelése
   if (e.target.matches(".delete-icon")) {
     const itemId = e.target.dataset.id
-    // Határozd meg, melyik lista eleme: teendők vagy bevásárló
     const parentUl = e.target.closest("ul").id
     if (parentUl === "tasks-ul") {
       remove(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}`))
