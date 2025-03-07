@@ -22,6 +22,8 @@
       <button id="login-btn">Bejelentkezés</button>
     </div>
     <button id="logout-btn" style="display:none;">Kijelentkezés</button>
+    <!-- Sikeres regisztráció üzenet -->
+    <div id="auth-message" class="auth-message"></div>
   </section>
 
   <!-- Teendőlista szekció (csak bejelentkezés után jelenik meg) -->
@@ -41,7 +43,7 @@
     </section>
   </section>
 
-  <!-- Bevásárlólista szekció (csak bejelentkezés után) -->
+  <!-- Bevásárlólista szekció (csak bejelentkezés után jelenik meg) -->
   <section id="shop-section" style="display:none;">
     <div class="hero">
       <div class="innertext">
@@ -58,8 +60,7 @@
     </section>
   </section>
 
-  <!-- Firebase modulokat importáló script, type="module" szükséges -->
+  <!-- Fontos: type="module", mert Firebase modulokat importálunk -->
   <script type="module" src="index.js"></script>
 </body>
 </html>
-

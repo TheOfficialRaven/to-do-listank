@@ -1,3 +1,4 @@
+// Import Firebase modulokat
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"
 import {
   getDatabase,
@@ -15,7 +16,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
 
-// Firebase konfiguráció – cseréld ki a saját adataidra, ha szükséges!
+// Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
   databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app/"
 }
@@ -24,41 +25,43 @@ const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 const auth = getAuth(app)
 
-// DOM elemek - Autentikáció
+// DOM elemek – Autentikációs rész
 const authSection = document.getElementById("auth-section")
 const emailInput = document.getElementById("email-input")
 const passwordInput = document.getElementById("password-input")
 const registerBtn = document.getElementById("register-btn")
 const loginBtn = document.getElementById("login-btn")
 const logoutBtn = document.getElementById("logout-btn")
+const authMessageEl = document.getElementById("auth-message")
 
-// DOM elemek - Teendőlista
+// DOM elemek – Teendőlista
 const todoSection = document.getElementById("todo-section")
 const taskInput = document.getElementById("task-input")
 const taskAddBtn = document.getElementById("task-add-btn")
 const tasksUl = document.getElementById("tasks-ul")
 
-// DOM elemek - Bevásárlólista
+// DOM elemek – Bevásárlólista
 const shopSection = document.getElementById("shop-section")
 const shopInput = document.getElementById("shop-input")
 const shopAddBtn = document.getElementById("shop-add-btn")
 const shopUl = document.getElementById("shop-ul")
 
-// Felhasználói állapot figyelése
+// Auth állapot figyelése
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("Bejelentkezett:", user.email)
-    // Elrejti az autentikációs részt, megjeleníti a listákat
+    // Elrejti az autentikációs szekciót, megjeleníti a listákat
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
     logoutBtn.style.display = "inline-block"
+    authMessageEl.textContent = ""
 
-    // Beállítjuk a bejelentkezett felhasználó saját feladatait a DB-ben
+    // Beállítjuk a felhasználó saját feladatait a DB-ben
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
     const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
 
-    // Feladatok figyelése
+    // Teendők figyelése
     onValue(userTasksRef, (snapshot) => {
       if (snapshot.exists()) {
         const dataObj = snapshot.val()
@@ -104,10 +107,14 @@ registerBtn.addEventListener("click", () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("Sikeres regisztráció:", userCredential.user.email)
+        authMessageEl.textContent = `Sikeres regisztráció! Üdvözlünk, ${userCredential.user.email}!`
       })
       .catch((error) => {
-        console.error("Regisztráció hiba:", error.message)
+        console.error("Regisztrációs hiba:", error.message)
+        authMessageEl.textContent = `Regisztrációs hiba: ${error.message}`
       })
+  } else {
+    authMessageEl.textContent = "Kérjük, add meg az email címet és a jelszót!"
   }
 })
 
@@ -121,7 +128,8 @@ loginBtn.addEventListener("click", () => {
         console.log("Sikeres bejelentkezés:", userCredential.user.email)
       })
       .catch((error) => {
-        console.error("Bejelentkezés hiba:", error.message)
+        console.error("Bejelentkezési hiba:", error.message)
+        authMessageEl.textContent = `Bejelentkezési hiba: ${error.message}`
       })
   }
 })
@@ -133,11 +141,11 @@ logoutBtn.addEventListener("click", () => {
       console.log("Sikeres kijelentkezés")
     })
     .catch((error) => {
-      console.error("Kijelentkezés hiba:", error.message)
+      console.error("Kijelentkezési hiba:", error.message)
     })
 })
 
-// Új feladat hozzáadása
+// Új teendő hozzáadása
 taskAddBtn.addEventListener("click", () => {
   const text = taskInput.value.trim()
   if (text !== "" && auth.currentUser) {
@@ -186,38 +194,22 @@ function renderList(arr, ulElement) {
   ulElement.innerHTML = html
 }
 
-// Közös kattintáskezelés a lista ikonokra
-// Event delegation: a <ul>-re tesszük, és az ikonok alapján kezeljük a kattintásokat.
-tasksUl.addEventListener("click", (e) => {
-  handleListClick(e, "tasks")
-})
-shopUl.addEventListener("click", (e) => {
-  handleListClick(e, "shopping")
-})
-
-function handleListClick(e, type) {
-  // Meghatározzuk a megfelelő adatbázis útvonalat a type alapján
-  let refPath = ""
-  if (auth.currentUser) {
-    if (type === "tasks") {
-      refPath = `users/${auth.currentUser.uid}/tasks`
-    } else if (type === "shopping") {
-      refPath = `users/${auth.currentUser.uid}/shopping`
-    }
-  } else {
-    return
-  }
-  
-  // Pipa (done) ikon kezelése
+// Közös kattintáskezelés az ikonokra (event delegation)
+document.addEventListener("click", (e) => {
+  // Teendő lista elemein belül
   if (e.target.matches(".done-icon")) {
     const itemId = e.target.dataset.id
     const currentDone = e.target.dataset.done === "true"
-    set(ref(db, `${refPath}/${itemId}/done`), !currentDone)
+    set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
   }
-  
-  // Kuka (delete) ikon kezelése
   if (e.target.matches(".delete-icon")) {
     const itemId = e.target.dataset.id
-    remove(ref(db, `${refPath}/${itemId}`))
+    // Meg kell határozni, hogy a teendő- vagy bevásárlólista eleme
+    if (e.target.closest("ul").id === "tasks-ul") {
+      remove(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}`))
+    }
+    if (e.target.closest("ul").id === "shop-ul") {
+      remove(ref(db, `users/${auth.currentUser.uid}/shopping/${itemId}`))
+    }
   }
-}
+})

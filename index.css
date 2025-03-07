@@ -1,4 +1,4 @@
-/* Alap stílusok, sötét háttér, zöld akcentus */
+/* Alap beállítások, sötét háttér, zöld akcentus */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -39,6 +39,11 @@ body {
 }
 #auth-section button:hover {
   opacity: 0.9;
+}
+.auth-message {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  color: #10B981;
 }
 
 /* HERO rész */
