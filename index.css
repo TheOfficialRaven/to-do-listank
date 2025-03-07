@@ -27,6 +27,11 @@ body {
   border-radius: 5px;
   font-size: 1.2rem;
 }
+
+#logout-section {
+  text-align: right;
+}
+
 #auth-section button, #logout-section button {
   padding: 1rem 2rem;
   margin: 0.5rem;
