@@ -30,7 +30,7 @@ const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 const auth = getAuth(app)
 
-// DOM elemek – Autentikációs szekció
+// DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section")
 const emailInput = document.getElementById("email-input")
 const passwordInput = document.getElementById("password-input")
@@ -58,10 +58,10 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "none"
     todoSection.style.display = "block"
     shopSection.style.display = "block"
-    logoutBtn.style.display = "block"
+    logoutBtn.style.display = "inline-block" // Mindig látható, függetlenül a bejelentkezéstől
     authMessageEl.textContent = ""
 
-    // Felhasználó saját feladatai és bevásárló tételei a DB-ben
+    // Felhasználó saját teendői és bevásárló tételei a DB-ben
     const userTasksRef = ref(db, `users/${user.uid}/tasks`)
     const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
 
@@ -94,10 +94,11 @@ onAuthStateChanged(auth, (user) => {
     })
   } else {
     console.log("Nincs bejelentkezett felhasználó")
+    // Mivel a kijelentkezés gomb mindig látható legyen, itt nem rejtjük el
     authSection.style.display = "block"
     todoSection.style.display = "none"
     shopSection.style.display = "none"
-    logoutBtn.style.display = "none"
+    logoutBtn.style.display = "inline-block"
   }
 })
 
@@ -136,20 +137,19 @@ loginBtn.addEventListener("click", () => {
   }
 })
 
-// Kijelentkezés – ez a rész teljesen külön kezeli a logout gombot
+// Kijelentkezés – mindig látható gomb, ellenőrizzük, hogy be van-e jelentkezve
 logoutBtn.addEventListener("click", () => {
-  signOut(auth)
-    .then(() => {
-      console.log("Sikeres kijelentkezés")
-      // Az auth UI visszaállítása, a fő UI elrejtése
-      authSection.style.display = "block"
-      todoSection.style.display = "none"
-      shopSection.style.display = "none"
-      logoutBtn.style.display = "inline-block"
-    })
-    .catch((error) => {
-      console.error("Kijelentkezési hiba:", error.message)
-    })
+  if (auth.currentUser) {
+    signOut(auth)
+      .then(() => {
+        console.log("Sikeres kijelentkezés")
+      })
+      .catch((error) => {
+        console.error("Kijelentkezési hiba:", error.message)
+      })
+  } else {
+    console.log("Nincs bejelentkezett felhasználó, nincs mit kijelentkezni.")
+  }
 })
 
 // Új teendő hozzáadása

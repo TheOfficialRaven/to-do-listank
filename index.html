@@ -22,11 +22,12 @@
       <button id="register-btn">Regisztráció</button>
       <button id="login-btn">Bejelentkezés</button>
     </div>
-    <button id="logout-btn" style="display: none;">Kijelentkezés</button>
+    <!-- A kijelentkezés gomb most mindig látható lesz, függetlenül az állapottól -->
+    <button id="logout-btn" style="display: inline-block;">Kijelentkezés</button>
     <div id="auth-message" class="auth-message"></div>
   </section>
 
-  <!-- Teendőlista szekció (csak bejelentkezés után) -->
+  <!-- Teendőlista szekció (csak bejelentkezés után jelenik meg) -->
   <section id="todo-section" style="display: none;">
     <div class="hero">
       <div class="innertext">
@@ -43,7 +44,7 @@
     </section>
   </section>
 
-  <!-- Bevásárlólista szekció (csak bejelentkezés után) -->
+  <!-- Bevásárlólista szekció (csak bejelentkezés után jelenik meg) -->
   <section id="shop-section" style="display: none;">
     <div class="hero">
       <div class="innertext">

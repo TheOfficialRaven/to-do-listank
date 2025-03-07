@@ -40,11 +40,6 @@ body {
 #auth-section button:hover {
   opacity: 0.9;
 }
-
-#logout-btn {
-  display: inline-block !important;
-}
-
 .auth-message {
   margin-top: 1rem;
   font-size: 1.2rem;
