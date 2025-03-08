@@ -207,7 +207,12 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".done-icon")) {
     const itemId = e.target.dataset.id
     const currentDone = e.target.dataset.done === "true"
-    set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
+    const parentUl = e.target.closest("ul").id
+    if (parentUl === "tasks-ul") {
+      set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
+    } else if (parentUl === "shop-ul") {
+      set(ref(db, `users/${auth.currentUser.uid}/shopping/${itemId}/done`), !currentDone)
+    }
   }
   // Kuka ikon kezelése
   if (e.target.matches(".delete-icon")) {
