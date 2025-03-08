@@ -221,6 +221,7 @@ document.addEventListener("click", (e) => {
   }
 })
 
+//Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
@@ -232,3 +233,29 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+
+//Telepítés Mobil Eszközre
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Megjelenítjük a saját telepítési gombot
+  const installBtn = document.getElementById('install-btn');
+  if (installBtn) {
+    installBtn.style.display = 'block';
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('Felhasználó elfogadta a telepítést.');
+        } else {
+          console.log('Felhasználó elutasította a telepítést.');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
