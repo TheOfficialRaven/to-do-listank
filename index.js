@@ -220,3 +220,15 @@ document.addEventListener("click", (e) => {
     }
   }
 })
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker regisztrálva:', registration.scope);
+      })
+      .catch(err => {
+        console.error('ServiceWorker regisztrációs hiba:', err);
+      });
+  });
+}
