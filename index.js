@@ -115,12 +115,33 @@ logoutBtn.addEventListener("click", () => {
 
 // Létrehozza a default listákat (Teendőlista és Bevásárlólista), ha még nem léteznek
 function createDefaultLists(uid) {
+  // Detektáljuk az aktuális nyelvet az <html lang="..."> attribútumból
+  const lang = document.documentElement.lang || "hu"; // ha nincs beállítva, alapértelmezetten magyar
+  
+  let todoListName, shoppingListName, todoCategory, shoppingCategory;
+  if (lang === "en") {
+    todoListName = "📋 To-Do List";
+    shoppingListName = "🛒 Shopping List";
+    todoCategory = "Tasks";
+    shoppingCategory = "Shopping";
+  } else if (lang === "de") {
+    todoListName = "📋 Aufgabenliste";
+    shoppingListName = "🛒 Einkaufsliste";
+    todoCategory = "Aufgaben";
+    shoppingCategory = "Einkauf";
+  } else { // alapértelmezetten magyar
+    todoListName = "📋 Teendőlista";
+    shoppingListName = "🛒 Bevásárlólista";
+    todoCategory = "Feladatok";
+    shoppingCategory = "Bevásárlás";
+  }
+
   const userListsRef = ref(db, `users/${uid}/lists`);
   get(userListsRef).then((snapshot) => {
-    // Csak akkor hozza létre, ha a listák nem léteznek (megelőzve az ismétlődést)
+    // Csak akkor hozza létre a default listákat, ha még nem léteznek
     if (!snapshot.exists()) {
-      push(userListsRef, { name: "📋 Teendőlista", category: "Feladatok" });
-      push(userListsRef, { name: "🛒 Bevásárlólista", category: "Bevásárlás" });
+      push(userListsRef, { name: todoListName, category: todoCategory });
+      push(userListsRef, { name: shoppingListName, category: shoppingCategory });
     }
   });
 }
@@ -368,6 +389,20 @@ document.addEventListener("click", (e) => {
     });
   }
 });
+
+// Hamburger ikon és nyelvválasztó menü kezelése
+const hamburgerIcon = document.getElementById("hamburger-icon");
+const languageDropdown = document.getElementById("language-dropdown");
+
+hamburgerIcon.addEventListener("click", () => {
+  // Egyszerű toggle: ha nem látszik, megjelenítjük, ha látszik, elrejtjük
+  if (languageDropdown.style.display === "none" || languageDropdown.style.display === "") {
+    languageDropdown.style.display = "block";
+  } else {
+    languageDropdown.style.display = "none";
+  }
+});
+
 
 
 

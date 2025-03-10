@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private To-Do List & Shopping List</title>
+  
+  <!-- Link to manifest file (for PWA support) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  <!-- Google Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  
+  <!-- Custom stylesheet -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- Language menu -->
+  <div id="language-menu">
+    <span id="hamburger-icon" class="material-icons">menu</span>
+    <div id="language-dropdown" class="language-dropdown">
+      <ul>
+        <li><a href="index.html">Hungarian</a></li>
+        <li><a href="de-index.html">German</a></li>
+        <!-- Additional languages here -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Authentication section -->
+  <section id="auth-section" style="display: none;">
+    <h1>Registration / Login</h1>
+    <input type="email" id="email-input" placeholder="Email Address" required>
+    <input type="password" id="password-input" placeholder="Password" required>
+    <div class="auth-buttons">
+      <button id="login-btn">Login</button>
+      <button id="register-btn">Register</button>
+    </div>
+    <div id="auth-message" class="auth-message"></div>
+  </section>
+
+  <!-- Logout section -->
+  <section id="logout-section">
+    <button id="logout-btn">Logout</button>
+  </section>
+
+  <!-- New list creation section (default + custom lists) -->
+  <section id="new-list-section" style="display: none; text-align: center;">
+    <h2>Create New List</h2>
+    <input type="text" id="custom-list-name-input" placeholder="List Name">
+    <input type="text" id="custom-list-category-input" placeholder="Category">
+    <button id="custom-new-list-btn">Add List</button>
+    <br>
+    <label for="filter-category">Filter by Category:</label>
+    <select id="filter-category">
+      <option value="all">All</option>
+    </select>
+  </section>
+
+  <!-- All lists (default + custom) in one container -->
+  <section id="lists-container" class="draggable-container"></section>
+
+  <!-- Firebase modules import script -->
+  <script type="module" src="index.js"></script>
+</body>
+</html>

@@ -18,6 +18,18 @@
 </head>
 <body>
 
+  <!-- Nyelvválasztó menü -->
+  <div id="language-menu">
+    <span id="hamburger-icon" class="material-icons">menu</span>
+    <div id="language-dropdown" class="language-dropdown">
+      <ul>
+        <li><a href="en-index.html">English</a></li>
+        <li><a href="de-index.html">Német</a></li>
+        <!-- További nyelvek itt -->
+      </ul>
+    </div>
+  </div>
+
   <!-- Autentikációs szekció -->
   <section id="auth-section" style="display: none;">
     <h1>Regisztráció / Bejelentkezés</h1>
@@ -35,7 +47,7 @@
     <button id="logout-btn">Kijelentkezés</button>
   </section>
 
-  <!-- Új lista létrehozása szekció (default + custom listák együttesen) -->
+  <!-- Új lista létrehozása szekció (default + custom listák) -->
   <section id="new-list-section" style="display: none; text-align: center;">
     <h2>Új lista létrehozása</h2>
     <input type="text" id="custom-list-name-input" placeholder="Lista neve">
@@ -48,7 +60,7 @@
     </select>
   </section>
 
-  <!-- Az összes lista (default és custom) egy közös konténerben -->
+  <!-- Az összes lista (default + custom) egy közös konténerben -->
   <section id="lists-container" class="draggable-container"></section>
 
   <!-- Firebase modulokat importáló script -->

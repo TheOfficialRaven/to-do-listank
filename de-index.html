@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Aufgabenliste & Einkaufsliste</title>
+  
+  <!-- Link zur Manifest-Datei (für PWA-Unterstützung) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  <!-- Google Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  
+  <!-- Eigene Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- Sprachauswahlmenü -->
+  <div id="language-menu">
+    <span id="hamburger-icon" class="material-icons">menu</span>
+    <div id="language-dropdown" class="language-dropdown">
+      <ul>
+        <li><a href="index.html">Ungarnisch</a></li>
+        <li><a href="en-index.html">Englisch</a></li>
+        <!-- Weitere Sprachen hier -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Authentifizierungsbereich -->
+  <section id="auth-section" style="display: none;">
+    <h1>Registrierung / Anmeldung</h1>
+    <input type="email" id="email-input" placeholder="E-Mail-Adresse" required>
+    <input type="password" id="password-input" placeholder="Passwort" required>
+    <div class="auth-buttons">
+      <button id="login-btn">Anmelden</button>
+      <button id="register-btn">Registrieren</button>
+    </div>
+    <div id="auth-message" class="auth-message"></div>
+  </section>
+
+  <!-- Abmeldebereich -->
+  <section id="logout-section">
+    <button id="logout-btn">Abmelden</button>
+  </section>
+
+  <!-- Bereich zum Erstellen einer neuen Liste (Standard- und benutzerdefinierte Listen zusammen) -->
+  <section id="new-list-section" style="display: none; text-align: center;">
+    <h2>Neue Liste erstellen</h2>
+    <input type="text" id="custom-list-name-input" placeholder="Listenname">
+    <input type="text" id="custom-list-category-input" placeholder="Kategorie">
+    <button id="custom-new-list-btn">Liste hinzufügen</button>
+    <br>
+    <label for="filter-category">Nach Kategorie filtern:</label>
+    <select id="filter-category">
+      <option value="all">Alle</option>
+    </select>
+  </section>
+
+  <!-- Alle Listen (Standard- und benutzerdefinierte) in einem gemeinsamen Container -->
+  <section id="lists-container" class="draggable-container"></section>
+
+  <!-- Firebase Module Import-Skript -->
+  <script type="module" src="index.js"></script>
+</body>
+</html>

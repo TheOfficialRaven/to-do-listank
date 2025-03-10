@@ -13,6 +13,52 @@ body {
   padding: 1rem;
 }
 
+/* Nyelvválasztó menü stílusai */
+#language-menu {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+#hamburger-icon {
+  cursor: pointer;
+  font-size: 36px;
+  color: #10B981;
+}
+
+.language-dropdown {
+  display: none;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: #2B3849;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.language-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.language-dropdown li {
+  margin: 5px 0;
+}
+
+.language-dropdown a {
+  color: #F8FAFC;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.language-dropdown a:hover {
+  color: #10B981;
+}
+
+
 h1, h2 {
   color: #10B981;
 }
