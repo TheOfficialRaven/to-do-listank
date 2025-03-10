@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privát Teendőlista & Bevásárlólista</title>
-
-    <!-- Link a manifest fájlhoz -->
-    <link rel="manifest" href="manifest.json">
-
-    <!-- Speciális meta tag-ek iOS-hoz -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  <!-- Link a manifest fájlhoz (PWA támogatás) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   <!-- Google Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -32,47 +30,28 @@
     <div id="auth-message" class="auth-message"></div>
   </section>
 
+  <!-- Kijelentkezési szekció -->
   <section id="logout-section">
-    <button id="logout-btn" style="display: inline-block;">Kijelentkezés</button>
-
-
+    <button id="logout-btn">Kijelentkezés</button>
   </section>
 
-  <!-- Teendőlista szekció (csak bejelentkezés után jelenik meg) -->
-  <section id="todo-section" style="display: none;">
-    <div class="hero">
-      <div class="innertext">
-        <h1>Teendőlista</h1>
-        <input type="text" id="task-input" placeholder="Írd be a feladatot...">
-        <button id="task-add-btn">Hozzáadás</button>
-      </div>
-    </div>
-    <section class="list-section">
-      <div class="box">
-        <h2>Feladataid</h2>
-        <ul id="tasks-ul"></ul>
-      </div>
-    </section>
+  <!-- Új lista létrehozása szekció (default + custom listák együttesen) -->
+  <section id="new-list-section" style="display: none; text-align: center;">
+    <h2>Új lista létrehozása</h2>
+    <input type="text" id="custom-list-name-input" placeholder="Lista neve">
+    <input type="text" id="custom-list-category-input" placeholder="Kategória">
+    <button id="custom-new-list-btn">Lista hozzáadása</button>
+    <br>
+    <label for="filter-category">Szűrő kategória szerint:</label>
+    <select id="filter-category">
+      <option value="all">Összes</option>
+    </select>
   </section>
 
-  <!-- Bevásárlólista szekció (csak bejelentkezés után jelenik meg) -->
-  <section id="shop-section" style="display: none;">
-    <div class="hero">
-      <div class="innertext">
-        <h1>Bevásárlólista</h1>
-        <input type="text" id="shop-input" placeholder="Mit kell venni?">
-        <button id="shop-add-btn">Hozzáadás</button>
-      </div>
-    </div>
-    <section class="list-section">
-      <div class="box">
-        <h2>Bevásárló tételek</h2>
-        <ul id="shop-ul"></ul>
-      </div>
-    </section>
-  </section>
+  <!-- Az összes lista (default és custom) egy közös konténerben -->
+  <section id="lists-container" class="draggable-container"></section>
 
-  <!-- Fontos: type="module", mert Firebase modulokat importálunk -->
+  <!-- Firebase modulokat importáló script -->
   <script type="module" src="index.js"></script>
 </body>
 </html>

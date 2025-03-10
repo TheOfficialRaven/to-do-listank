@@ -1,21 +1,12 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import {
-  getDatabase,
-  ref,
-  push,
-  onValue,
-  remove,
-  set
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"
+  getDatabase, ref, push, onValue, remove, set, get
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-// Firebase konfiguráció 
+// Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
   authDomain: "leads-tracker-app-78b83.firebaseapp.com",
@@ -24,209 +15,374 @@ const firebaseConfig = {
   storageBucket: "leads-tracker-app-78b83.appspot.com",
   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
   appId: "1:907489703312:web:c4138807d8a7aa96512f15"
-}
+};
 
-const app = initializeApp(firebaseConfig)
-const db = getDatabase(app)
-const auth = getAuth(app)
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
 // DOM elemek – Autentikáció
-const authSection = document.getElementById("auth-section")
-const emailInput = document.getElementById("email-input")
-const passwordInput = document.getElementById("password-input")
-const registerBtn = document.getElementById("register-btn")
-const loginBtn = document.getElementById("login-btn")
-const logoutBtn = document.getElementById("logout-btn")
-const authMessageEl = document.getElementById("auth-message")
+const authSection = document.getElementById("auth-section");
+const emailInput = document.getElementById("email-input");
+const passwordInput = document.getElementById("password-input");
+const registerBtn = document.getElementById("register-btn");
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const authMessageEl = document.getElementById("auth-message");
 
-// DOM elemek – Teendőlista
-const todoSection = document.getElementById("todo-section")
-const taskInput = document.getElementById("task-input")
-const taskAddBtn = document.getElementById("task-add-btn")
-const tasksUl = document.getElementById("tasks-ul")
+// DOM elemek – Eredeti listák (todo, shop)
+// Ezeket a default listákat a Firebaseből töltjük be, és megjelenítjük az egyesített konténerben.
+const tasksUl = document.getElementById("tasks-ul");
+const shopUl = document.getElementById("shop-ul");
 
-// DOM elemek – Bevásárlólista
-const shopSection = document.getElementById("shop-section")
-const shopInput = document.getElementById("shop-input")
-const shopAddBtn = document.getElementById("shop-add-btn")
-const shopUl = document.getElementById("shop-ul")
+// DOM elemek – Egyesített lista konténer (default + egyéni)
+const listsContainer = document.getElementById("lists-container");
+
+// DOM elemek – Új lista létrehozása
+const newListSection = document.getElementById("new-list-section");
+const customListNameInput = document.getElementById("custom-list-name-input");
+const customListCategoryInput = document.getElementById("custom-list-category-input");
+const customNewListBtn = document.getElementById("custom-new-list-btn");
+const filterCategorySelect = document.getElementById("filter-category");
 
 // Auth állapot figyelése
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("Bejelentkezett:", user.email)
-    authSection.style.display = "none"
-    todoSection.style.display = "block"
-    shopSection.style.display = "block"
-    logoutBtn.style.display = "inline-block" // Mindig látható, függetlenül a bejelentkezéstől
-    authMessageEl.textContent = ""
-
-    // Felhasználó saját teendői és bevásárló tételei a DB-ben
-    const userTasksRef = ref(db, `users/${user.uid}/tasks`)
-    const userShoppingRef = ref(db, `users/${user.uid}/shopping`)
-
-    onValue(userTasksRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const dataObj = snapshot.val()
-        const tasksArr = Object.entries(dataObj).map(([key, val]) => ({
-          id: key,
-          text: val.text,
-          done: val.done
-        }))
-        renderList(tasksArr, tasksUl)
-      } else {
-        tasksUl.innerHTML = ""
-      }
-    })
-
-    onValue(userShoppingRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const dataObj = snapshot.val()
-        const shopArr = Object.entries(dataObj).map(([key, val]) => ({
-          id: key,
-          text: val.text,
-          done: val.done
-        }))
-        renderList(shopArr, shopUl)
-      } else {
-        shopUl.innerHTML = ""
-      }
-    })
+    authSection.style.display = "none";
+    newListSection.style.display = "block";
+    document.getElementById("logout-section").style.display = "block";
+    // Csak egyszer hozod létre a default listákat, ha még nem léteznek:
+    createDefaultLists(user.uid);
+    // Utána betöltöd az összes listát:
+    loadUserLists(user.uid);
   } else {
-    console.log("Nincs bejelentkezett felhasználó")
-    // Mivel a kijelentkezés gomb mindig látható legyen, itt nem rejtjük el
-    authSection.style.display = "block"
-    todoSection.style.display = "none"
-    shopSection.style.display = "none"
-    logoutBtn.style.display = "none"
+    authSection.style.display = "block";
+    newListSection.style.display = "none";
+    document.getElementById("logout-section").style.display = "none";
+    listsContainer.innerHTML = "";
   }
-})
+});
 
 // Regisztráció
 registerBtn.addEventListener("click", () => {
-  const email = emailInput.value.trim()
-  const password = passwordInput.value.trim()
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
   if (email && password) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log("Sikeres regisztráció:", userCredential.user.email)
-        authMessageEl.textContent = `Sikeres regisztráció! Üdvözlünk, ${userCredential.user.email}!`
+        console.log("Sikeres regisztráció:", userCredential.user.email);
+        authMessageEl.textContent = `Sikeres regisztráció! Üdvözlünk, ${userCredential.user.email}!`;
       })
       .catch((error) => {
-        console.error("Regisztrációs hiba:", error.message)
-        authMessageEl.textContent = `Regisztrációs hiba: ${error.message}`
-      })
+        console.error("Regisztrációs hiba:", error.message);
+        authMessageEl.textContent = `Regisztrációs hiba: ${error.message}`;
+      });
   } else {
-    authMessageEl.textContent = "Kérjük, add meg az email címet és a jelszót!"
+    authMessageEl.textContent = "Kérjük, add meg az email címet és a jelszót!";
   }
-})
+});
 
 // Bejelentkezés
 loginBtn.addEventListener("click", () => {
-  const email = emailInput.value.trim()
-  const password = passwordInput.value.trim()
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log("Sikeres bejelentkezés:", userCredential.user.email)
+        console.log("Sikeres bejelentkezés:", userCredential.user.email);
       })
       .catch((error) => {
-        console.error("Bejelentkezési hiba:", error.message)
-        authMessageEl.textContent = `Bejelentkezési hiba: ${error.message}`
-      })
+        console.error("Bejelentkezési hiba:", error.message);
+        authMessageEl.textContent = `Bejelentkezési hiba: ${error.message}`;
+      });
   }
-})
+});
 
-// Kijelentkezés – mindig látható gomb, ellenőrizzük, hogy be van-e jelentkezve
+// Kijelentkezés
 logoutBtn.addEventListener("click", () => {
   if (auth.currentUser) {
     signOut(auth)
       .then(() => {
-        console.log("Sikeres kijelentkezés")
+        console.log("Sikeres kijelentkezés");
       })
       .catch((error) => {
-        console.error("Kijelentkezési hiba:", error.message)
-      })
+        console.error("Kijelentkezési hiba:", error.message);
+      });
   } else {
-    console.log("Nincs bejelentkezett felhasználó, nincs mit kijelentkezni.")
+    console.log("Nincs bejelentkezett felhasználó, nincs mit kijelentkezni.");
   }
-})
+});
 
-// Új teendő hozzáadása
-taskAddBtn.addEventListener("click", () => {
-  const text = taskInput.value.trim()
-  if (text !== "" && auth.currentUser) {
-    const userTasksRef = ref(db, `users/${auth.currentUser.uid}/tasks`)
-    push(userTasksRef, {
-      text: text,
-      done: false
-    })
-    taskInput.value = ""
-  }
-})
-
-// Új bevásárló tétel hozzáadása
-shopAddBtn.addEventListener("click", () => {
-  const text = shopInput.value.trim()
-  if (text !== "" && auth.currentUser) {
-    const userShoppingRef = ref(db, `users/${auth.currentUser.uid}/shopping`)
-    push(userShoppingRef, {
-      text: text,
-      done: false
-    })
-    shopInput.value = ""
-  }
-})
-
-// Lista renderelése
-function renderList(arr, ulElement) {
-  let html = ""
-  for (let i = 0; i < arr.length; i++) {
-    const item = arr[i]
-    const doneClass = item.done ? "done" : ""
-    html += `
-      <li class="${doneClass}">
-        <span class="item-text">${item.text}</span>
-        <div class="icons">
-          <span class="material-icons done-icon" data-id="${item.id}" data-done="${item.done}">
-            done
-          </span>
-          <span class="material-icons delete-icon" data-id="${item.id}">
-            delete
-          </span>
-        </div>
-      </li>
-    `
-  }
-  ulElement.innerHTML = html
+// Létrehozza a default listákat (Teendőlista és Bevásárlólista), ha még nem léteznek
+function createDefaultLists(uid) {
+  const userListsRef = ref(db, `users/${uid}/lists`);
+  get(userListsRef).then((snapshot) => {
+    // Csak akkor hozza létre, ha a listák nem léteznek (megelőzve az ismétlődést)
+    if (!snapshot.exists()) {
+      push(userListsRef, { name: "📋 Teendőlista", category: "Feladatok" });
+      push(userListsRef, { name: "🛒 Bevásárlólista", category: "Bevásárlás" });
+    }
+  });
 }
 
-// Közös kattintáskezelés az ikonokra (event delegation)
-document.addEventListener("click", (e) => {
-  // Pipa ikon kezelése
-  if (e.target.matches(".done-icon")) {
-    const itemId = e.target.dataset.id
-    const currentDone = e.target.dataset.done === "true"
-    const parentUl = e.target.closest("ul").id
-    if (parentUl === "tasks-ul") {
-      set(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}/done`), !currentDone)
-    } else if (parentUl === "shop-ul") {
-      set(ref(db, `users/${auth.currentUser.uid}/shopping/${itemId}/done`), !currentDone)
+// Betöltjük a felhasználó összes listáját (default + egyéni)
+function loadUserLists(uid) {
+  createDefaultLists(uid);
+  const userListsRef = ref(db, `users/${uid}/lists`);
+  onValue(userListsRef, (snapshot) => {
+    listsContainer.innerHTML = "";
+    if (snapshot.exists()) {
+      // Készítünk egy tömböt az összes listával
+      const fullListsArray = Object.entries(snapshot.val()).map(
+        ([id, data]) => ({ id, ...data })
+      );
+      // Szűrés: ha a filter nem "all", akkor kiszűrjük a kategóriát
+      const filterValue = filterCategorySelect.value;
+      let filteredListsArray = fullListsArray;
+      if (filterValue !== "all") {
+        filteredListsArray = fullListsArray.filter(
+          list => list.category.toLowerCase() === filterValue.toLowerCase()
+        );
+      }
+      // Rendereljük a szűrt listákat
+      filteredListsArray.forEach(list => {
+        renderListBox(list.id, list.name, list.category, uid);
+      });
+      // Frissítjük a filter opciókat a teljes listából, de visszaállítjuk a jelenlegi értéket
+      updateFilterOptions(fullListsArray);
+    } else {
+      listsContainer.innerHTML = "<p>Nincsenek listák.</p>";
     }
-  }
-  // Kuka ikon kezelése
-  if (e.target.matches(".delete-icon")) {
-    const itemId = e.target.dataset.id
-    const parentUl = e.target.closest("ul").id
-    if (parentUl === "tasks-ul") {
-      remove(ref(db, `users/${auth.currentUser.uid}/tasks/${itemId}`))
-    } else if (parentUl === "shop-ul") {
-      remove(ref(db, `users/${auth.currentUser.uid}/shopping/${itemId}`))
-    }
-  }
-})
+  });
+}
 
-//Service Worker
+function updateFilterOptions(listsArray) {
+  // Elmentjük a jelenlegi kiválasztást
+  const currentValue = filterCategorySelect.value;
+  filterCategorySelect.innerHTML = `<option value="all">Összes</option>`;
+  const categories = new Set(listsArray.map(list => list.category));
+  categories.forEach(cat => {
+    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+  });
+  // Ha volt kiválasztott érték, visszaállítjuk
+  if (currentValue) {
+    filterCategorySelect.value = currentValue;
+  }
+}
+
+
+filterCategorySelect.addEventListener("change", () => {
+  if (auth.currentUser) {
+    loadUserLists(auth.currentUser.uid);
+  }
+});
+
+// Megjeleníti a lista boxot (default és egyéni)
+function renderListBox(listId, listName, category, uid) {
+  const box = document.createElement("div");
+  box.classList.add("list-box");
+  // A h2-ben a cím egy span-ben van, majd egy "title-icons" konténer a jobb felső sarkában,
+  // amely tartalmazza az edit és delete gombokat.
+  box.innerHTML = `
+    <h2>
+      <span class="list-title">${listName}</span>
+      <div class="title-icons">
+        <button class="edit-title-btn" data-list="${listId}">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="delete-list-btn" data-list="${listId}">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </h2>
+    <input type="text" class="item-input" placeholder="Új elem hozzáadása">
+    <button class="item-add-btn" data-list="${listId}">Hozzáadás</button>
+    <ul class="items-ul" id="items-${listId}"></ul>
+  `;
+  listsContainer.appendChild(box);
+  loadListItems(uid, listId, box.querySelector(".items-ul"));
+}
+
+// Betölti az adott lista elemeit
+function loadListItems(uid, listId, ulElement) {
+  const itemsRef = ref(db, `users/${uid}/lists/${listId}/items`);
+  onValue(itemsRef, (snapshot) => {
+    ulElement.innerHTML = "";
+    if (snapshot.exists()) {
+      Object.entries(snapshot.val()).forEach(([itemId, item]) => {
+        renderListItem(itemId, item.text, item.done, ulElement, listId, uid);
+      });
+    }
+  });
+}
+
+// Megjeleníti az egyes listaelemeket
+function renderListItem(itemId, text, done, ulElement, listId, uid) {
+  const li = document.createElement("li");
+  li.classList.toggle("done", done);
+  li.innerHTML = `
+    <span class="item-text">${text}</span>
+    <div class="icons">
+      <span class="material-icons done-icon" data-item="${itemId}" data-list="${listId}" data-done="${done}">done</span>
+      <span class="material-icons delete-icon" data-item="${itemId}" data-list="${listId}">delete</span>
+      <span class="material-icons edit-icon" data-item="${itemId}" data-list="${listId}">edit</span>
+    </div>
+  `;
+  ulElement.appendChild(li);
+}
+
+//Lista boxok létrehozása
+customNewListBtn.addEventListener("click", () => {
+  const listName = document.getElementById("custom-list-name-input").value.trim();
+  const category = document.getElementById("custom-list-category-input").value.trim();
+  console.log("Custom lista hozzáadása:", listName, category);
+
+  if (listName === "") {
+    console.warn("Üres lista név!");
+    return;
+  }
+  if (!auth.currentUser) {
+    console.warn("Nincs bejelentkezett felhasználó!");
+    return;
+  }
+
+  // DEFINIÁLD A VÁLTOZÓT, mielőtt push() hívnád!
+  const userListsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
+
+  let fullName = listName;
+  if (category.toLowerCase() === "bevásárlás") {
+    fullName = "🛒 " + listName;
+  } else if (category.toLowerCase() === "feladatok") {
+    fullName = "📋 " + listName;
+  }
+
+  push(userListsRef, { name: fullName, category: category })
+    .then(() => {
+      console.log("Custom lista sikeresen hozzáadva:", fullName);
+    })
+    .catch((error) => {
+      console.error("Hiba a custom lista hozzáadásakor:", error);
+    });
+
+  // Töröljük az inputok tartalmát
+  document.getElementById("custom-list-name-input").value = "";
+  document.getElementById("custom-list-category-input").value = "";
+});
+
+// Eseménykezelés a listaelemekhez
+document.addEventListener("click", (e) => {
+  // Új elem hozzáadása a lista boxban
+  if (e.target.matches(".item-add-btn")) {
+    const listId = e.target.dataset.list;
+    const inputField = e.target.previousElementSibling;
+    const text = inputField.value.trim();
+    if (text !== "" && auth.currentUser) {
+      const itemsRef = ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items`);
+      push(itemsRef, { text: text, done: false });
+      inputField.value = "";
+    }
+  }
+  
+  // Lista box törlése
+  if (e.target.closest(".delete-list-btn")) {
+    const listId = e.target.closest(".delete-list-btn").dataset.list;
+    remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
+  }
+  
+  // Listaelem pipálása
+  if (e.target.matches(".done-icon")) {
+    const itemId = e.target.dataset.item;
+    const listId = e.target.dataset.list;
+    const currentDone = e.target.dataset.done === "true";
+    set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}/done`), !currentDone);
+  }
+  
+  // Listaelem törlése
+  if (e.target.matches(".delete-icon")) {
+    const itemId = e.target.dataset.item;
+    const listId = e.target.dataset.list;
+    remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}`));
+  }
+  
+  // Listaelem inline szerkesztése
+  if (e.target.matches(".edit-icon")) {
+    const itemId = e.target.dataset.item;
+    const listId = e.target.dataset.list;
+    const spanEl = e.target.parentElement.previousElementSibling;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = spanEl.textContent;
+    input.className = "inline-edit-input";
+    spanEl.replaceWith(input);
+    input.focus();
+    input.addEventListener("blur", () => {
+      const newText = input.value.trim();
+      if (newText !== "") {
+        set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}/text`), newText);
+      }
+      const newSpan = document.createElement("span");
+      newSpan.className = "item-text";
+      newSpan.textContent = newText;
+      input.replaceWith(newSpan);
+    });
+    input.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") {
+        input.blur();
+      }
+    });
+  }
+
+  // Lista box címének inline szerkesztése
+document.addEventListener("click", (e) => {
+  if (e.target.matches(".edit-title-btn") || e.target.closest(".edit-title-btn")) {
+    const btn = e.target.closest(".edit-title-btn");
+    const listId = btn.dataset.list;
+    // Keressük meg a h2 elemet, amely tartalmazza a list title-t és a gombokat
+    const h2El = btn.closest("h2");
+    if (!h2El) return;
+    // Ha már van inline input, ne indítsuk újra a szerkesztést
+    if (h2El.querySelector("input.inline-edit-input")) return;
+    // Keressük meg a cím span elemét
+    let titleSpan = h2El.querySelector(".list-title");
+    // Fallback: ha a span nem található, létrehozzuk azt a h2 első gyermekéből
+    if (!titleSpan) {
+      const rawText = h2El.childNodes[0] ? h2El.childNodes[0].textContent : "";
+      titleSpan = document.createElement("span");
+      titleSpan.className = "list-title";
+      titleSpan.textContent = rawText.trim();
+      h2El.prepend(titleSpan);
+    }
+    const currentTitle = titleSpan.textContent;
+    // Létrehozunk egy input mezőt az inline szerkesztéshez
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = currentTitle;
+    input.className = "inline-edit-input";
+    titleSpan.replaceWith(input);
+    input.focus();
+    input.addEventListener("blur", () => {
+      const newTitle = input.value.trim();
+      if (newTitle !== "") {
+        // Frissítjük a Firebase adatbázisban a listabox címét
+        set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/name`), newTitle);
+      }
+      const newSpan = document.createElement("span");
+      newSpan.className = "list-title";
+      newSpan.textContent = newTitle || currentTitle;
+      input.replaceWith(newSpan);
+    });
+    input.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") {
+        input.blur();
+      }
+    });
+  }
+});
+});
+
+
+
+// Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')

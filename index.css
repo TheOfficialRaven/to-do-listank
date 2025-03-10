@@ -13,11 +13,16 @@ body {
   padding: 1rem;
 }
 
+h1, h2 {
+  color: #10B981;
+}
+
 /* Autentikációs szekció */
 #auth-section {
   text-align: center;
   margin-bottom: 2rem;
 }
+
 #auth-section input {
   padding: 1rem;
   margin: 0.5rem;
@@ -28,11 +33,11 @@ body {
   font-size: 1.2rem;
 }
 
-#logout-section {
-  text-align: right;
+.auth-buttons {
+  margin: 1rem 0;
 }
 
-#auth-section button, #logout-section button {
+#auth-section button {
   padding: 1rem 2rem;
   margin: 0.5rem;
   background-color: #10B981;
@@ -42,103 +47,253 @@ body {
   cursor: pointer;
   font-size: 1.2rem;
 }
+
 #auth-section button:hover {
   opacity: 0.9;
 }
+
 .auth-message {
   margin-top: 1rem;
   font-size: 1.2rem;
   color: #10B981;
 }
 
-/* HERO rész */
-.hero {
-  text-align: center;
-  padding: 2rem 1rem;
-}
-.hero .innertext {
-  max-width: 600px;
-  margin: 0 auto;
-}
-.hero h1 {
-  font-size: 3rem;
+/* Kijelentkezési szekció */
+#logout-section {
+  text-align: right;
   margin-bottom: 1rem;
 }
-.hero input[type="text"] {
-  width: 80%;
-  max-width: 350px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.3rem;
-}
-.hero input[type="text"]:focus {
-  outline: 2px solid #10B981;
-}
-.hero button {
+
+#logout-section button {
   padding: 1rem 2rem;
   background-color: #10B981;
+  color: white;
   border: none;
   border-radius: 5px;
-  color: white;
   cursor: pointer;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
-.hero button:hover {
+
+#logout-section button:hover {
   opacity: 0.9;
 }
 
-/* Lista szekciók */
-.list-section {
-  max-width: 600px;
-  margin: 1.5rem auto;
+/* Új lista létrehozása szekció */
+#new-list-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+#new-list-section input {
   padding: 1rem;
+  margin: 0.5rem;
+  width: 80%;
+  max-width: 300px;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  background: #1F2937;
+  font-size: 1.2rem;
+  color: #F8FAFC;
 }
-.box {
-  background-color: #2B3849;
-  padding: 2rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
-.box h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
+
+#filter-category {
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #1F2937;
   color: #10B981;
 }
 
-/* Lista stílusok */
-ul {
+#new-list-section button {
+  padding: 1rem 2rem;
+  margin: 0.5rem;
+  background-color: #10B981;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+#new-list-section button:hover {
+  opacity: 0.9;
+}
+
+#new-list-section select {
+  padding: 0.75rem;
+  margin: 0.5rem;
+  font-size: 1.2rem;
+}
+
+/* Egyesített lista konténer */
+#lists-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Lista box stílus – ugyanaz, mint az eredeti Teendő- és Bevásárlólista boxok */
+.list-box {
+  background-color: #2B3849;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 300px;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  border: 1px solid #10B981;
+}
+
+/* A lista box h2 eleme: a cím és a jobb felső ikonok egy flex konténerben */
+/* A header-icons konténer a listabox bal felső sarkában */
+.header-icons {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Módosított h2, hogy legyen alsó margó a header-icons miatt */
+.list-box h2 {
+  margin-top: 40px; /* Ez elég helyet biztosít a header-icons számára */
+  text-align: center;
+  font-size: 1.5rem;
+  color: #10B981;
+}
+
+/* A list-title és az inline szerkesztési input stílusa */
+.list-title {
+  display: inline-block;
+}
+
+.inline-edit-input {
+  padding: 0.55rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #1F2937;
+  color: #F8FAFC;
+}
+
+.title-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Gombok a lista box címében */
+.title-icons button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #10B981;
+  font-size: 1.2rem;
+}
+
+.title-icons button:hover {
+  color: #14eaa6;
+}
+
+/* Inline szerkesztési input a lista box címéhez */
+.inline-edit-input {
+  padding: 0.55rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #1F2937;
+  color: #F8FAFC;
+}
+
+/* Lista box tartalom */
+.list-box .item-input {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #1F2937;
+  color: #F8FAFC;
+}
+
+.list-box .item-add-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #10B981;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.list-box .item-add-btn:hover {
+  opacity: 0.9;
+}
+
+.list-box ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
-li {
+
+.list-box li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: #374151;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
   border-radius: 6px;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
 }
-li.done span.item-text {
+
+.list-box li.done span.item-text {
   text-decoration: line-through;
   opacity: 0.8;
 }
 
-/* Ikonok */
-.icons {
+.list-box .icons {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
 }
-.icons .material-icons {
+
+.list-box .material-icons {
   cursor: pointer;
   color: #10B981;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
-.icons .material-icons:hover {
+
+.list-box .material-icons:hover {
   color: #14eaa6;
+}
+
+/* Kis kuka ikon a lista box törléséhez (jobb felső sarokban) */
+.list-box .delete-list-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #10B981;
+}
+
+.list-box .edit-title-btn {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #10B981;
 }
 
 /* Mobil optimalizáció */
@@ -147,21 +302,21 @@ li.done span.item-text {
     font-size: 24px;
     padding: 0.5rem;
   }
-  #auth-section input, .hero input[type="text"] {
+  #auth-section input, #new-list-section input, .list-box .item-input {
     width: 90%;
   }
-  #auth-section button, .hero button {
+  #auth-section button, #new-list-section button, .list-box .item-add-btn {
     padding: 1rem 2.5rem;
     font-size: 1.4rem;
   }
-  .box h2 {
-    font-size: 1.6rem;
+  .list-box h2 {
+    font-size: 1.4rem;
   }
-  li {
+  .list-box li {
     font-size: 1.2rem;
     padding: 0.75rem;
   }
-  .icons .material-icons {
+  .list-box .material-icons {
     font-size: 1.8rem;
   }
 }
