@@ -299,24 +299,43 @@ h1, h2 {
 /* Mobil optimalizáció */
 @media (max-width: 480px) {
   body {
-    font-size: 24px;
-    padding: 0.5rem;
+    font-size: 26px;
+    padding: 1rem;
   }
-  #auth-section input, #new-list-section input, .list-box .item-input {
-    width: 90%;
+  /* Beviteli mezők és gombok nagyobbak */
+  #auth-section input,
+  #new-list-section input,
+  .list-box .item-input {
+    width: 95%;
+    padding: 1rem;
+    font-size: 20px;
   }
-  #auth-section button, #new-list-section button, .list-box .item-add-btn {
-    padding: 1rem 2.5rem;
-    font-size: 1.4rem;
+  #auth-section button,
+  #new-list-section button,
+  .list-box .item-add-btn {
+    padding: 1.2rem 2.5rem;
+    font-size: 20px;
   }
+  /* Lista boxok szélessége és padding-je megnő */
+  .list-box {
+    width: 95%;
+    padding: 2rem;
+  }
+  /* Lista box címe nagyobb, és a header-icons is nagyobbak */
   .list-box h2 {
-    font-size: 1.4rem;
+    font-size: 22px;
+    margin-bottom: 1rem;
+    margin-top: 50px; /* Hely a header-icons számára */
   }
+  .title-icons button {
+    font-size: 24px;
+  }
+  /* Listaelemek nagyobbak */
   .list-box li {
-    font-size: 1.2rem;
-    padding: 0.75rem;
+    font-size: 20px;
+    padding: 1rem;
   }
   .list-box .material-icons {
-    font-size: 1.8rem;
+    font-size: 24px;
   }
 }
