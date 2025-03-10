@@ -333,37 +333,27 @@ document.addEventListener("click", (e) => {
   }
 
   // Lista box címének inline szerkesztése
-document.addEventListener("click", (e) => {
   if (e.target.matches(".edit-title-btn") || e.target.closest(".edit-title-btn")) {
     const btn = e.target.closest(".edit-title-btn");
     const listId = btn.dataset.list;
-    // Keressük meg a h2 elemet, amely tartalmazza a list title-t és a gombokat
+    // Keressük meg a h2 elemet, amely tartalmazza a listabox címét
     const h2El = btn.closest("h2");
     if (!h2El) return;
-    // Ha már van inline input, ne indítsuk újra a szerkesztést
-    if (h2El.querySelector("input.inline-edit-input")) return;
     // Keressük meg a cím span elemét
-    let titleSpan = h2El.querySelector(".list-title");
-    // Fallback: ha a span nem található, létrehozzuk azt a h2 első gyermekéből
-    if (!titleSpan) {
-      const rawText = h2El.childNodes[0] ? h2El.childNodes[0].textContent : "";
-      titleSpan = document.createElement("span");
-      titleSpan.className = "list-title";
-      titleSpan.textContent = rawText.trim();
-      h2El.prepend(titleSpan);
-    }
+    const titleSpan = h2El.querySelector(".list-title");
+    if (!titleSpan) return;
     const currentTitle = titleSpan.textContent;
-    // Létrehozunk egy input mezőt az inline szerkesztéshez
+    // Hozzunk létre egy input mezőt az inline szerkesztéshez
     const input = document.createElement("input");
     input.type = "text";
     input.value = currentTitle;
     input.className = "inline-edit-input";
+    // Cseréljük le a span-t az inputra
     titleSpan.replaceWith(input);
     input.focus();
     input.addEventListener("blur", () => {
       const newTitle = input.value.trim();
       if (newTitle !== "") {
-        // Frissítjük a Firebase adatbázisban a listabox címét
         set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/name`), newTitle);
       }
       const newSpan = document.createElement("span");
@@ -377,7 +367,6 @@ document.addEventListener("click", (e) => {
       }
     });
   }
-});
 });
 
 
