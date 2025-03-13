@@ -6,7 +6,7 @@ import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-// Firebase konfiguráció – cseréld ki a saját adataidra!
+// Firebase konfiguráció 
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
   authDomain: "leads-tracker-app-78b83.firebaseapp.com",
@@ -44,6 +44,31 @@ const customListNameInput = document.getElementById("custom-list-name-input");
 const customListCategoryInput = document.getElementById("custom-list-category-input");
 const customNewListBtn = document.getElementById("custom-new-list-btn");
 const filterCategorySelect = document.getElementById("filter-category");
+
+// showConfirmModal: megjeleníti a megerősítő modal-t, és callback-el visszaadja a felhasználó döntését
+function showConfirmModal(message, callback) {
+  const modal = document.getElementById("confirm-modal");
+  const confirmMessage = document.getElementById("confirm-message");
+  const yesBtn = document.getElementById("confirm-yes");
+  const noBtn = document.getElementById("confirm-no");
+
+  confirmMessage.textContent = message;
+  modal.style.display = "flex";
+
+  // Eltávolítjuk az előző eseményfigyelőket (ha vannak)
+  yesBtn.onclick = null;
+  noBtn.onclick = null;
+
+  yesBtn.onclick = () => {
+    modal.style.display = "none";
+    callback(true);
+  };
+
+  noBtn.onclick = () => {
+    modal.style.display = "none";
+    callback(false);
+  };
+}
 
 // Auth állapot figyelése
 onAuthStateChanged(auth, (user) => {
@@ -303,12 +328,19 @@ document.addEventListener("click", (e) => {
       inputField.value = "";
     }
   }
+})
   
   // Lista box törlése
-  if (e.target.closest(".delete-list-btn")) {
-    const listId = e.target.closest(".delete-list-btn").dataset.list;
-    remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
-  }
+  document.addEventListener("click", (e) => {
+    // Lista box törlése – kérdezzen rá megerősítésre
+    if (e.target.closest(".delete-list-btn")) {
+      const listId = e.target.closest(".delete-list-btn").dataset.list;
+      showConfirmModal("Biztosan törlöd ezt a listát?", (confirmed) => {
+        if (confirmed) {
+          remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
+        }
+      });
+    }
   
   // Listaelem pipálása
   if (e.target.matches(".done-icon")) {
@@ -322,7 +354,11 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".delete-icon")) {
     const itemId = e.target.dataset.item;
     const listId = e.target.dataset.list;
-    remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}`));
+    showConfirmModal("Biztosan törlöd ezt a listaelemet?", (confirmed) => {
+      if (confirmed) {
+        remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}`));
+      }
+    });
   }
   
   // Listaelem inline szerkesztése
@@ -357,19 +393,15 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".edit-title-btn") || e.target.closest(".edit-title-btn")) {
     const btn = e.target.closest(".edit-title-btn");
     const listId = btn.dataset.list;
-    // Keressük meg a h2 elemet, amely tartalmazza a listabox címét
     const h2El = btn.closest("h2");
     if (!h2El) return;
-    // Keressük meg a cím span elemét
     const titleSpan = h2El.querySelector(".list-title");
     if (!titleSpan) return;
     const currentTitle = titleSpan.textContent;
-    // Hozzunk létre egy input mezőt az inline szerkesztéshez
     const input = document.createElement("input");
     input.type = "text";
     input.value = currentTitle;
     input.className = "inline-edit-input";
-    // Cseréljük le a span-t az inputra
     titleSpan.replaceWith(input);
     input.focus();
     input.addEventListener("blur", () => {
@@ -395,7 +427,6 @@ const hamburgerIcon = document.getElementById("hamburger-icon");
 const languageDropdown = document.getElementById("language-dropdown");
 
 hamburgerIcon.addEventListener("click", () => {
-  // Egyszerű toggle: ha nem látszik, megjelenítjük, ha látszik, elrejtjük
   if (languageDropdown.style.display === "none" || languageDropdown.style.display === "") {
     languageDropdown.style.display = "block";
   } else {
