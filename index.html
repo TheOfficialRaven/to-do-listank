@@ -23,7 +23,7 @@
     <span id="hamburger-icon" class="material-icons">menu</span>
     <div id="language-dropdown" class="language-dropdown">
       <ul>
-        <li><a href="en-index.html">Angol</a></li>
+        <li><a href="en-index.html">English</a></li>
         <li><a href="de-index.html">Német</a></li>
         <!-- További nyelvek itt -->
       </ul>
@@ -62,6 +62,14 @@
 
   <!-- Az összes lista (default + custom) egy közös konténerben -->
   <section id="lists-container" class="draggable-container"></section>
+
+  <div id="confirm-modal" class="confirm-modal">
+    <div class="confirm-modal-content">
+      <p id="confirm-message">Biztosan törlöd ezt a listát?</p>
+      <button id="confirm-yes">Igen</button>
+      <button id="confirm-no">Nem</button>
+    </div>
+  </div>
 
   <!-- Firebase modulokat importáló script -->
   <script type="module" src="index.js"></script>
