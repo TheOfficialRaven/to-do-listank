@@ -1,12 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import {
-  getDatabase, ref, push, onValue, remove, set, get
+  getDatabase, ref, push, onValue, remove, set, get, query, orderByChild
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-// Firebase konfiguráció 
+// Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",
   authDomain: "leads-tracker-app-78b83.firebaseapp.com",
@@ -45,7 +45,7 @@ const customListCategoryInput = document.getElementById("custom-list-category-in
 const customNewListBtn = document.getElementById("custom-new-list-btn");
 const filterCategorySelect = document.getElementById("filter-category");
 
-// showConfirmModal: megjeleníti a megerősítő modal-t, és callback-el visszaadja a felhasználó döntését
+// Confirmation modal (feltételezve, hogy az index.html-ben megvan)
 function showConfirmModal(message, callback) {
   const modal = document.getElementById("confirm-modal");
   const confirmMessage = document.getElementById("confirm-message");
@@ -55,7 +55,6 @@ function showConfirmModal(message, callback) {
   confirmMessage.textContent = message;
   modal.style.display = "flex";
 
-  // Eltávolítjuk az előző eseményfigyelőket (ha vannak)
   yesBtn.onclick = null;
   noBtn.onclick = null;
 
@@ -76,15 +75,41 @@ onAuthStateChanged(auth, (user) => {
     authSection.style.display = "none";
     newListSection.style.display = "block";
     document.getElementById("logout-section").style.display = "block";
-    // Csak egyszer hozod létre a default listákat, ha még nem léteznek:
     createDefaultLists(user.uid);
-    // Utána betöltöd az összes listát:
     loadUserLists(user.uid);
   } else {
     authSection.style.display = "block";
     newListSection.style.display = "none";
     document.getElementById("logout-section").style.display = "none";
     listsContainer.innerHTML = "";
+  }
+});
+
+// Inicializáljuk a SortableJS-t a lista konténeren
+Sortable.create(listsContainer, {
+  animation: 150,
+  ghostClass: 'sortable-ghost',
+  onEnd: function(evt) {
+    console.log("Drag end event fired");
+    const children = Array.from(listsContainer.children);
+    const updatePromises = children.map((child, index) => {
+      const listId = child.getAttribute("data-list-id");
+      console.log("Child index:", index, "ListID:", listId);
+      if (listId && auth.currentUser) {
+        console.log("Updating order for list", listId, "to", index + 1);
+        return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
+      } else {
+        return Promise.resolve();
+      }
+    });
+    Promise.all(updatePromises)
+      .then(() => {
+        console.log("All order updates complete");
+        loadUserLists(auth.currentUser.uid);
+      })
+      .catch((error) => {
+        console.error("Error updating order for one or more lists:", error);
+      });
   }
 });
 
@@ -140,9 +165,7 @@ logoutBtn.addEventListener("click", () => {
 
 // Létrehozza a default listákat (Teendőlista és Bevásárlólista), ha még nem léteznek
 function createDefaultLists(uid) {
-  // Detektáljuk az aktuális nyelvet az <html lang="..."> attribútumból
-  const lang = document.documentElement.lang || "hu"; // ha nincs beállítva, alapértelmezetten magyar
-  
+  const lang = document.documentElement.lang || "hu";
   let todoListName, shoppingListName, todoCategory, shoppingCategory;
   if (lang === "en") {
     todoListName = "📋 To-Do List";
@@ -154,7 +177,7 @@ function createDefaultLists(uid) {
     shoppingListName = "🛒 Einkaufsliste";
     todoCategory = "Aufgaben";
     shoppingCategory = "Einkauf";
-  } else { // alapértelmezetten magyar
+  } else {
     todoListName = "📋 Teendőlista";
     shoppingListName = "🛒 Bevásárlólista";
     todoCategory = "Feladatok";
@@ -163,10 +186,10 @@ function createDefaultLists(uid) {
 
   const userListsRef = ref(db, `users/${uid}/lists`);
   get(userListsRef).then((snapshot) => {
-    // Csak akkor hozza létre a default listákat, ha még nem léteznek
     if (!snapshot.exists()) {
-      push(userListsRef, { name: todoListName, category: todoCategory });
-      push(userListsRef, { name: shoppingListName, category: shoppingCategory });
+      // A default listákhoz beállítjuk az order értéket (például 1 és 2)
+      push(userListsRef, { name: todoListName, category: todoCategory, order: 1 });
+      push(userListsRef, { name: shoppingListName, category: shoppingCategory, order: 2 });
     }
   });
 }
@@ -175,14 +198,18 @@ function createDefaultLists(uid) {
 function loadUserLists(uid) {
   createDefaultLists(uid);
   const userListsRef = ref(db, `users/${uid}/lists`);
-  onValue(userListsRef, (snapshot) => {
+  const orderedQuery = query(userListsRef, orderByChild("order"));
+  onValue(orderedQuery, (snapshot) => {
     listsContainer.innerHTML = "";
     if (snapshot.exists()) {
-      // Készítünk egy tömböt az összes listával
-      const fullListsArray = Object.entries(snapshot.val()).map(
-        ([id, data]) => ({ id, ...data })
-      );
-      // Szűrés: ha a filter nem "all", akkor kiszűrjük a kategóriát
+      // Használjuk a snapshot.forEach() metódust a rendezett tömb létrehozásához
+      const fullListsArray = [];
+      snapshot.forEach(childSnapshot => {
+        const list = childSnapshot.val();
+        list.id = childSnapshot.key;
+        fullListsArray.push(list);
+      });
+      
       const filterValue = filterCategorySelect.value;
       let filteredListsArray = fullListsArray;
       if (filterValue !== "all") {
@@ -190,11 +217,10 @@ function loadUserLists(uid) {
           list => list.category.toLowerCase() === filterValue.toLowerCase()
         );
       }
-      // Rendereljük a szűrt listákat
+      
       filteredListsArray.forEach(list => {
         renderListBox(list.id, list.name, list.category, uid);
       });
-      // Frissítjük a filter opciókat a teljes listából, de visszaállítjuk a jelenlegi értéket
       updateFilterOptions(fullListsArray);
     } else {
       listsContainer.innerHTML = "<p>Nincsenek listák.</p>";
@@ -203,19 +229,17 @@ function loadUserLists(uid) {
 }
 
 function updateFilterOptions(listsArray) {
-  // Elmentjük a jelenlegi kiválasztást
   const currentValue = filterCategorySelect.value;
-  filterCategorySelect.innerHTML = `<option value="all">Összes</option>`;
+  let optionsHTML = `<option value="all">Összes</option>`;
   const categories = new Set(listsArray.map(list => list.category));
   categories.forEach(cat => {
-    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+    optionsHTML += `<option value="${cat}">${cat}</option>`;
   });
-  // Ha volt kiválasztott érték, visszaállítjuk
+  filterCategorySelect.innerHTML = optionsHTML;
   if (currentValue) {
     filterCategorySelect.value = currentValue;
   }
 }
-
 
 filterCategorySelect.addEventListener("change", () => {
   if (auth.currentUser) {
@@ -227,8 +251,8 @@ filterCategorySelect.addEventListener("change", () => {
 function renderListBox(listId, listName, category, uid) {
   const box = document.createElement("div");
   box.classList.add("list-box");
-  // A h2-ben a cím egy span-ben van, majd egy "title-icons" konténer a jobb felső sarkában,
-  // amely tartalmazza az edit és delete gombokat.
+  // Állítsuk be a data-list-id attribútumot
+  box.setAttribute("data-list-id", listId);
   box.innerHTML = `
     <h2>
       <span class="list-title">${listName}</span>
@@ -277,7 +301,7 @@ function renderListItem(itemId, text, done, ulElement, listId, uid) {
   ulElement.appendChild(li);
 }
 
-//Lista boxok létrehozása
+// Új lista boxok létrehozása
 customNewListBtn.addEventListener("click", () => {
   const listName = document.getElementById("custom-list-name-input").value.trim();
   const category = document.getElementById("custom-list-category-input").value.trim();
@@ -292,27 +316,37 @@ customNewListBtn.addEventListener("click", () => {
     return;
   }
 
-  // DEFINIÁLD A VÁLTOZÓT, mielőtt push() hívnád!
   const userListsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
-
-  let fullName = listName;
-  if (category.toLowerCase() === "bevásárlás") {
-    fullName = "🛒 " + listName;
-  } else if (category.toLowerCase() === "feladatok") {
-    fullName = "📋 " + listName;
-  }
-
-  push(userListsRef, { name: fullName, category: category })
-    .then(() => {
-      console.log("Custom lista sikeresen hozzáadva:", fullName);
-    })
-    .catch((error) => {
-      console.error("Hiba a custom lista hozzáadásakor:", error);
-    });
-
-  // Töröljük az inputok tartalmát
-  document.getElementById("custom-list-name-input").value = "";
-  document.getElementById("custom-list-category-input").value = "";
+  
+  // Először lekérjük a meglévő listák maximum order értékét
+  get(userListsRef).then((snapshot) => {
+    let maxOrder = 0;
+    if (snapshot.exists()) {
+      const lists = Object.values(snapshot.val());
+      lists.forEach(list => {
+        if (list.order && list.order > maxOrder) {
+          maxOrder = list.order;
+        }
+      });
+    }
+    let fullName = listName;
+    if (category.toLowerCase() === "bevásárlás") {
+      fullName = "🛒 " + listName;
+    } else if (category.toLowerCase() === "feladatok") {
+      fullName = "📋 " + listName;
+    }
+    // Az új lista order értéke: max + 1
+    const newOrder = maxOrder + 1;
+    push(userListsRef, { name: fullName, category: category, order: newOrder })
+      .then(() => {
+        console.log("Custom lista sikeresen hozzáadva:", fullName, "order:", newOrder);
+      })
+      .catch((error) => {
+        console.error("Hiba a custom lista hozzáadásakor:", error);
+      });
+    document.getElementById("custom-list-name-input").value = "";
+    document.getElementById("custom-list-category-input").value = "";
+  });
 });
 
 // Eseménykezelés a listaelemekhez
@@ -328,19 +362,16 @@ document.addEventListener("click", (e) => {
       inputField.value = "";
     }
   }
-})
   
   // Lista box törlése
-  document.addEventListener("click", (e) => {
-    // Lista box törlése – kérdezzen rá megerősítésre
-    if (e.target.closest(".delete-list-btn")) {
-      const listId = e.target.closest(".delete-list-btn").dataset.list;
-      showConfirmModal("Biztosan törlöd ezt a listát?", (confirmed) => {
-        if (confirmed) {
-          remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
-        }
-      });
-    }
+  if (e.target.closest(".delete-list-btn")) {
+    const listId = e.target.closest(".delete-list-btn").dataset.list;
+    showConfirmModal("Biztosan törlöd ezt a listát?", (confirmed) => {
+      if (confirmed) {
+        remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
+      }
+    });
+  }
   
   // Listaelem pipálása
   if (e.target.matches(".done-icon")) {
@@ -388,7 +419,7 @@ document.addEventListener("click", (e) => {
       }
     });
   }
-
+  
   // Lista box címének inline szerkesztése
   if (e.target.matches(".edit-title-btn") || e.target.closest(".edit-title-btn")) {
     const btn = e.target.closest(".edit-title-btn");
@@ -433,9 +464,6 @@ hamburgerIcon.addEventListener("click", () => {
     languageDropdown.style.display = "none";
   }
 });
-
-
-
 
 // Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {

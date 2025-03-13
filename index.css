@@ -385,6 +385,10 @@ h1, h2 {
   opacity: 0.8;
 }
 
+.sortable-ghost {
+  opacity: 0.6;
+}
+
 /* Mobil optimalizáció */
 @media (max-width: 480px) {
   body {
