@@ -45,14 +45,54 @@ const customListCategoryInput = document.getElementById("custom-list-category-in
 const customNewListBtn = document.getElementById("custom-new-list-btn");
 const filterCategorySelect = document.getElementById("filter-category");
 
+// Lista átrendezés toggle gomb
+const toggleReorderBtn = document.getElementById("toggle-reorder-btn");
+let isReorderingEnabled = false;
+let sortableInstance = null;
+
 // Confirmation modal (feltételezve, hogy az index.html-ben megvan)
-function showConfirmModal(message, callback) {
+function showConfirmModal(messageKey, callback, isListDeletion = true) {
   const modal = document.getElementById("confirm-modal");
   const confirmMessage = document.getElementById("confirm-message");
   const yesBtn = document.getElementById("confirm-yes");
   const noBtn = document.getElementById("confirm-no");
 
+  const lang = document.documentElement.lang || "hu";
+  let message, yesText, noText;
+  
+  if (isListDeletion) {
+    if (lang === "en") {
+      message = "Are you sure you want to delete this list?";
+      yesText = "Yes";
+      noText = "No";
+    } else if (lang === "de") {
+      message = "Sind Sie sicher, dass Sie diese Liste löschen möchten?";
+      yesText = "Ja";
+      noText = "Nein";
+    } else {
+      message = "Biztosan törlöd ezt a listát?";
+      yesText = "Igen";
+      noText = "Nem";
+    }
+  } else {
+    if (lang === "en") {
+      message = "Are you sure you want to delete this item?";
+      yesText = "Yes";
+      noText = "No";
+    } else if (lang === "de") {
+      message = "Sind Sie sicher, dass Sie dieses Element löschen möchten?";
+      yesText = "Ja";
+      noText = "Nein";
+    } else {
+      message = "Biztosan törlöd ezt a listaelemet?";
+      yesText = "Igen";
+      noText = "Nem";
+    }
+  }
+
   confirmMessage.textContent = message;
+  yesBtn.textContent = yesText;
+  noBtn.textContent = noText;
   modal.style.display = "flex";
 
   yesBtn.onclick = null;
@@ -77,40 +117,85 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById("logout-section").style.display = "block";
     createDefaultLists(user.uid);
     loadUserLists(user.uid);
+    initializeSortable(); // Sortable inicializálása a bejelentkezés után
   } else {
     authSection.style.display = "block";
     newListSection.style.display = "none";
     document.getElementById("logout-section").style.display = "none";
     listsContainer.innerHTML = "";
+    // Sortable eltávolítása kijelentkezéskor
+    if (sortableInstance) {
+      sortableInstance.destroy();
+      sortableInstance = null;
+    }
+    isReorderingEnabled = false;
   }
 });
 
-// Inicializáljuk a SortableJS-t a lista konténeren
-Sortable.create(listsContainer, {
-  animation: 150,
-  ghostClass: 'sortable-ghost',
-  onEnd: function(evt) {
-    console.log("Drag end event fired");
-    const children = Array.from(listsContainer.children);
-    const updatePromises = children.map((child, index) => {
-      const listId = child.getAttribute("data-list-id");
-      console.log("Child index:", index, "ListID:", listId);
-      if (listId && auth.currentUser) {
-        console.log("Updating order for list", listId, "to", index + 1);
-        return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
-      } else {
-        return Promise.resolve();
+// Sortable inicializálása és kezelése
+function initializeSortable() {
+  if (sortableInstance) {
+    sortableInstance.destroy();
+  }
+  
+  if (isReorderingEnabled) {
+    sortableInstance = Sortable.create(listsContainer, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: function(evt) {
+        console.log("Drag end event fired");
+        const children = Array.from(listsContainer.children);
+        const updatePromises = children.map((child, index) => {
+          const listId = child.getAttribute("data-list-id");
+          console.log("Child index:", index, "ListID:", listId);
+          if (listId && auth.currentUser) {
+            console.log("Updating order for list", listId, "to", index + 1);
+            return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
+          } else {
+            return Promise.resolve();
+          }
+        });
+        Promise.all(updatePromises)
+          .then(() => {
+            console.log("All order updates complete");
+            loadUserLists(auth.currentUser.uid);
+          })
+          .catch((error) => {
+            console.error("Error updating order for one or more lists:", error);
+          });
       }
     });
-    Promise.all(updatePromises)
-      .then(() => {
-        console.log("All order updates complete");
-        loadUserLists(auth.currentUser.uid);
-      })
-      .catch((error) => {
-        console.error("Error updating order for one or more lists:", error);
-      });
   }
+}
+
+// Toggle gomb eseménykezelő
+toggleReorderBtn.addEventListener("click", () => {
+  isReorderingEnabled = !isReorderingEnabled;
+  const lang = document.documentElement.lang || "hu";
+  
+  if (isReorderingEnabled) {
+    if (lang === "en") {
+      toggleReorderBtn.textContent = "Disable List Reordering";
+    } else if (lang === "de") {
+      toggleReorderBtn.textContent = "Listenumordnung deaktivieren";
+    } else {
+      toggleReorderBtn.textContent = "Lista átrendezés letiltása";
+    }
+    toggleReorderBtn.classList.add("active");
+    listsContainer.classList.add("reorder-enabled");
+  } else {
+    if (lang === "en") {
+      toggleReorderBtn.textContent = "Enable List Reordering";
+    } else if (lang === "de") {
+      toggleReorderBtn.textContent = "Listenumordnung aktivieren";
+    } else {
+      toggleReorderBtn.textContent = "Lista átrendezés engedélyezése";
+    }
+    toggleReorderBtn.classList.remove("active");
+    listsContainer.classList.remove("reorder-enabled");
+  }
+  
+  initializeSortable();
 });
 
 // Regisztráció
@@ -223,14 +308,30 @@ function loadUserLists(uid) {
       });
       updateFilterOptions(fullListsArray);
     } else {
-      listsContainer.innerHTML = "<p>Nincsenek listák.</p>";
+      const lang = document.documentElement.lang || "hu";
+      let noListsMsg = "Nincsenek listák.";
+      if (lang === "en") {
+        noListsMsg = "No lists available.";
+      } else if (lang === "de") {
+        noListsMsg = "Keine Listen verfügbar.";
+      }
+      listsContainer.innerHTML = `<p>${noListsMsg}</p>`;
     }
   });
 }
 
 function updateFilterOptions(listsArray) {
   const currentValue = filterCategorySelect.value;
-  let optionsHTML = `<option value="all">Összes</option>`;
+  const lang = document.documentElement.lang || "hu";
+  
+  let allOptionText = "Összes";
+  if (lang === "en") {
+    allOptionText = "All";
+  } else if (lang === "de") {
+    allOptionText = "Alle";
+  }
+  
+  let optionsHTML = `<option value="all">${allOptionText}</option>`;
   const categories = new Set(listsArray.map(list => list.category));
   categories.forEach(cat => {
     optionsHTML += `<option value="${cat}">${cat}</option>`;
@@ -253,6 +354,21 @@ function renderListBox(listId, listName, category, uid) {
   box.classList.add("list-box");
   // Állítsuk be a data-list-id attribútumot
   box.setAttribute("data-list-id", listId);
+
+  const lang = document.documentElement.lang || "hu";
+  let placeholder, addButtonText;
+  
+  if (lang === "en") {
+    placeholder = "Add new item";
+    addButtonText = "Add";
+  } else if (lang === "de") {
+    placeholder = "Neues Element hinzufügen";
+    addButtonText = "Hinzufügen";
+  } else {
+    placeholder = "Új elem hozzáadása";
+    addButtonText = "Hozzáadás";
+  }
+  
   box.innerHTML = `
     <h2>
       <span class="list-title">${listName}</span>
@@ -265,11 +381,23 @@ function renderListBox(listId, listName, category, uid) {
         </button>
       </div>
     </h2>
-    <input type="text" class="item-input" placeholder="Új elem hozzáadása">
-    <button class="item-add-btn" data-list="${listId}">Hozzáadás</button>
+    <input type="text" class="item-input" placeholder="${placeholder}" data-list="${listId}">
+    <button class="item-add-btn" data-list="${listId}">${addButtonText}</button>
     <ul class="items-ul" id="items-${listId}"></ul>
   `;
   listsContainer.appendChild(box);
+  
+  // Enter billentyű támogatás hozzáadása
+  const itemInput = box.querySelector('.item-input');
+  itemInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const addBtn = e.target.nextElementSibling;
+      if (addBtn && addBtn.classList.contains('item-add-btn')) {
+        addBtn.click();
+      }
+    }
+  });
+  
   loadListItems(uid, listId, box.querySelector(".items-ul"));
 }
 
@@ -303,12 +431,20 @@ function renderListItem(itemId, text, done, ulElement, listId, uid) {
 
 // Új lista boxok létrehozása
 customNewListBtn.addEventListener("click", () => {
-  const listName = document.getElementById("custom-list-name-input").value.trim();
-  const category = document.getElementById("custom-list-category-input").value.trim();
+  const listName = customListNameInput.value.trim();
+  const category = customListCategoryInput.value.trim();
   console.log("Custom lista hozzáadása:", listName, category);
 
   if (listName === "") {
-    console.warn("Üres lista név!");
+    const lang = document.documentElement.lang || "hu";
+    let errorMsg = "Kérjük, add meg a lista nevét!";
+    if (lang === "en") {
+      errorMsg = "Please enter a list name!";
+    } else if (lang === "de") {
+      errorMsg = "Bitte geben Sie einen Listennamen ein!";
+    }
+    alert(errorMsg);
+    customListNameInput.focus();
     return;
   }
   if (!auth.currentUser) {
@@ -317,6 +453,19 @@ customNewListBtn.addEventListener("click", () => {
   }
 
   const userListsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
+  
+  // Alapértelmezett kategória beállítása, ha üres
+  const lang = document.documentElement.lang || "hu";
+  let finalCategory = category;
+  if (!finalCategory) {
+    if (lang === "en") {
+      finalCategory = "General";
+    } else if (lang === "de") {
+      finalCategory = "Allgemein";
+    } else {
+      finalCategory = "Általános";
+    }
+  }
   
   // Először lekérjük a meglévő listák maximum order értékét
   get(userListsRef).then((snapshot) => {
@@ -330,22 +479,40 @@ customNewListBtn.addEventListener("click", () => {
       });
     }
     let fullName = listName;
-    if (category.toLowerCase() === "bevásárlás") {
-      fullName = "🛒 " + listName;
-    } else if (category.toLowerCase() === "feladatok") {
-      fullName = "📋 " + listName;
+    
+    // Emoji hozzáadása kategória alapján
+    if (lang === "en") {
+      if (finalCategory.toLowerCase() === "shopping") {
+        fullName = "🛒 " + listName;
+      } else if (finalCategory.toLowerCase() === "tasks") {
+        fullName = "📋 " + listName;
+      }
+    } else if (lang === "de") {
+      if (finalCategory.toLowerCase() === "einkauf") {
+        fullName = "🛒 " + listName;
+      } else if (finalCategory.toLowerCase() === "aufgaben") {
+        fullName = "📋 " + listName;
+      }
+    } else {
+      if (finalCategory.toLowerCase() === "bevásárlás") {
+        fullName = "🛒 " + listName;
+      } else if (finalCategory.toLowerCase() === "feladatok") {
+        fullName = "📋 " + listName;
+      }
     }
     // Az új lista order értéke: max + 1
     const newOrder = maxOrder + 1;
-    push(userListsRef, { name: fullName, category: category, order: newOrder })
+    push(userListsRef, { name: fullName, category: finalCategory, order: newOrder })
       .then(() => {
         console.log("Custom lista sikeresen hozzáadva:", fullName, "order:", newOrder);
+        // Input mezők tisztítása csak sikeres hozzáadás után
+        customListNameInput.value = "";
+        customListCategoryInput.value = "";
+        customListNameInput.focus(); // Visszafókuszál az első input mezőre
       })
       .catch((error) => {
         console.error("Hiba a custom lista hozzáadásakor:", error);
       });
-    document.getElementById("custom-list-name-input").value = "";
-    document.getElementById("custom-list-category-input").value = "";
   });
 });
 
@@ -360,17 +527,18 @@ document.addEventListener("click", (e) => {
       const itemsRef = ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items`);
       push(itemsRef, { text: text, done: false });
       inputField.value = "";
+      inputField.focus(); // Visszafókuszál az input mezőre
     }
   }
   
   // Lista box törlése
   if (e.target.closest(".delete-list-btn")) {
     const listId = e.target.closest(".delete-list-btn").dataset.list;
-    showConfirmModal("Biztosan törlöd ezt a listát?", (confirmed) => {
+    showConfirmModal("deleteList", (confirmed) => {
       if (confirmed) {
         remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}`));
       }
-    });
+    }, true);
   }
   
   // Listaelem pipálása
@@ -385,11 +553,11 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".delete-icon")) {
     const itemId = e.target.dataset.item;
     const listId = e.target.dataset.list;
-    showConfirmModal("Biztosan törlöd ezt a listaelemet?", (confirmed) => {
+    showConfirmModal("deleteItem", (confirmed) => {
       if (confirmed) {
         remove(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${itemId}`));
       }
-    });
+    }, false);
   }
   
   // Listaelem inline szerkesztése
@@ -468,7 +636,7 @@ hamburgerIcon.addEventListener("click", () => {
 // Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(registration => {
         console.log('ServiceWorker regisztrálva:', registration.scope);
       })
@@ -477,3 +645,22 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  // Ctrl/Cmd + Enter: Gyors elem hozzáadás
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement.classList.contains('item-input')) {
+      const addBtn = activeElement.nextElementSibling;
+      if (addBtn && addBtn.classList.contains('item-add-btn')) {
+        addBtn.click();
+      }
+    }
+  }
+});
+
+// Debug információ a konzolban
+console.log('Todo & Shopping List App initialized');
+console.log('Language:', document.documentElement.lang || 'hu');
+console.log('Firebase config loaded:', !!firebaseConfig.apiKey);

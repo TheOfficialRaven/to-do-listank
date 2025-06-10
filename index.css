@@ -171,6 +171,32 @@ h1, h2 {
   font-size: 1.2rem;
 }
 
+/* Reorder toggle gomb stílusai */
+.reorder-btn {
+  padding: 1rem 2rem;
+  margin: 0.5rem;
+  background-color: #6B7280;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease;
+}
+
+.reorder-btn:hover {
+  background-color: #4B5563;
+}
+
+.reorder-btn.active {
+  background-color: #F59E0B;
+  color: #1F2937;
+}
+
+.reorder-btn.active:hover {
+  background-color: #D97706;
+}
+
 /* Egyesített lista konténer */
 #lists-container {
   display: flex;
@@ -178,6 +204,26 @@ h1, h2 {
   gap: 1.5rem;
   justify-content: center;
   padding: 1rem;
+}
+
+/* Reordering engedélyezve vizuális jelzés */
+#lists-container.reorder-enabled {
+  background-color: rgba(251, 191, 36, 0.1);
+  border: 2px dashed #F59E0B;
+  border-radius: 8px;
+}
+
+#lists-container.reorder-enabled .list-box {
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+#lists-container.reorder-enabled .list-box:hover {
+  transform: scale(1.02);
+}
+
+#lists-container.reorder-enabled .list-box:active {
+  cursor: grabbing;
 }
 
 /* Lista box stílus – ugyanaz, mint az eredeti Teendő- és Bevásárlólista boxok */
@@ -387,6 +433,8 @@ h1, h2 {
 
 .sortable-ghost {
   opacity: 0.6;
+  transform: rotate(2deg);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
 }
 
 /* Mobil optimalizáció */

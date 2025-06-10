@@ -12,6 +12,9 @@
   
   <!-- Google Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <!-- SortableJS-Bibliothek (als globale Variable verfügbar) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   
   <!-- Eigene Stylesheet -->
   <link rel="stylesheet" href="index.css">
@@ -58,10 +61,20 @@
     <select id="filter-category">
       <option value="all">Alle</option>
     </select>
+    <br>
+    <button id="toggle-reorder-btn" class="reorder-btn">Listenumordnung aktivieren</button>
   </section>
 
   <!-- Alle Listen (Standard- und benutzerdefinierte) in einem gemeinsamen Container -->
   <section id="lists-container" class="draggable-container"></section>
+
+  <div id="confirm-modal" class="confirm-modal">
+    <div class="confirm-modal-content">
+      <p id="confirm-message">Sind Sie sicher, dass Sie diese Liste löschen möchten?</p>
+      <button id="confirm-yes">Ja</button>
+      <button id="confirm-no">Nein</button>
+    </div>
+  </div>
 
   <!-- Firebase Module Import-Skript -->
   <script type="module" src="index.js"></script>
