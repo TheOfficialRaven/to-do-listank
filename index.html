@@ -23,14 +23,24 @@
 
   <!-- Nyelvválasztó menü -->
   <div id="language-menu">
-    <span id="hamburger-icon" class="material-icons">menu</span>
+    <button id="hamburger-icon" title="Nyelv váltás / Language">
+      <span class="material-icons">language</span>
+      <span class="language-text">HU</span>
+    </button>
     <div id="language-dropdown" class="language-dropdown">
       <ul>
-        <li><a href="en-index.html">English</a></li>
-        <li><a href="de-index.html">Német</a></li>
-        <!-- További nyelvek itt -->
+        <li><a href="index.html">🇭🇺 Magyar</a></li>
+        <li><a href="en-index.html">🇺🇸 English</a></li>
+        <li><a href="de-index.html">🇩🇪 Német</a></li>
       </ul>
     </div>
+  </div>
+
+  <!-- Téma váltó gomb -->
+  <div id="theme-toggle-container">
+    <button id="theme-toggle-btn" class="theme-toggle-btn">
+      <span class="material-icons">dark_mode</span>
+    </button>
   </div>
 
   <!-- Autentikációs szekció -->
@@ -50,23 +60,320 @@
     <button id="logout-btn">Kijelentkezés</button>
   </section>
 
-  <!-- Új lista létrehozása szekció (default + custom listák) -->
-  <section id="new-list-section" style="display: none; text-align: center;">
-    <h2>Új lista létrehozása</h2>
-    <input type="text" id="custom-list-name-input" placeholder="Lista neve">
-    <input type="text" id="custom-list-category-input" placeholder="Kategória">
-    <button id="custom-new-list-btn">Lista hozzáadása</button>
-    <br>
-    <label for="filter-category">Szűrő kategória szerint:</label>
-    <select id="filter-category">
-      <option value="all">Összes</option>
-    </select>
-    <br>
-    <button id="toggle-reorder-btn" class="reorder-btn">Lista átrendezés engedélyezése</button>
+  <!-- Főnavigáció -->
+  <nav id="main-navigation">
+    <div class="nav-container">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard">🏠 Dashboard</button>
+        <button class="nav-tab" data-tab="overview">📊 Áttekintés</button>
+        <button class="nav-tab" data-tab="lists">📝 Listák</button>
+        <button class="nav-tab" data-tab="notes">📒 Jegyzetek</button>
+        <button class="nav-tab" data-tab="calendar">🗓️ Naptár</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard szekció -->
+  <section id="dashboard-section" class="tab-content active">
+    <div class="dashboard-grid">
+      <div class="welcome-card">
+        <h2>👋 Üdvözlünk újra!</h2>
+        <p>Itt a mai áttekintésed</p>
+        <div class="streak-info">
+          <span class="streak-number" id="current-streak">0</span>
+          <span class="streak-label">napos sorozat</span>
+        </div>
+        <div class="current-time">
+          <span id="current-date"></span>
+          <span id="current-time-display"></span>
+        </div>
+      </div>
+      
+      <div class="quick-actions">
+        <h3>⚡ Gyors műveletek</h3>
+        <div class="action-buttons">
+          <button class="action-btn" data-action="quick-task">+ Gyors feladat</button>
+          <button class="action-btn" data-action="quick-note">+ Gyors jegyzet</button>
+          <button class="action-btn" data-action="quick-event">+ Esemény</button>
+        </div>
+      </div>
+      
+      <div class="daily-quote">
+        <h3>💡 Mai inspiráció</h3>
+        <p id="quote-text">"A legnagyobb dicsőség nem abban van, hogy sosem bukunk el, hanem abban, hogy minden bukás után felkelünk."</p>
+        <small id="quote-author">- Konfuciusz</small>
+      </div>
+      
+      <div class="today-events">
+        <h3>📅 Mai események</h3>
+        <div id="today-events-list" class="events-preview">
+          <p class="no-events">Nincs mai esemény</p>
+        </div>
+      </div>
+      
+      <div class="pinned-items">
+        <h3>📌 Kiemelt elemek</h3>
+        <div id="pinned-notes" class="pinned-section">
+          <h4>Jegyzetek</h4>
+          <div id="pinned-notes-list" class="pinned-list"></div>
+        </div>
+        <div id="pinned-tasks" class="pinned-section">
+          <h4>Feladatok</h4>
+          <div id="pinned-tasks-list" class="pinned-list"></div>
+        </div>
+      </div>
+      
+      <div class="urgent-tasks">
+        <h3>⚠️ Sürgős feladatok</h3>
+        <div id="urgent-tasks-list" class="urgent-list">
+          <p class="no-urgent">Nincs sürgős feladat</p>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- Az összes lista (default + custom) egy közös konténerben -->
-  <section id="lists-container" class="draggable-container"></section>
+  <!-- Áttekintés szekció - Statisztikák és eredmények -->
+  <section id="overview-section" class="tab-content" style="display: none;">
+    <div class="section-header">
+      <h2>📊 Áttekintés & Statisztikák</h2>
+    </div>
+    
+    <!-- Főstatisztikák panel - visszahozva az eredeti designt -->
+    <section id="main-stats-panel">
+      <h3>📈 Statisztikák</h3>
+      <div id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-number" id="total-lists">0</div>
+          <div class="stat-label">Lista</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="lists-progress"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-number" id="total-items">0</div>
+          <div class="stat-label">Elem</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="items-progress"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-number" id="completed-items">0</div>
+          <div class="stat-label">Kész</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="completed-progress"></div>
+          </div>
+        </div>
+        <div class="stat-card completion-card">
+          <div class="stat-icon">🎯</div>
+          <div class="completion-circle">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+              <path class="circle-bg" d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" id="completion-circle" stroke-dasharray="0, 100" d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage" id="completion-percentage">0%</text>
+            </svg>
+          </div>
+          <div class="stat-label">Teljesítés</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Alsó rész - gamifikáció és insights -->
+    <div class="overview-bottom">
+      <div class="overview-left">
+        <div class="level-card">
+          <h3>🌟 Szinted</h3>
+          <div class="level-info">
+            <span class="level-number" id="user-level">1</span>
+            <div class="xp-bar">
+              <div class="xp-fill" id="xp-progress"></div>
+            </div>
+            <span class="xp-text" id="xp-text">0 / 100 XP</span>
+          </div>
+        </div>
+        
+        <div class="activity-graph">
+          <h3>📊 Aktivitás grafikon</h3>
+          <div class="activity-calendar" id="activity-calendar">
+            <!-- Activity heatmap will be generated here -->
+          </div>
+          <div class="activity-legend">
+            <div class="activity-legend-item">
+              <div class="activity-legend-dot" style="background: rgba(16, 185, 129, 0.1);"></div>
+              <span>Kevés</span>
+            </div>
+            <div class="activity-legend-item">
+              <div class="activity-legend-dot" style="background: rgba(16, 185, 129, 0.5);"></div>
+              <span>Közepes</span>
+            </div>
+            <div class="activity-legend-item">
+              <div class="activity-legend-dot" style="background: var(--accent-primary);"></div>
+              <span>Magas</span>
+            </div>
+          </div>
+          <div class="activity-stats">
+            <div class="activity-stat">
+              <span class="activity-stat-number" id="activity-total">42</span>
+              <span class="activity-stat-label">Összes nap</span>
+            </div>
+            <div class="activity-stat">
+              <span class="activity-stat-number" id="activity-streak">7</span>
+              <span class="activity-stat-label">Legjobb sorozat</span>
+            </div>
+            <div class="activity-stat">
+              <span class="activity-stat-number" id="activity-avg">3.2</span>
+              <span class="activity-stat-label">Átlag/nap</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="overview-right">
+        <div class="achievements-list">
+          <h3>🏅 Elért eredmények</h3>
+          <div id="achievement-badges">
+            <!-- Eredmények itt jelennek meg -->
+          </div>
+        </div>
+        
+        <div class="productivity-insights">
+          <h3>🔍 Produktivitási betekintés</h3>
+          <div class="insights-list" id="insights-list">
+            <div class="insight-item">
+              <span class="insight-icon">📈</span>
+              <span class="insight-text">Ez a hét: +23% produktivitás!</span>
+            </div>
+            <div class="insight-item">
+              <span class="insight-icon">⭐</span>
+              <span class="insight-text">Legjobb nap: Hétfő (8 kész feladat)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Listák szekció -->
+  <section id="lists-section" class="tab-content" style="display: none;">
+    <div class="section-header">
+      <h2>📝 To-Do Listák</h2>
+      <button id="toggle-reorder-btn" class="reorder-btn">
+        <span class="material-icons">swap_vert</span>
+        Átrendezés
+      </button>
+    </div>
+    
+    <!-- Új lista létrehozása -->
+    <div class="create-panel modern-card">
+      <div class="create-header">
+        <h3>✨ Új lista létrehozása</h3>
+        <span class="create-icon">📋</span>
+      </div>
+      <div class="create-form">
+        <div class="input-row">
+          <div class="input-field">
+            <label for="custom-list-name-input">Lista neve</label>
+            <input type="text" id="custom-list-name-input" placeholder="pl. Bevásárlólista, Munkahelyi feladatok...">
+          </div>
+          <div class="input-field">
+            <label for="custom-list-category-input">Kategória</label>
+            <input type="text" id="custom-list-category-input" placeholder="pl. Otthon, Munka, Hobbi...">
+          </div>
+        </div>
+        <div class="create-actions">
+          <button id="custom-new-list-btn" class="create-btn">
+            <span class="material-icons">add_circle</span>
+            Lista létrehozása
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Szűrés és keresés -->
+    <div class="filter-panel modern-card">
+      <div class="filter-header">
+        <h3>🔍 Szűrés és keresés</h3>
+      </div>
+      <div class="filter-content">
+        <div class="filter-row">
+          <div class="filter-field">
+            <label for="filter-category">Kategória szűrő:</label>
+            <select id="filter-category">
+              <option value="all">Összes kategória</option>
+            </select>
+          </div>
+          
+          <!-- Kereső mező -->
+          <div class="search-field">
+            <label for="search-input">Keresés:</label>
+            <div id="search-container">
+              <input type="text" id="search-input" placeholder="🔍 Keresés a listákban és elemekben...">
+              <button id="clear-search-btn" class="clear-search-btn">
+                <span class="material-icons">clear</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Az összes lista (default + custom) egy közös konténerben -->
+    <section id="lists-container" class="draggable-container"></section>
+  </section>
+
+  <!-- Jegyzetek szekció -->
+  <section id="notes-section" class="tab-content" style="display: none;">
+    <div class="section-header">
+      <h2>📒 Jegyzetek</h2>
+      <button id="new-note-btn" class="primary-btn">
+        <span class="material-icons">add</span>
+        Új jegyzet
+      </button>
+    </div>
+    
+    <div class="notes-grid" id="notes-container">
+      <!-- Jegyzetek itt jelennek meg -->
+    </div>
+  </section>
+
+  <!-- Naptár szekció -->
+  <section id="calendar-section" class="tab-content" style="display: none;">
+    <div class="section-header">
+      <h2>🗓️ Naptár</h2>
+      <button id="new-event-btn" class="primary-btn">
+        <span class="material-icons">event</span>
+        Új esemény
+      </button>
+    </div>
+    
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <button id="prev-month" class="calendar-nav">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <h3 id="current-month-year"></h3>
+        <button id="next-month" class="calendar-nav">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- Naptár rács itt jelenik meg -->
+      </div>
+    </div>
+    
+    <div class="upcoming-events">
+      <h3>📅 Közelgő események</h3>
+      <div id="upcoming-events-list">
+        <!-- Közelgő események listája -->
+      </div>
+    </div>
+  </section>
 
   <div id="confirm-modal" class="confirm-modal">
     <div class="confirm-modal-content">
@@ -76,7 +383,147 @@
     </div>
   </div>
 
+  <!-- Jegyzetek törlés modal -->
+  <div id="delete-note-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🗑️ Jegyzet törlése</h3>
+        <button class="close-btn" id="delete-note-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="warning-content">
+          <div class="warning-icon">⚠️</div>
+          <p>Biztosan törölni szeretnéd ezt a jegyzetet?</p>
+          <div class="note-preview">
+            <h4 id="delete-note-title">Jegyzetek címe</h4>
+            <p id="delete-note-content">Jegyzetek tartalma előnézet...</p>
+          </div>
+          <p class="warning-text">Ez a művelet nem vonható vissza!</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="confirm-delete-note" class="danger-btn">🗑️ Törlés</button>
+        <button id="cancel-delete-note" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase modulokat importáló script -->
   <script type="module" src="index.js"></script>
+
+  <!-- Lebegő gyors hozzáadás gomb -->
+  <div id="quick-add-fab" class="quick-add-fab" style="display: none;">
+    <span class="material-icons">add</span>
+  </div>
+
+  <!-- Gyors hozzáadás modal -->
+  <div id="quick-add-modal" class="quick-add-modal" style="display: none;">
+    <div class="quick-add-modal-content">
+      <h3>⚡ Gyors elem hozzáadása</h3>
+      <input type="text" id="quick-add-text" placeholder="Írd be az elemet...">
+      <select id="quick-add-list-select">
+        <option value="">Válassz listát...</option>
+      </select>
+      <div class="quick-add-buttons">
+        <button id="quick-add-submit">Hozzáadás</button>
+        <button id="quick-add-cancel">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jegyzet modal -->
+  <div id="note-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="note-modal-title">📒 Új jegyzet</h3>
+        <button class="close-btn" id="note-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="note-title" placeholder="Jegyzet címe..." maxlength="100">
+        <textarea id="note-content" placeholder="Itt írhatsz részletes jegyzeteket, jelszavakat, vagy bármit amit nem szeretnél elfelejteni..." rows="10"></textarea>
+        <div class="note-categories">
+          <label>🏷️ Kategória:</label>
+          <select id="note-category">
+            <option value="general">Általános</option>
+            <option value="passwords">Jelszavak</option>
+            <option value="ideas">Ötletek</option>
+            <option value="important">Fontos</option>
+            <option value="work">Munka</option>
+            <option value="personal">Személyes</option>
+          </select>
+        </div>
+        <div class="note-security">
+          <label class="checkbox-label">
+            <input type="checkbox" id="note-private">
+            <span class="checkmark"></span>
+            🔒 Bizalmas jegyzet (jelszóval védett)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="save-note" class="primary-btn">Mentés</button>
+        <button id="cancel-note" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Esemény modal -->
+  <div id="event-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="event-modal-title">🗓️ Új esemény</h3>
+        <button class="close-btn" id="event-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="event-title" placeholder="Esemény neve..." maxlength="100">
+        <div class="date-time-group">
+          <div class="input-group">
+            <label>📅 Dátum:</label>
+            <input type="date" id="event-date">
+          </div>
+          <div class="input-group">
+            <label>⏰ Idő:</label>
+            <input type="time" id="event-time">
+          </div>
+        </div>
+        <textarea id="event-description" placeholder="Esemény leírása..." rows="4"></textarea>
+        <div class="event-categories">
+          <label>🎯 Típus:</label>
+          <select id="event-type">
+            <option value="birthday">🎂 Születésnap</option>
+            <option value="meeting">💼 Megbeszélés</option>
+            <option value="reminder">⏰ Emlékeztető</option>
+            <option value="appointment">🏥 Időpont</option>
+            <option value="event">🎉 Esemény</option>
+            <option value="deadline">📝 Határidő</option>
+          </select>
+        </div>
+        <div class="reminder-settings">
+          <label class="checkbox-label">
+            <input type="checkbox" id="event-reminder">
+            <span class="checkmark"></span>
+            🔔 Emlékeztető beállítása
+          </label>
+          <select id="reminder-time" disabled>
+            <option value="0">Esemény időpontjában</option>
+            <option value="15">15 perccel előtte</option>
+            <option value="30">30 perccel előtte</option>
+            <option value="60">1 órával előtte</option>
+            <option value="1440">1 nappal előtte</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="save-event" class="primary-btn">Mentés</button>
+        <button id="cancel-event" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
