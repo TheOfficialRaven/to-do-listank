@@ -50,9 +50,14 @@ const toggleReorderBtn = document.getElementById("toggle-reorder-btn");
 let isReorderingEnabled = false;
 let sortableInstance = null;
 
-// Téma váltó gomb
-const themeToggleBtn = document.getElementById("theme-toggle-btn");
-let isDarkTheme = true;
+// Modern téma választó rendszer
+let currentTheme = {
+  name: 'default',
+  mode: 'light'
+};
+
+// Hátramaradó régi téma változók (kompatibilitásért)
+let isDarkTheme = false;
 
 // Navigáció és új UI elemek
 const navTabs = document.querySelectorAll('.nav-tab');
@@ -91,6 +96,13 @@ const quickAddText = document.getElementById("quick-add-text");
 const quickAddListSelect = document.getElementById("quick-add-list-select");
 const quickAddSubmit = document.getElementById("quick-add-submit");
 const quickAddCancel = document.getElementById("quick-add-cancel");
+
+// Quick task modal elemek
+const quickTaskModal = document.getElementById("quick-task-modal");
+const quickTaskText = document.getElementById("quick-task-text");
+const quickTaskListSelect = document.getElementById("quick-task-list-select");
+const quickTaskSubmit = document.getElementById("quick-task-submit");
+const quickTaskCancel = document.getElementById("quick-task-cancel");
 
 // Confirmation modal (feltételezve, hogy az index.html-ben megvan)
 function showConfirmModal(messageKey, callback, isListDeletion = true) {
@@ -171,7 +183,7 @@ onAuthStateChanged(auth, (user) => {
     const oldNewListSection = document.getElementById("new-list-section");
     if (oldNewListSection) oldNewListSection.style.display = "none";
     
-    document.getElementById("logout-section").style.display = "block";
+    // Logout button is now in the profile menu - no need to show/hide
     if (quickAddFab) {
       quickAddFab.style.display = "flex"; // FAB gomb megjelenítése
     }
@@ -188,10 +200,18 @@ onAuthStateChanged(auth, (user) => {
     loadUserProgress();
     loadNotes();
     updateDailyQuote();
-    updateAchievements();
+    
+    // updateAchievements csak akkor hívható, ha a translations már inicializálva van
+    // Ezért setTimeout-tal késleltetjük
+    setTimeout(() => {
+      updateAchievements();
+    }, 500);
     
     // Azonnali dashboard frissítés
     updateDashboard();
+    
+    // Téma betöltése Firebase-ből
+    loadThemeFromFirebase();
     
     // Statisztikák frissítése kis késleltetéssel hogy a listák betöltődjenek
     setTimeout(() => {
@@ -209,7 +229,7 @@ onAuthStateChanged(auth, (user) => {
       content.classList.remove("active");
     });
     
-    document.getElementById("logout-section").style.display = "none";
+    // Logout button is now in the profile menu - no need to show/hide
     if (quickAddFab) {
       quickAddFab.style.display = "none"; // FAB gomb elrejtése
     }
@@ -292,28 +312,7 @@ toggleReorderBtn.addEventListener("click", () => {
   initializeSortable();
 });
 
-// Téma váltó eseménykezelő
-if (themeToggleBtn) {
-  themeToggleBtn.addEventListener("click", () => {
-    isDarkTheme = !isDarkTheme;
-    const body = document.documentElement;
-    
-    if (isDarkTheme) {
-      body.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      body.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
-  });
-}
-
-// Téma betöltése localStorage-ból
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'light') {
-  isDarkTheme = false;
-  document.documentElement.setAttribute('data-theme', 'light');
-}
+// Régi téma rendszer eltávolítva - modern theme selector használata
 
 // Kereső funkcionalitás
 if (searchInput) {
@@ -399,6 +398,8 @@ navTabs.forEach(tab => {
       initializeCalendar();
     } else if (targetTab === 'notes') {
       loadNotes();
+    } else if (targetTab === 'overview') {
+      updateOverview();
     } else if (targetTab === 'achievements') {
       updateAchievements();
     }
@@ -490,11 +491,14 @@ function saveNote() {
     createdAt: new Date().toISOString()
   };
   
-  push(notesRef, noteData).then(() => {
+  push(notesRef, noteData).then(async () => {
     closeNoteModal();
     loadNotes();
     addXP(5); // XP jegyzet mentésért
-    showNotification('📒 Jegyzet sikeresen mentve!');
+    showNotification(getText('notifications.note_saved'));
+    
+    // Teljes adatfrissítés
+    await forceRefreshAllData();
   }).catch(error => {
     console.error('Hiba a jegyzet mentése során:', error);
     alert('Hiba történt a jegyzet mentése során.');
@@ -678,7 +682,7 @@ function isToday(date) {
   return date.toDateString() === today.toDateString();
 }
 
-function openEventModal(selectedDate = null) {
+function openEventModal(selectedDate = null, showExistingEvents = false) {
   if (!auth.currentUser) {
     showNotification('⚠️ Be kell jelentkezned az esemény kezeléséhez!');
     return;
@@ -686,6 +690,7 @@ function openEventModal(selectedDate = null) {
 
   if (eventModal) {
     eventModal.style.display = 'flex';
+    clearEventModal(); // Tisztítsuk meg a modal-t
     
     if (selectedDate) {
       const dateInput = document.getElementById('event-date');
@@ -693,20 +698,21 @@ function openEventModal(selectedDate = null) {
         const dateStr = selectedDate.toISOString().split('T')[0];
         dateInput.value = dateStr;
         
-        // Meglévő események megjelenítése a dátumhoz
-        const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
-        get(eventsRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            const dayEvents = Object.entries(snapshot.val())
-              .filter(([id, data]) => data.date === dateStr)
-              .map(([id, data]) => ({ id, ...data }));
-            
-            if (dayEvents.length > 0) {
-              // Esemény lista modal vagy prompt megjelenítése
-              showDayEventsModal(dayEvents, dateStr);
+        // Csak akkor mutassuk meg a meglévő eseményeket, ha explicit kérjük
+        if (showExistingEvents) {
+          const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
+          get(eventsRef).then((snapshot) => {
+            if (snapshot.exists()) {
+              const dayEvents = Object.entries(snapshot.val())
+                .filter(([id, data]) => data.date === dateStr)
+                .map(([id, data]) => ({ id, ...data }));
+              
+              if (dayEvents.length > 0) {
+                showDayEventsModal(dayEvents, dateStr);
+              }
             }
-          }
-        });
+          });
+        }
       }
     }
   }
@@ -880,34 +886,39 @@ function loadUserProgress() {
   });
 }
 
-function updateStreakDisplay() {
+async function updateStreakDisplay() {
   const streakElement = document.getElementById('current-streak');
   if (!streakElement || !auth.currentUser) return;
   
-  const today = new Date().toISOString().split('T')[0];
-  const userActivityData = getUserActivityData();
-  
-  // Sorozat számítása visszafelé
-  let streak = 0;
-  let currentDate = new Date();
-  
-  while (true) {
-    const dateStr = currentDate.toISOString().split('T')[0];
-    const activity = getActivityLevelForDate(dateStr, userActivityData);
+  try {
+    const userActivityData = await getUserActivityData();
     
-    if (activity > 0) {
-      streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-      break;
+    // Sorozat számítása visszafelé a mai naptól
+    let streak = 0;
+    let currentDate = new Date();
+    
+    while (true) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      const activity = getActivityLevelForDate(dateStr, userActivityData);
+      
+      if (activity > 0) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+      
+      // Végtelen ciklus elkerülése
+      if (streak > 365) break;
     }
     
-    // Végtelen ciklus elkerülése
-    if (streak > 365) break;
+    streakElement.textContent = streak;
+    currentStreak = streak;
+  } catch (error) {
+    console.error('Error updating streak display:', error);
+    streakElement.textContent = '0';
+    currentStreak = 0;
   }
-  
-  streakElement.textContent = streak;
-  currentStreak = streak;
 }
 
 function updateDailyQuote() {
@@ -960,67 +971,57 @@ function updateAchievements() {
   const achievementBadges = document.getElementById('achievement-badges');
   if (!achievementBadges) return;
   
+  // Ellenőrizzük, hogy a translations inicializálva van-e
+  if (!translations || Object.keys(translations).length === 0) {
+    console.warn('Translations not loaded yet, skipping achievements update');
+    return;
+  }
+  
   const achievements = [
     {
       id: 'first-task',
-      title: 'Első lépés',
-      description: 'Teljesítsd az első feladatod',
       icon: '🎯',
       condition: () => userXP >= 2,
       xpReward: 5
     },
     {
       id: 'task-master',
-      title: 'Feladat mester',
-      description: 'Teljesíts 10 feladatot',
       icon: '⭐',
       condition: () => userXP >= 20,
       xpReward: 15
     },
     {
       id: 'list-creator',
-      title: 'Lista készítő',
-      description: 'Hozz létre 3 listát',
       icon: '📝',
       condition: () => userXP >= 30,
       xpReward: 20
     },
     {
       id: 'note-taker',
-      title: 'Jegyzet készítő',
-      description: 'Írj 5 jegyzetet',
       icon: '📒',
       condition: () => userXP >= 25,
       xpReward: 10
     },
     {
       id: 'level-up',
-      title: 'Szint emelkedés',
-      description: 'Érj el 2. szintet',
       icon: '🏆',
       condition: () => userLevel >= 2,
       xpReward: 25
     },
     {
       id: 'streak-3',
-      title: 'Kitartó',
-      description: '3 napos sorozat',
       icon: '🔥',
       condition: () => currentStreak >= 3,
       xpReward: 15
     },
     {
       id: 'streak-7',
-      title: 'Legenda',
-      description: '7 napos sorozat',
       icon: '👑',
       condition: () => currentStreak >= 7,
       xpReward: 50
     },
     {
       id: 'explorer',
-      title: 'Felfedező',
-      description: 'Próbáld ki az összes funkciót',
       icon: '🌟',
       condition: () => userLevel >= 3,
       xpReward: 30
@@ -1088,13 +1089,19 @@ function updateAchievements() {
       `;
     }
     
-    badgeElement.innerHTML = `
-      <div class="badge-icon">${achievement.icon}</div>
-      <div class="badge-title">${achievement.title}</div>
-      <div class="badge-description">${achievement.description}</div>
-      ${isUnlocked ? '<div class="badge-unlocked">🔓 Elérve!</div>' : '<div class="badge-locked">🔒 Zárva</div>'}
-      ${progressHTML}
-    `;
+    const title = getText(`achievements.${achievement.id.replace('-', '_')}.title`);
+    const description = getText(`achievements.${achievement.id.replace('-', '_')}.description`);
+    
+          const unlockedText = isUnlocked ? '🔓 ' + (currentLanguage === 'en' ? 'Unlocked!' : currentLanguage === 'de' ? 'Erreicht!' : 'Elérve!') : 
+                                           '🔒 ' + (currentLanguage === 'en' ? 'Locked' : currentLanguage === 'de' ? 'Gesperrt' : 'Zárva');
+      
+      badgeElement.innerHTML = `
+        <div class="badge-icon">${achievement.icon}</div>
+        <div class="badge-title">${title}</div>
+        <div class="badge-description">${description}</div>
+        <div class="badge-${isUnlocked ? 'unlocked' : 'locked'}">${unlockedText}</div>
+        ${progressHTML}
+      `;
     
     achievementBadges.appendChild(badgeElement);
   });
@@ -1284,19 +1291,41 @@ if (quickAddSubmit) {
   });
 }
 
+// Quick task modal event listeners
+if (quickTaskCancel) {
+  quickTaskCancel.addEventListener("click", () => {
+    closeQuickTaskModal();
+  });
+}
+
+if (quickTaskSubmit) {
+  quickTaskSubmit.addEventListener("click", () => {
+    submitQuickTask();
+  });
+}
+
+// Enter key support for quick task
+if (quickTaskText) {
+  quickTaskText.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      submitQuickTask();
+    }
+  });
+}
+
+// Click outside to close quick task modal
+if (quickTaskModal) {
+  quickTaskModal.addEventListener("click", (e) => {
+    if (e.target === quickTaskModal) {
+      closeQuickTaskModal();
+    }
+  });
+}
+
 function populateQuickAddListSelect() {
   if (!quickAddListSelect) return;
   
-  const lang = document.documentElement.lang || "hu";
-  let defaultText;
-  if (lang === "en") {
-    defaultText = "Choose list...";
-  } else if (lang === "de") {
-    defaultText = "Liste auswählen...";
-  } else {
-    defaultText = "Válassz listát...";
-  }
-  
+  const defaultText = getText('modals.quick_add.select_list');
   quickAddListSelect.innerHTML = `<option value="">${defaultText}</option>`;
   
   if (auth.currentUser) {
@@ -1864,12 +1893,28 @@ function initNavigation() {
 }
 
 // Dashboard frissítése
-function updateDashboard() {
+async function updateDashboard() {
   updateCurrentTime();
   updateTodayEvents();
   updatePinnedItems();
   updateUrgentTasks();
-  updateStreakDisplay();
+  await updateStreakDisplay();
+  updateStatistics(); // Statisztikák frissítése
+  
+  // Ha az overview fül aktív, akkor frissítsük az activity graph-ot is
+  const overviewTab = document.querySelector('.nav-tab[data-tab="overview"]');
+  if (overviewTab && overviewTab.classList.contains('active')) {
+    await updateOverview();
+  }
+}
+
+// Minden adatfrissítő funkció, amit gyakran hívni kell
+async function forceRefreshAllData() {
+  await updateStreakDisplay();
+  await updateOverview();
+  updateStatistics();
+  updateDashboard();
+  updateAchievements();
 }
 
 // Dashboard automatikus frissítése minden 30 másodpercben
@@ -1879,13 +1924,28 @@ setInterval(() => {
   }
 }, 30000);
 
-// Aktuális idő frissítése
+// Aktuális idő frissítése lokalizációval
 function updateCurrentTime() {
   const now = new Date();
   const dateElement = document.getElementById('current-date');
   const timeElement = document.getElementById('current-time-display');
   
   if (dateElement && timeElement) {
+    // Nyelv alapú lokalizáció
+    let locale = 'hu-HU';
+    switch(currentLanguage) {
+      case 'en':
+        locale = 'en-US';
+        break;
+      case 'de':
+        locale = 'de-DE';
+        break;
+      case 'hu':
+      default:
+        locale = 'hu-HU';
+        break;
+    }
+    
     const options = { 
       year: 'numeric', 
       month: 'long', 
@@ -1893,8 +1953,8 @@ function updateCurrentTime() {
       weekday: 'long'
     };
     
-    dateElement.textContent = now.toLocaleDateString('hu-HU', options);
-    timeElement.textContent = now.toLocaleTimeString('hu-HU', { 
+    dateElement.textContent = now.toLocaleDateString(locale, options);
+    timeElement.textContent = now.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit'
     });
@@ -1989,11 +2049,69 @@ function switchToListsTab(listId) {
 // Sürgős feladatok frissítése
 function updateUrgentTasks() {
   const urgentTasksList = document.getElementById('urgent-tasks-list');
-  if (!urgentTasksList) return;
+  if (!urgentTasksList || !auth.currentUser) return;
   
-  // Itt implementálhatnánk a sürgős feladatok logikáját
-  // Egyelőre placeholder
-  urgentTasksList.innerHTML = '<p class="no-urgent">Nincs sürgős feladat</p>';
+  const listsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
+  
+  onValue(listsRef, (snapshot) => {
+    let urgentTasks = [];
+    
+    if (snapshot.exists()) {
+      const lists = snapshot.val();
+      
+      // Sürgős feladatok gyűjtése (nem kész feladatok + fontosnak megjelölt listák)
+      Object.entries(lists).forEach(([listId, listData]) => {
+        if (listData.items) {
+          Object.entries(listData.items).forEach(([itemId, item]) => {
+            // Sürgős ha: nem kész ÉS (régi vagy fontos kategóriából)
+            if (!item.done) {
+              const isOld = item.timestamp && (Date.now() - item.timestamp > 7 * 24 * 60 * 60 * 1000); // 7 napnál régebbi
+              const isImportant = listData.category && ['Fontos', 'Munka', 'important', 'work'].includes(listData.category);
+              
+              if (isOld || isImportant) {
+                urgentTasks.push({
+                  id: itemId,
+                  listId: listId,
+                  text: item.text,
+                  listName: listData.name,
+                  category: listData.category,
+                  isOld: isOld,
+                  isImportant: isImportant,
+                  pinned: item.pinned || false
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    // Sürgős feladatok megjelenítése
+    if (urgentTasks.length === 0) {
+      urgentTasksList.innerHTML = '<p class="no-urgent">🎉 Nincs sürgős feladat!</p>';
+    } else {
+      urgentTasksList.innerHTML = urgentTasks.slice(0, 5).map(task => `
+        <div class="urgent-task ${task.pinned ? 'pinned' : ''}" data-task-id="${task.id}" data-list-id="${task.listId}">
+          <div class="urgent-task-content">
+            <span class="urgent-task-text">${task.text}</span>
+            <span class="urgent-task-list">${task.listName}</span>
+            <div class="urgent-task-tags">
+              ${task.isOld ? '<span class="urgent-tag old">🕒 Régi</span>' : ''}
+              ${task.isImportant ? '<span class="urgent-tag important">⭐ Fontos</span>' : ''}
+            </div>
+          </div>
+          <div class="urgent-task-actions">
+            <button onclick="togglePinUrgentTask('${task.listId}', '${task.id}')" title="${task.pinned ? 'Kiemelés eltávolítása' : 'Kiemelés'}">
+              ${task.pinned ? '📌' : '📍'}
+            </button>
+            <button onclick="markUrgentTaskDone('${task.listId}', '${task.id}')" title="Kész">
+              ✅
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  });
 }
 
 // Áttekintés frissítése
@@ -2151,7 +2269,7 @@ function updateActivityStats(totalDays, maxStreak, avgActivity) {
   if (avgElement) avgElement.textContent = avgActivity.toFixed(1);
 }
 
-// Produktivitási betekintések frissítése
+// Produktivitási betekintések frissítése (lokalizációval)
 function updateProductivityInsights() {
   const insightsList = document.getElementById('insights-list');
   if (!insightsList) return;
@@ -2162,24 +2280,69 @@ function updateProductivityInsights() {
   const completedItems = document.querySelectorAll('.list-box li.done').length;
   const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
   
-  const insights = [
-    { 
-      icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
-      text: `Teljesítés: ${completionRate}% (${completedItems}/${totalItems} feladat)` 
-    },
-    { 
-      icon: '⭐', 
-      text: `${totalLists} aktív lista kezelése` 
-    },
-    { 
-      icon: currentStreak > 0 ? '🔥' : '💤', 
-      text: currentStreak > 0 ? `${currentStreak} napos sorozat aktív!` : 'Kezdj új sorozatot ma!' 
-    },
-    { 
-      icon: userLevel >= 3 ? '🏆' : '🎯', 
-      text: `${userLevel}. szint - ${userXP} XP összesen` 
-    }
-  ];
+  // Lokalizált szövegek a jelenlegi nyelvhez
+  const currentLang = document.documentElement.lang || 'hu';
+  
+  let insights;
+  if (currentLang === 'en') {
+    insights = [
+      { 
+        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
+        text: `Completion: ${completionRate}% (${completedItems}/${totalItems} tasks)` 
+      },
+      { 
+        icon: '⭐', 
+        text: `Managing ${totalLists} active lists` 
+      },
+      { 
+        icon: currentStreak > 0 ? '🔥' : '💤', 
+        text: currentStreak > 0 ? `${currentStreak} day streak active!` : 'Start a new streak today!' 
+      },
+      { 
+        icon: userLevel >= 3 ? '🏆' : '🎯', 
+        text: `Level ${userLevel} - ${userXP} XP total` 
+      }
+    ];
+  } else if (currentLang === 'de') {
+    insights = [
+      { 
+        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
+        text: `Abschluss: ${completionRate}% (${completedItems}/${totalItems} Aufgaben)` 
+      },
+      { 
+        icon: '⭐', 
+        text: `Verwaltung von ${totalLists} aktiven Listen` 
+      },
+      { 
+        icon: currentStreak > 0 ? '🔥' : '💤', 
+        text: currentStreak > 0 ? `${currentStreak} Tage Streak aktiv!` : 'Starte heute einen neuen Streak!' 
+      },
+      { 
+        icon: userLevel >= 3 ? '🏆' : '🎯', 
+        text: `Level ${userLevel} - ${userXP} XP gesamt` 
+      }
+    ];
+  } else {
+    // Magyar (default)
+    insights = [
+      { 
+        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
+        text: `Teljesítés: ${completionRate}% (${completedItems}/${totalItems} feladat)` 
+      },
+      { 
+        icon: '⭐', 
+        text: `${totalLists} aktív lista kezelése` 
+      },
+      { 
+        icon: currentStreak > 0 ? '🔥' : '💤', 
+        text: currentStreak > 0 ? `${currentStreak} napos sorozat aktív!` : 'Kezdj új sorozatot ma!' 
+      },
+      { 
+        icon: userLevel >= 3 ? '🏆' : '🎯', 
+        text: `${userLevel}. szint - ${userXP} XP összesen` 
+      }
+    ];
+  }
   
   insightsList.innerHTML = insights.map(insight => `
     <div class="insight-item">
@@ -2224,9 +2387,18 @@ function openNoteForEdit(noteId) {
 setInterval(updateCurrentTime, 1000);
 
 // Alkalmazás inicializálása
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Nyelv rendszer inicializálása
+  await initLanguageSystem();
+  
   // Navigáció inicializálása
   initNavigation();
+  
+  // Téma választó inicializálása
+  initThemeSelector();
+  
+  // Profile menü inicializálása
+  initProfileMenu();
   
   // Dashboard kezdeti betöltése
   updateDashboard();
@@ -2261,21 +2433,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Közelgő értesítések ellenőrzése
   setTimeout(checkUpcomingNotifications, 2000); // 2 másodperc késleltetéssel
-  
-  // Nyelv dropdown kezelése
-  initLanguageDropdown();
 });
 
 // Gyors műveletek kezelése
 function handleQuickAction(action) {
   switch(action) {
     case 'quick-task':
-      // Váltás a listák fülre és új elem hozzáadás
-      document.querySelector('[data-tab="lists"]').click();
-      setTimeout(() => {
-        const firstInput = document.querySelector('.item-input');
-        if (firstInput) firstInput.focus();
-      }, 100);
+      // Quick task modal megnyitása
+      openQuickTaskModal();
       break;
     case 'quick-note':
       // Váltás a jegyzetek fülre és új jegyzet
@@ -2685,6 +2850,399 @@ function requestNotificationPermission() {
   }
 }
 
+// ===============================================
+// 🌐 INTERNATIONALIZATION (i18n) SYSTEM
+// ===============================================
+
+let currentLanguage = 'hu';
+let translations = {};
+
+// Nyelv inicializálása
+async function initLanguageSystem() {
+  // Mentett nyelv betöltése
+  const savedLanguage = localStorage.getItem('language') || 'hu';
+  await loadLanguage(savedLanguage);
+  
+  // Nyelv dropdown inicializálása
+  initLanguageDropdown();
+}
+
+// Nyelvi fájl betöltése
+async function loadLanguage(languageCode) {
+  try {
+    const response = await fetch(`languages/${languageCode}.json`);
+    if (response.ok) {
+      translations = await response.json();
+      currentLanguage = languageCode;
+      localStorage.setItem('language', languageCode);
+      
+      // UI frissítése
+      updateUITexts();
+    } else {
+      console.error(`Language file ${languageCode}.json not found, falling back to Hungarian`);
+      if (languageCode !== 'hu') {
+        await loadLanguage('hu');
+      }
+    }
+  } catch (error) {
+    console.error('Error loading language:', error);
+    if (languageCode !== 'hu') {
+      await loadLanguage('hu');
+    }
+  }
+}
+
+// Szöveg lekérése
+function getText(key, placeholders = {}) {
+  const keys = key.split('.');
+  let value = translations;
+  
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = value[k];
+    } else {
+      console.warn(`Translation key not found: ${key}`);
+      return key;
+    }
+  }
+  
+  // Placeholder-ek helyettesítése
+  if (typeof value === 'string') {
+    return value.replace(/\{(\w+)\}/g, (match, placeholder) => {
+      return placeholders[placeholder] || match;
+    });
+  }
+  
+  return value;
+}
+
+// UI szövegek frissítése
+function updateUITexts() {
+  // Navigáció
+  const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+  const overviewTab = document.querySelector('[data-tab="overview"]');
+  const listsTab = document.querySelector('[data-tab="lists"]');
+  const notesTab = document.querySelector('[data-tab="notes"]');
+  const calendarTab = document.querySelector('[data-tab="calendar"]');
+  
+  if (dashboardTab) dashboardTab.innerHTML = getText('navigation.dashboard');
+  if (overviewTab) overviewTab.innerHTML = getText('navigation.overview');
+  if (listsTab) listsTab.innerHTML = getText('navigation.lists');
+  if (notesTab) notesTab.innerHTML = getText('navigation.notes');
+  if (calendarTab) calendarTab.innerHTML = getText('navigation.calendar');
+  
+  // Auth szekció szövegek
+  const authTitle = document.querySelector('#auth-section h1');
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('password-input');
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  
+  if (authTitle) authTitle.textContent = getText('auth.title');
+  if (emailInput) emailInput.placeholder = getText('auth.email_placeholder');
+  if (passwordInput) passwordInput.placeholder = getText('auth.password_placeholder');
+  if (loginBtn) loginBtn.textContent = getText('auth.login');
+  if (registerBtn) registerBtn.textContent = getText('auth.register');
+  if (logoutBtn) logoutBtn.textContent = getText('auth.logout');
+  
+  // Dashboard szövegek
+  const welcomeTitle = document.querySelector('.welcome-card h2');
+  const welcomeText = document.querySelector('.welcome-card p');
+  const streakLabel = document.querySelector('.streak-label');
+  
+  if (welcomeTitle) welcomeTitle.textContent = getText('dashboard.welcome');
+  if (welcomeText) welcomeText.textContent = getText('dashboard.overview_text');
+  if (streakLabel) streakLabel.textContent = getText('dashboard.streak_label');
+  
+  // Quick actions
+  const quickActionsTitle = document.querySelector('.quick-actions h3');
+  if (quickActionsTitle) quickActionsTitle.textContent = getText('dashboard.quick_actions');
+  
+  const quickTaskBtn = document.querySelector('[data-action="quick-task"]');
+  const quickNoteBtn = document.querySelector('[data-action="quick-note"]');
+  const quickEventBtn = document.querySelector('[data-action="quick-event"]');
+  
+  if (quickTaskBtn) quickTaskBtn.textContent = getText('dashboard.quick_task');
+  if (quickNoteBtn) quickNoteBtn.textContent = getText('dashboard.quick_note');
+  if (quickEventBtn) quickEventBtn.textContent = getText('dashboard.quick_event');
+  
+  // Dashboard további szövegek
+  const dailyInspirationTitle = document.querySelector('.daily-quote h3');
+  const todayEventsTitle = document.querySelector('.today-events h3');
+  const pinnedItemsTitle = document.querySelector('.pinned-items h3');
+  const urgentTasksTitle = document.querySelector('.urgent-tasks h3');
+  const noEventsText = document.querySelector('.no-events');
+  const noUrgentText = document.querySelector('.no-urgent');
+  
+  if (dailyInspirationTitle) dailyInspirationTitle.textContent = getText('dashboard.daily_inspiration');
+  if (todayEventsTitle) todayEventsTitle.textContent = getText('dashboard.today_events');
+  if (pinnedItemsTitle) pinnedItemsTitle.textContent = getText('dashboard.pinned_items');
+  if (urgentTasksTitle) urgentTasksTitle.textContent = getText('dashboard.urgent_tasks');
+  if (noEventsText) noEventsText.textContent = getText('dashboard.no_events');
+  if (noUrgentText) noUrgentText.textContent = getText('dashboard.no_urgent');
+  
+  // Pinned items szekcióban
+  const pinnedNotesTitle = document.querySelector('#pinned-notes h4');
+  const pinnedTasksTitle = document.querySelector('#pinned-tasks h4');
+  
+  if (pinnedNotesTitle) pinnedNotesTitle.textContent = getText('dashboard.notes');
+  if (pinnedTasksTitle) pinnedTasksTitle.textContent = getText('dashboard.tasks');
+  
+  // Overview szekció
+  const overviewTitle = document.querySelector('#overview-section .section-header h2');
+  const statisticsTitle = document.querySelector('#main-stats-panel h3');
+  const levelTitle = document.querySelector('.level-card h3');
+  const activityGraphTitle = document.querySelector('.activity-graph h3');
+  
+  if (overviewTitle) overviewTitle.textContent = getText('overview.title');
+  if (statisticsTitle) statisticsTitle.textContent = getText('overview.statistics');
+  if (levelTitle) levelTitle.textContent = getText('overview.level');
+  if (activityGraphTitle) activityGraphTitle.textContent = getText('overview.activity_graph');
+  
+  // Stat cards
+  const statLabels = document.querySelectorAll('.stat-label');
+  if (statLabels[0]) statLabels[0].textContent = getText('overview.lists');
+  if (statLabels[1]) statLabels[1].textContent = getText('overview.items');
+  if (statLabels[2]) statLabels[2].textContent = getText('overview.completed');
+  if (statLabels[3]) statLabels[3].textContent = getText('overview.completion');
+  
+  // Activity legend
+  const activityLegendItems = document.querySelectorAll('.activity-legend-item span');
+  if (activityLegendItems[0]) activityLegendItems[0].textContent = getText('overview.activity_less');
+  if (activityLegendItems[1]) activityLegendItems[1].textContent = getText('overview.activity_medium');
+  if (activityLegendItems[2]) activityLegendItems[2].textContent = getText('overview.activity_high');
+  
+  // Activity stats labels
+  const activityStatLabels = document.querySelectorAll('.activity-stat-label');
+  if (activityStatLabels[0]) activityStatLabels[0].textContent = getText('overview.activity_total');
+  if (activityStatLabels[1]) activityStatLabels[1].textContent = getText('overview.activity_streak');
+  if (activityStatLabels[2]) activityStatLabels[2].textContent = getText('overview.activity_avg');
+  
+  // Quick task modal
+  const quickTaskModalTitle = document.querySelector('#quick-task-modal h3');
+  const quickTaskInput = document.getElementById('quick-task-text');
+  const quickTaskSelect = document.getElementById('quick-task-list-select');
+  const quickTaskSubmitBtn = document.getElementById('quick-task-submit');
+  const quickTaskCancelBtn = document.getElementById('quick-task-cancel');
+  
+  if (quickTaskModalTitle) quickTaskModalTitle.textContent = getText('modals.quick_task.title');
+  if (quickTaskInput) quickTaskInput.placeholder = getText('modals.quick_task.placeholder');
+  if (quickTaskSubmitBtn) quickTaskSubmitBtn.textContent = getText('modals.quick_task.add');
+  if (quickTaskCancelBtn) quickTaskCancelBtn.textContent = getText('modals.quick_task.cancel');
+  
+  // Listák szekció fordítása
+  const listsTitle = document.querySelector('#lists-section .section-header h2');
+  const createNewListBtn = document.getElementById('create-new-list-btn');
+  const listNameInput = document.getElementById('list-name');
+  const listCategoryInput = document.getElementById('list-category');
+  const createListBtn = document.getElementById('create-list-btn');
+  const reorderBtn = document.getElementById('toggle-reorder-btn');
+  
+  if (listsTitle) listsTitle.textContent = getText('lists.title');
+  if (createNewListBtn) createNewListBtn.textContent = getText('lists.create_new');
+  if (listNameInput) listNameInput.placeholder = getText('lists.list_name_placeholder');
+  if (listCategoryInput) listCategoryInput.placeholder = getText('lists.category_placeholder');
+  if (createListBtn) createListBtn.textContent = getText('lists.create_list');
+  if (reorderBtn) {
+    const reorderText = reorderBtn.querySelector('span:not(.material-icons)');
+    if (reorderText) reorderText.textContent = getText('lists.reorder');
+  }
+  
+  // Jegyzetek szekció fordítása
+  const notesTitle = document.querySelector('#notes-section .section-header h2');
+  const newNoteBtn = document.getElementById('new-note-btn');
+  
+  if (notesTitle) notesTitle.textContent = getText('notes.title');
+  if (newNoteBtn) newNoteBtn.textContent = getText('notes.new_note');
+  
+  // Naptár szekció fordítása
+  const calendarTitle = document.querySelector('#calendar-section .section-header h2');
+  const newEventBtn = document.getElementById('new-event-btn');
+  const upcomingEventsTitle = document.querySelector('.upcoming-events h3');
+  
+  if (calendarTitle) calendarTitle.textContent = getText('calendar.title');
+  if (newEventBtn) newEventBtn.textContent = getText('calendar.new_event');
+  if (upcomingEventsTitle) upcomingEventsTitle.textContent = getText('calendar.upcoming_events');
+  
+  // Event modal fordítása
+  const eventModalTitle = document.getElementById('event-modal-title');
+  const eventTitleInput = document.getElementById('event-title');
+  const eventDateInput = document.getElementById('event-date');
+  const eventTimeInput = document.getElementById('event-time');
+  const eventDescInput = document.getElementById('event-description');
+  const saveEventBtn = document.getElementById('save-event');
+  const cancelEventBtn = document.getElementById('cancel-event');
+  
+  if (eventModalTitle) eventModalTitle.textContent = getText('calendar.new_event');
+  if (eventTitleInput) eventTitleInput.placeholder = getText('calendar.event_title');
+  if (eventDescInput) eventDescInput.placeholder = getText('calendar.event_description');
+  if (saveEventBtn) saveEventBtn.textContent = getText('calendar.save_event');
+  if (cancelEventBtn) cancelEventBtn.textContent = getText('calendar.cancel');
+  
+  // Note modal fordítása
+  const noteModalTitle = document.getElementById('note-modal-title');
+  const noteTitleInput = document.getElementById('note-title');
+  const noteContentInput = document.getElementById('note-content');
+  const saveNoteBtn = document.getElementById('save-note');
+  const cancelNoteBtn = document.getElementById('cancel-note');
+  
+  if (noteModalTitle) noteModalTitle.textContent = getText('notes.note_title');
+  if (noteTitleInput) noteTitleInput.placeholder = getText('notes.title_placeholder');
+  if (noteContentInput) noteContentInput.placeholder = getText('notes.content_placeholder');
+  if (saveNoteBtn) saveNoteBtn.textContent = getText('notes.save');
+  if (cancelNoteBtn) cancelNoteBtn.textContent = getText('notes.cancel');
+  
+  // Naptár hónapok és napok nevei (dinamikusan generált tartalom)
+  updateCalendarLocales();
+  
+  // Create panel fordítása
+  const createHeader = document.querySelector('.create-header h3');
+  const createListNameLabel = document.querySelector('label[for="custom-list-name-input"]');
+  const createListCategoryLabel = document.querySelector('label[for="custom-list-category-input"]');
+  const customCreateListBtn = document.getElementById('custom-new-list-btn');
+  const createListNameInput = document.getElementById('custom-list-name-input');
+  const createListCategoryInput = document.getElementById('custom-list-category-input');
+  
+  if (createHeader) createHeader.textContent = getText('lists.create_new');
+  if (createListNameLabel) createListNameLabel.textContent = getText('lists.list_name');
+  if (createListCategoryLabel) createListCategoryLabel.textContent = getText('lists.category');
+  if (createListNameInput) createListNameInput.placeholder = getText('lists.list_name_placeholder');
+  if (createListCategoryInput) createListCategoryInput.placeholder = getText('lists.category_placeholder');
+  if (customCreateListBtn) {
+    const buttonText = customCreateListBtn.querySelector('span:not(.material-icons)');
+    if (buttonText) buttonText.textContent = getText('lists.create_list');
+  }
+  
+  // Filter panel fordítása
+  const filterHeader = document.querySelector('.filter-header h3');
+  const filterCategoryLabel = document.querySelector('label[for="filter-category"]');
+  const searchLabel = document.querySelector('label[for="search-input"]');
+  const searchInput = document.getElementById('search-input');
+  const allCategoriesOption = document.querySelector('#filter-category option[value="all"]');
+  
+  if (filterHeader) filterHeader.textContent = getText('lists.filter_search');
+  if (filterCategoryLabel) filterCategoryLabel.textContent = getText('lists.filter_category');
+  if (searchLabel) searchLabel.textContent = getText('lists.search');
+  if (searchInput) searchInput.placeholder = getText('lists.search_placeholder');
+  if (allCategoriesOption) allCategoriesOption.textContent = getText('lists.all_categories');
+  
+  // Toggle reorder button fordítása
+  const toggleReorderBtn = document.getElementById('toggle-reorder-btn');
+  if (toggleReorderBtn) {
+    const reorderText = toggleReorderBtn.querySelector('span:not(.material-icons)');
+    if (reorderText) reorderText.textContent = getText('lists.reorder');
+  }
+  
+  // Jegyzetek törlési modal fordítása
+  const deleteNoteTitle = document.querySelector('#delete-note-modal .modal-header h3');
+  const deleteNoteConfirm = document.querySelector('#delete-note-modal .warning-content p');
+  const deleteNoteWarning = document.querySelector('#delete-note-modal .warning-text');
+  const deleteNoteBtn = document.getElementById('confirm-delete-note');
+  const cancelDeleteNoteBtn = document.getElementById('cancel-delete-note');
+  
+  if (deleteNoteTitle) deleteNoteTitle.textContent = getText('notes.delete_note');
+  if (deleteNoteConfirm) deleteNoteConfirm.textContent = getText('notes.delete_confirm');
+  if (deleteNoteWarning) deleteNoteWarning.textContent = getText('notes.delete_warning');
+  if (deleteNoteBtn) deleteNoteBtn.textContent = getText('notes.delete_button');
+  if (cancelDeleteNoteBtn) cancelDeleteNoteBtn.textContent = getText('notes.cancel');
+  
+  // Sürgős feladatok "nincs sürgős" szövege
+  const noUrgentElements = document.querySelectorAll('.no-urgent');
+  noUrgentElements.forEach(el => {
+    if (el) el.textContent = getText('dashboard.no_urgent');
+  });
+  
+  // Note categories select opciók
+  const noteCategorySelect = document.getElementById('note-category');
+  if (noteCategorySelect) {
+    noteCategorySelect.innerHTML = `
+      <option value="general">${getText('notes.categories.general')}</option>
+      <option value="passwords">${getText('notes.categories.passwords')}</option>
+      <option value="ideas">${getText('notes.categories.ideas')}</option>
+      <option value="important">${getText('notes.categories.important')}</option>
+      <option value="work">${getText('notes.categories.work')}</option>
+      <option value="personal">${getText('notes.categories.personal')}</option>
+    `;
+  }
+  
+  // Event type select opciók
+  const eventTypeSelect = document.getElementById('event-type');
+  if (eventTypeSelect) {
+    eventTypeSelect.innerHTML = `
+      <option value="birthday">${getText('calendar.event_types.birthday')}</option>
+      <option value="meeting">${getText('calendar.event_types.meeting')}</option>
+      <option value="reminder">${getText('calendar.event_types.reminder')}</option>
+      <option value="appointment">${getText('calendar.event_types.appointment')}</option>
+      <option value="event">${getText('calendar.event_types.event')}</option>
+      <option value="deadline">${getText('calendar.event_types.deadline')}</option>
+    `;
+  }
+  
+  // Reminder times select opciók
+  const reminderTimeSelect = document.getElementById('reminder-time');
+  if (reminderTimeSelect) {
+    reminderTimeSelect.innerHTML = `
+      <option value="0">${getText('calendar.reminder_times.0')}</option>
+      <option value="15">${getText('calendar.reminder_times.15')}</option>
+      <option value="30">${getText('calendar.reminder_times.30')}</option>
+      <option value="60">${getText('calendar.reminder_times.60')}</option>
+      <option value="1440">${getText('calendar.reminder_times.1440')}</option>
+    `;
+  }
+  
+  // Event modal input labelek
+  const eventDateLabel = document.querySelector('label[for="event-date"]');
+  const eventTimeLabel = document.querySelector('label[for="event-time"]');
+  const eventTypeLabel = document.querySelector('label[for="event-type"]');
+  const eventReminderLabel = document.querySelector('label[for="event-reminder"]');
+  
+  if (eventDateLabel) eventDateLabel.textContent = getText('calendar.date_label');
+  if (eventTimeLabel) eventTimeLabel.textContent = getText('calendar.time_label');
+  if (eventTypeLabel) eventTypeLabel.textContent = getText('calendar.type_label');
+  if (eventReminderLabel) eventReminderLabel.textContent = getText('calendar.reminder_label');
+  
+  // Event modal placeholder szövegek
+  const modalEventTitleInput = document.getElementById('event-title');
+  const modalEventDescInput = document.getElementById('event-description');
+  if (modalEventTitleInput) modalEventTitleInput.placeholder = getText('calendar.event_name_placeholder');
+  if (modalEventDescInput) modalEventDescInput.placeholder = getText('calendar.event_desc_placeholder');
+  
+  // Produktivitási insights frissítése (már lokalizált)
+  updateProductivityInsights();
+  
+  // Confirm modal szövegek
+  const confirmMessage = document.getElementById('confirm-message');
+  const confirmYes = document.getElementById('confirm-yes');
+  const confirmNo = document.getElementById('confirm-no');
+  
+  if (confirmYes) confirmYes.textContent = getText('modals.yes');
+  if (confirmNo) confirmNo.textContent = getText('modals.no');
+  
+  // Quick add modal szövegek (FAB modal)
+  const quickAddTitle = document.querySelector('#quick-add-modal h3');
+  const quickAddInput = document.getElementById('quick-add-text');
+  const quickAddSubmit = document.getElementById('quick-add-submit');
+  const quickAddCancel = document.getElementById('quick-add-cancel');
+  
+  if (quickAddTitle) quickAddTitle.textContent = getText('modals.quick_add.title');
+  if (quickAddInput) quickAddInput.placeholder = getText('modals.quick_add.placeholder');
+  if (quickAddSubmit) quickAddSubmit.textContent = getText('modals.quick_add.add');
+  if (quickAddCancel) quickAddCancel.textContent = getText('modals.quick_add.cancel');
+  
+  // Item input placeholder frissítése (dinamikusan létrehozott elemekhez)
+  updateItemInputPlaceholders();
+  
+  // Quick add lista select frissítése
+  populateQuickTaskListSelect();
+  
+  // Dátum frissítése lokalizációval
+  updateCurrentTime();
+  
+  // Achievement szövegek frissítése
+  updateAchievements();
+}
+
 // Nyelv dropdown inicializálása
 function initLanguageDropdown() {
   const hamburgerIcon = document.getElementById('hamburger-icon');
@@ -2696,9 +3254,7 @@ function initLanguageDropdown() {
     
     hamburgerIcon.addEventListener('click', (e) => {
       e.stopPropagation();
-      // CSS class alapú megjelenítés használata style.display helyett
       languageDropdown.classList.toggle('show');
-      console.log('Language dropdown toggled:', languageDropdown.classList.contains('show'));
     });
     
     // Kívülre kattintás esetén bezárás
@@ -2708,12 +3264,31 @@ function initLanguageDropdown() {
       }
     });
     
-    // Nyelv linkekre kattintás
+    // ESC billentyű lenyomásakor bezárás
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && languageDropdown.classList.contains('show')) {
+        languageDropdown.classList.remove('show');
+      }
+    });
+    
+    // Nyelv linkekre kattintás - JSON alapú váltás
     const languageLinks = languageDropdown.querySelectorAll('a');
     languageLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        
+        const languageCode = link.getAttribute('data-lang') || 'hu';
+        
+        // Dropdown azonnal bezárása a nyelv váltás előtt
         languageDropdown.classList.remove('show');
+        
+        try {
+          await loadLanguage(languageCode);
+          markCurrentLanguage();
+        } catch (error) {
+          console.error('Hiba a nyelv betöltése során:', error);
+        }
       });
     });
   }
@@ -2721,24 +3296,32 @@ function initLanguageDropdown() {
 
 // Aktuális nyelv jelölése
 function markCurrentLanguage() {
-  const currentPath = window.location.pathname;
   const languageLinks = document.querySelectorAll('.language-dropdown a');
   const languageText = document.querySelector('.language-text');
   
   languageLinks.forEach(link => {
     link.classList.remove('current');
     
-    // Ellenőrizzük az aktuális oldalt
-    if (currentPath.includes('en-index.html') && link.href.includes('en-index.html')) {
+    // Ellenőrizzük az aktuális nyelvet
+    const linkLang = link.getAttribute('data-lang');
+    if (linkLang === currentLanguage) {
       link.classList.add('current');
-      if (languageText) languageText.textContent = 'EN';
-    } else if (currentPath.includes('de-index.html') && link.href.includes('de-index.html')) {
-      link.classList.add('current');
-      if (languageText) languageText.textContent = 'DE';
-    } else if ((!currentPath.includes('en-index.html') && !currentPath.includes('de-index.html')) 
-               && link.href.includes('index.html') && !link.href.includes('en-') && !link.href.includes('de-')) {
-      link.classList.add('current');
-      if (languageText) languageText.textContent = 'HU';
+      
+      // Frissítjük a hamburger menü szövegét
+      if (languageText) {
+        switch(currentLanguage) {
+          case 'en':
+            languageText.textContent = 'EN';
+            break;
+          case 'de':
+            languageText.textContent = 'DE';
+            break;
+          case 'hu':
+          default:
+            languageText.textContent = 'HU';
+            break;
+        }
+      }
     }
   });
 }
@@ -2750,6 +3333,7 @@ window.togglePinNote = togglePinNote;
 window.deleteEvent = deleteEvent;
 window.togglePinList = togglePinList;
 window.switchToListsTab = switchToListsTab;
+window.openNoteForEdit = openNoteForEdit;
 
 // Lista kiemelés/kiemelés eltávolítása
 function togglePinList(listId) {
@@ -2771,3 +3355,361 @@ function togglePinList(listId) {
     }
   });
 }
+
+// ===============================================
+// 🚀 QUICK TASK MODAL FUNCTIONS
+// ===============================================
+
+function openQuickTaskModal() {
+  if (quickTaskModal) {
+    populateQuickTaskListSelect();
+    quickTaskModal.style.display = 'flex';
+    if (quickTaskText) quickTaskText.focus();
+  }
+}
+
+function populateQuickTaskListSelect() {
+  if (!quickTaskListSelect || !auth.currentUser) return;
+  
+  quickTaskListSelect.innerHTML = `<option value="">${getText('modals.quick_task.select_list')}</option>`;
+  
+  const listsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
+  onValue(listsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const lists = snapshot.val();
+      Object.keys(lists).forEach(listId => {
+        const list = lists[listId];
+        const option = document.createElement('option');
+        option.value = listId;
+        option.textContent = list.name;
+        quickTaskListSelect.appendChild(option);
+      });
+    }
+  });
+}
+
+function submitQuickTask() {
+  const taskText = quickTaskText.value.trim();
+  const selectedListId = quickTaskListSelect.value;
+  
+  if (!taskText || !selectedListId) {
+    const message = currentLanguage === 'en' ? 'Please fill in the task text and choose a list!' : 
+                   currentLanguage === 'de' ? 'Bitte füllen Sie den Aufgabentext aus und wählen Sie eine Liste!' : 
+                   'Kérjük, töltsd ki a feladat szövegét és válassz egy listát!';
+    alert(message);
+    return;
+  }
+  
+  if (!auth.currentUser) {
+    alert(getText('notifications.login_required'));
+    return;
+  }
+  
+  const listItemsRef = ref(db, `users/${auth.currentUser.uid}/lists/${selectedListId}/items`);
+  push(listItemsRef, {
+    text: taskText,
+    done: false,
+    createdAt: new Date().toISOString(),
+    timestamp: Date.now()
+  }).then(async () => {
+    quickTaskText.value = '';
+    quickTaskModal.style.display = 'none';
+    showNotification(getText('notifications.task_added'));
+    addXP(5); // XP hozzáadása
+    
+    // Teljes adatfrissítés
+    await forceRefreshAllData();
+  }).catch(error => {
+    console.error('Hiba a feladat hozzáadása során:', error);
+    alert('Hiba történt a feladat hozzáadása során.');
+  });
+}
+
+function closeQuickTaskModal() {
+  if (quickTaskModal) {
+    quickTaskModal.style.display = 'none';
+    quickTaskText.value = '';
+  }
+}
+
+// Sürgős feladatok kezelése
+function togglePinUrgentTask(listId, taskId) {
+  if (!auth.currentUser) return;
+  
+  const taskRef = ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${taskId}`);
+  
+  get(taskRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const currentPinned = snapshot.val().pinned || false;
+      
+      update(taskRef, { 
+        pinned: !currentPinned,
+        updatedAt: new Date().toISOString()
+      }).then(() => {
+        updateUrgentTasks();
+        updatePinnedTasks();
+        showNotification(!currentPinned ? getText('notifications.task_pinned') : getText('notifications.task_unpinned'));
+      });
+    }
+  });
+}
+
+function markUrgentTaskDone(listId, taskId) {
+  if (!auth.currentUser) return;
+  
+  const taskRef = ref(db, `users/${auth.currentUser.uid}/lists/${listId}/items/${taskId}`);
+  
+  update(taskRef, { 
+    done: true,
+    completedAt: new Date().toISOString()
+  }).then(async () => {
+    updateUrgentTasks();
+    addXP(5); // XP a feladat teljesítéséért
+    showNotification(getText('notifications.task_completed'));
+    await forceRefreshAllData();
+  });
+}
+
+// Helper funkciók a fordításokhoz
+function updateCalendarLocales() {
+  // Naptár lokalizációja a renderCalendar funkciónál történik
+  if (document.getElementById('calendar-grid')) {
+    renderCalendar();
+  }
+}
+
+
+
+function updateItemInputPlaceholders() {
+  // Dinamikusan létrehozott item inputok frissítése
+  setTimeout(() => {
+    const itemInputs = document.querySelectorAll('.item-input');
+    itemInputs.forEach(input => {
+      if (input) input.placeholder = getText('dashboard.item_placeholder');
+    });
+  }, 100);
+}
+
+// Modern téma választó rendszer
+function initThemeSelector() {
+  const themeSelector = document.getElementById('theme-selector-btn');
+  const themeModal = document.getElementById('theme-modal');
+  const themeModalClose = document.getElementById('theme-modal-close');
+  const themeApplyBtn = document.getElementById('theme-apply-btn');
+  const themeCancelBtn = document.getElementById('theme-cancel-btn');
+  const themeOptions = document.querySelectorAll('.theme-option');
+  
+  if (!themeSelector || !themeModal) return;
+  
+  // Load saved theme
+  const savedTheme = JSON.parse(localStorage.getItem('selectedTheme') || '{"name":"default","mode":"light"}');
+  currentTheme = savedTheme;
+  applyTheme(currentTheme.name, currentTheme.mode);
+  updateActiveThemeOption();
+  
+  let selectedTheme = { ...currentTheme };
+  
+  // Open modal
+  themeSelector.addEventListener('click', (e) => {
+    e.stopPropagation();
+    themeModal.style.display = 'flex';
+    selectedTheme = { ...currentTheme };
+    updateActiveThemeOption();
+  });
+  
+  // Close modal and revert theme
+  const closeModal = () => {
+    themeModal.style.display = 'none';
+    selectedTheme = { ...currentTheme };
+    // Visszaállítjuk az eredeti témát
+    applyTheme(currentTheme.name, currentTheme.mode);
+    updateActiveThemeOption();
+  };
+  
+  if (themeModalClose) themeModalClose.addEventListener('click', closeModal);
+  if (themeCancelBtn) themeCancelBtn.addEventListener('click', closeModal);
+  
+  // Close modal when clicking outside
+  themeModal.addEventListener('click', (e) => {
+    if (e.target === themeModal) {
+      closeModal();
+    }
+  });
+  
+  // Theme option selection with live preview
+  themeOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      const themeName = option.dataset.theme;
+      const themeMode = option.dataset.mode;
+      
+      selectedTheme = { name: themeName, mode: themeMode };
+      window.selectedTheme = selectedTheme; // Global hozzáférés biztosítása
+      
+      // Élő előnézet alkalmazása
+      applyTheme(themeName, themeMode);
+      updateActiveThemeOption();
+    });
+  });
+  
+  // Apply selected theme
+  if (themeApplyBtn) {
+    themeApplyBtn.addEventListener('click', () => {
+      selectTheme(selectedTheme.name, selectedTheme.mode);
+      themeModal.style.display = 'none';
+    });
+  }
+}
+
+function selectTheme(themeName, themeMode) {
+  currentTheme = { name: themeName, mode: themeMode };
+  
+  // Save to localStorage
+  localStorage.setItem('selectedTheme', JSON.stringify(currentTheme));
+  
+  // Apply theme
+  applyTheme(themeName, themeMode);
+  updateActiveThemeOption();
+  
+  // Save to Firebase if user is logged in
+  if (auth.currentUser) {
+    saveThemeToFirebase(currentTheme);
+  }
+  
+  // Show notification
+  showNotification(`🎨 ${getText('notifications.theme_applied')}: ${themeName} (${themeMode})`);
+}
+
+function applyTheme(themeName, themeMode) {
+  const root = document.documentElement;
+  
+  // Remove all theme classes
+  root.className = root.className.replace(/theme-\w+/g, '');
+  
+  // Set theme data attributes
+  root.setAttribute('data-theme', themeMode);
+  
+  // Add theme class
+  if (themeName !== 'default') {
+    root.classList.add(`theme-${themeName}`);
+  }
+  
+  // Load theme CSS if needed
+  loadThemeCSS(themeName);
+}
+
+function loadThemeCSS(themeName) {
+  const existingLink = document.getElementById('theme-css');
+  
+  if (themeName === 'default') {
+    if (existingLink) {
+      existingLink.remove();
+    }
+    return;
+  }
+  
+  if (!existingLink) {
+    const link = document.createElement('link');
+    link.id = 'theme-css';
+    link.rel = 'stylesheet';
+    link.href = 'modern-themes.css';
+    document.head.appendChild(link);
+  }
+}
+
+function updateActiveThemeOption() {
+  const themeOptions = document.querySelectorAll('.theme-option');
+  const themeModal = document.getElementById('theme-modal');
+  
+  // Ha a modal nyitva van, használjuk a selectedTheme-t, különben a currentTheme-t
+  let targetTheme = currentTheme;
+  if (themeModal && themeModal.style.display === 'flex' && window.selectedTheme) {
+    targetTheme = window.selectedTheme;
+  }
+  
+  themeOptions.forEach(option => {
+    option.classList.remove('active');
+    
+    if (option.dataset.theme === targetTheme.name && option.dataset.mode === targetTheme.mode) {
+      option.classList.add('active');
+    }
+  });
+}
+
+async function saveThemeToFirebase(themeSettings) {
+  try {
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    await updateDoc(userRef, {
+      themeSettings: themeSettings,
+      lastUpdated: new Date()
+    });
+  } catch (error) {
+    console.log('Theme save error:', error);
+  }
+}
+
+async function loadThemeFromFirebase() {
+  if (!auth.currentUser) return;
+  
+  try {
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists() && userSnap.data().themeSettings) {
+      const savedTheme = userSnap.data().themeSettings;
+      currentTheme = savedTheme;
+      localStorage.setItem('selectedTheme', JSON.stringify(currentTheme));
+      applyTheme(currentTheme.name, currentTheme.mode);
+      updateActiveThemeOption();
+    }
+  } catch (error) {
+    console.log('Theme load error:', error);
+  }
+}
+
+// Profile menü inicializálása
+function initProfileMenu() {
+  const profileBtn = document.getElementById('profile-btn');
+  const profileDropdown = document.getElementById('profile-dropdown');
+  const logoutBtn = document.getElementById('logout-btn');
+  
+  if (!profileBtn || !profileDropdown || !logoutBtn) return;
+  
+  // Profile gomb kattintás
+  profileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle('show');
+  });
+  
+  // Kívülre kattintás esetén bezárás
+  document.addEventListener('click', (e) => {
+    if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+      profileDropdown.classList.remove('show');
+    }
+  });
+  
+  // ESC billentyű lenyomásakor bezárás
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && profileDropdown.classList.contains('show')) {
+      profileDropdown.classList.remove('show');
+    }
+  });
+  
+  // Logout gomb
+  logoutBtn.addEventListener('click', () => {
+    if (confirm(getText('auth.logout') + '?')) {
+      signOut(auth).then(() => {
+        profileDropdown.classList.remove('show');
+        showNotification('👋 ' + getText('notifications.logout_success'));
+      }).catch((error) => {
+        console.error('Kijelentkezési hiba:', error);
+      });
+    }
+  });
+}
+
+// Globális függvény elérhetővé tétele
+window.openQuickTaskModal = openQuickTaskModal;
+window.submitQuickTask = submitQuickTask;
+window.closeQuickTaskModal = closeQuickTaskModal;
+window.togglePinUrgentTask = togglePinUrgentTask;
+window.markUrgentTaskDone = markUrgentTaskDone;

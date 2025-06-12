@@ -18,29 +18,113 @@
   
   <!-- Saját stíluslap -->
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="modern-themes.css">
 </head>
 <body>
 
-  <!-- Nyelvválasztó menü -->
-  <div id="language-menu">
-    <button id="hamburger-icon" title="Nyelv váltás / Language">
-      <span class="material-icons">language</span>
-      <span class="language-text">HU</span>
-    </button>
-    <div id="language-dropdown" class="language-dropdown">
-      <ul>
-        <li><a href="index.html">🇭🇺 Magyar</a></li>
-        <li><a href="en-index.html">🇺🇸 English</a></li>
-        <li><a href="de-index.html">🇩🇪 Német</a></li>
-      </ul>
-    </div>
-  </div>
 
-  <!-- Téma váltó gomb -->
-  <div id="theme-toggle-container">
-    <button id="theme-toggle-btn" class="theme-toggle-btn">
-      <span class="material-icons">dark_mode</span>
-    </button>
+
+  <!-- Téma modal -->
+  <div id="theme-modal" class="modal" style="display: none;">
+    <div class="modal-content theme-modal-content">
+      <div class="modal-header">
+        <h3 id="theme-modal-title">🎨 Téma választás</h3>
+        <button class="close-btn" id="theme-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="theme-options">
+          <div class="theme-group">
+            <h5>Alapértelmezett</h5>
+            <div class="theme-option" data-theme="default" data-mode="light" title="Alapértelmezett világos">
+              <div class="theme-preview default-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="default" data-mode="dark" title="Alapértelmezett sötét">
+              <div class="theme-preview default-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Ocean Blue</h5>
+            <div class="theme-option" data-theme="ocean-blue" data-mode="light" title="Ocean Blue világos">
+              <div class="theme-preview ocean-blue-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="ocean-blue" data-mode="dark" title="Ocean Blue sötét">
+              <div class="theme-preview ocean-blue-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Sakura Pink</h5>
+            <div class="theme-option" data-theme="sakura-pink" data-mode="light" title="Sakura Pink világos">
+              <div class="theme-preview sakura-pink-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="sakura-pink" data-mode="dark" title="Sakura Pink sötét">
+              <div class="theme-preview sakura-pink-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Forest Green</h5>
+            <div class="theme-option" data-theme="forest-green" data-mode="light" title="Forest Green világos">
+              <div class="theme-preview forest-green-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="forest-green" data-mode="dark" title="Forest Green sötét">
+              <div class="theme-preview forest-green-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Minimal Mono</h5>
+            <div class="theme-option" data-theme="minimal-mono" data-mode="light" title="Minimal Mono világos">
+              <div class="theme-preview minimal-mono-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="minimal-mono" data-mode="dark" title="Minimal Mono sötét">
+              <div class="theme-preview minimal-mono-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Sunset Orange</h5>
+            <div class="theme-option" data-theme="sunset-orange" data-mode="light" title="Sunset Orange világos">
+              <div class="theme-preview sunset-orange-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="sunset-orange" data-mode="dark" title="Sunset Orange sötét">
+              <div class="theme-preview sunset-orange-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+          
+          <div class="theme-group">
+            <h5>Royal Purple</h5>
+            <div class="theme-option" data-theme="royal-purple" data-mode="light" title="Royal Purple világos">
+              <div class="theme-preview royal-purple-light"></div>
+              <span>Világos</span>
+            </div>
+            <div class="theme-option" data-theme="royal-purple" data-mode="dark" title="Royal Purple sötét">
+              <div class="theme-preview royal-purple-dark"></div>
+              <span>Sötét</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="theme-apply-btn" class="primary-btn">Alkalmaz</button>
+        <button id="theme-cancel-btn" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
   </div>
 
   <!-- Autentikációs szekció -->
@@ -55,20 +139,55 @@
     <div id="auth-message" class="auth-message"></div>
   </section>
 
-  <!-- Kijelentkezési szekció -->
-  <section id="logout-section">
-    <button id="logout-btn">Kijelentkezés</button>
-  </section>
-
   <!-- Főnavigáció -->
   <nav id="main-navigation">
     <div class="nav-container">
+      <!-- Bal oldali navigációs tabek -->
       <div class="nav-tabs">
         <button class="nav-tab active" data-tab="dashboard">🏠 Dashboard</button>
         <button class="nav-tab" data-tab="overview">📊 Áttekintés</button>
         <button class="nav-tab" data-tab="lists">📝 Listák</button>
         <button class="nav-tab" data-tab="notes">📒 Jegyzetek</button>
         <button class="nav-tab" data-tab="calendar">🗓️ Naptár</button>
+      </div>
+      
+      <!-- Jobb oldali kontroll gombok -->
+      <div class="nav-controls">
+        <!-- Nyelv váltó -->
+        <div class="nav-language-menu">
+          <button id="hamburger-icon" class="nav-control-btn" title="Nyelv váltás / Language">
+            <span class="material-icons">language</span>
+            <span class="language-text">HU</span>
+          </button>
+          <div id="language-dropdown" class="language-dropdown">
+            <ul>
+              <li><a href="#" data-lang="hu">🇭🇺 Magyar</a></li>
+              <li><a href="#" data-lang="en">🇺🇸 English</a></li>
+              <li><a href="#" data-lang="de">🇩🇪 Deutsch</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Téma váltó -->
+        <div class="nav-theme-selector">
+          <button id="theme-selector-btn" class="nav-control-btn">
+            <span class="material-icons">palette</span>
+            <span class="theme-text">Téma</span>
+          </button>
+        </div>
+        
+        <!-- Profil dropdown -->
+        <div class="profile-menu">
+          <button id="profile-btn" class="profile-btn">
+            <span class="material-icons">account_circle</span>
+          </button>
+          <div id="profile-dropdown" class="profile-dropdown">
+            <button id="logout-btn" class="logout-menu-btn">
+              <span class="material-icons">logout</span>
+              Kijelentkezés
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -263,10 +382,6 @@
   <section id="lists-section" class="tab-content" style="display: none;">
     <div class="section-header">
       <h2>📝 To-Do Listák</h2>
-      <button id="toggle-reorder-btn" class="reorder-btn">
-        <span class="material-icons">swap_vert</span>
-        Átrendezés
-      </button>
     </div>
     
     <!-- Új lista létrehozása -->
@@ -321,6 +436,14 @@
           </div>
         </div>
       </div>
+    </div>
+    
+    <!-- Átrendezés gomb közvetlenül a listák felett -->
+    <div class="lists-control-panel">
+      <button id="toggle-reorder-btn" class="reorder-btn">
+        <span class="material-icons">swap_vert</span>
+        Átrendezés
+      </button>
     </div>
     
     <!-- Az összes lista (default + custom) egy közös konténerben -->
@@ -429,6 +552,21 @@
       <div class="quick-add-buttons">
         <button id="quick-add-submit">Hozzáadás</button>
         <button id="quick-add-cancel">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gyors feladat modal -->
+  <div id="quick-task-modal" class="quick-add-modal" style="display: none;">
+    <div class="quick-add-modal-content">
+      <h3>⚡ Gyors feladat hozzáadása</h3>
+      <input type="text" id="quick-task-text" placeholder="Írd be a feladatot...">
+      <select id="quick-task-list-select">
+        <option value="">Válassz listát...</option>
+      </select>
+      <div class="quick-add-buttons">
+        <button id="quick-task-submit">Hozzáadás</button>
+        <button id="quick-task-cancel">Mégse</button>
       </div>
     </div>
   </div>

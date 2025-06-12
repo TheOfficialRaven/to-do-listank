@@ -1,0 +1,216 @@
+{
+  "navigation": {
+    "dashboard": "🏠 Dashboard",
+    "overview": "📊 Áttekintés",
+    "lists": "📝 Listák",
+    "notes": "📒 Jegyzetek",
+    "calendar": "🗓️ Naptár"
+  },
+  "dashboard": {
+    "welcome": "👋 Üdvözlünk újra!",
+    "overview_text": "Itt a mai áttekintésed",
+    "streak_label": "napos sorozat",
+    "quick_actions": "⚡ Gyors műveletek",
+    "quick_task": "+ Gyors feladat",
+    "quick_note": "+ Gyors jegyzet", 
+    "quick_event": "+ Esemény",
+    "daily_inspiration": "💡 Mai inspiráció",
+    "today_events": "📅 Mai események",
+    "no_events": "Nincs mai esemény",
+    "pinned_items": "📌 Kiemelt elemek",
+    "notes": "Jegyzetek",
+    "tasks": "Feladatok",
+    "no_pinned_notes": "Nincs kiemelt jegyzet",
+    "no_pinned_tasks": "Használd a 📌 gombot a listáknál",
+    "urgent_tasks": "⚠️ Sürgős feladatok",
+    "no_urgent": "🎉 Nincs sürgős feladat!",
+    "item_placeholder": "Új elem hozzáadása..."
+  },
+  "overview": {
+    "title": "📊 Áttekintés & Statisztikák",
+    "statistics": "📈 Statisztikák",
+    "lists": "Lista",
+    "items": "Elem", 
+    "completed": "Kész",
+    "completion": "Teljesítés",
+    "level": "🌟 Szinted",
+    "activity_graph": "📊 Aktivitás grafikon",
+    "activity_less": "Kevés",
+    "activity_medium": "Közepes",
+    "activity_high": "Magas",
+    "activity_total": "Összes nap",
+    "activity_streak": "Legjobb sorozat",
+    "activity_avg": "Átlag/nap",
+    "achievements": "🏅 Elért eredmények",
+    "productivity": "🔍 Produktivitási betekintés",
+    "productivity_insights": {
+      "week_progress": "Ez a hét: +23% produktivitás!",
+      "best_day": "Legjobb nap: Hétfő (8 kész feladat)"
+    }
+  },
+  "auth": {
+    "title": "Regisztráció / Bejelentkezés",
+    "email_placeholder": "Email cím",
+    "password_placeholder": "Jelszó",
+    "login": "Bejelentkezés",
+    "register": "Regisztráció",
+    "logout": "Kijelentkezés"
+  },
+  "lists": {
+    "title": "📝 To-Do Listák",
+    "reorder": "Átrendezés",
+    "create_new": "✨ Új lista létrehozása",
+    "list_name": "Lista neve",
+    "list_name_placeholder": "pl. Bevásárlólista, Munkahelyi feladatok...",
+    "category": "Kategória", 
+    "category_placeholder": "pl. Otthon, Munka, Hobbi...",
+    "create_list": "Lista létrehozása",
+    "filter_search": "🔍 Szűrés és keresés",
+    "filter_category": "Kategória szűrő:",
+    "all_categories": "Összes kategória",
+    "search": "Keresés:",
+    "search_placeholder": "🔍 Keresés a listákban és elemekben...",
+    "no_lists": "📝 Még nincsenek listáid",
+    "create_first": "Hozz létre az első listádat a fenti gombbal!",
+    "pin_list": "Lista kiemelése",
+    "unpin_list": "Kiemelés eltávolítása",
+    "delete_list": "Lista törlése",
+    "add_item": "Elem hozzáadása"
+  },
+  "notes": {
+    "title": "📒 Jegyzetek",
+    "new_note": "Új jegyzet",
+    "note_title": "📒 Új jegyzet",
+    "edit_note": "✏️ Jegyzet szerkesztése",
+    "title_placeholder": "Jegyzet címe...",
+    "content_placeholder": "Itt írhatsz részletes jegyzeteket, jelszavakat, vagy bármit amit nem szeretnél elfelejteni...",
+    "category_label": "🏷️ Kategória:",
+    "private_note": "🔒 Bizalmas jegyzet (jelszóval védett)",
+    "save": "Mentés",
+    "update": "Frissítés",
+    "cancel": "Mégse",
+    "no_notes": "📒 Még nincsenek jegyzeteid",
+    "create_first": "Hozz létre az első jegyzetedet a fenti gombbal!",
+    "delete_note": "🗑️ Jegyzet törlése",
+    "delete_confirm": "Biztosan törölni szeretnéd ezt a jegyzetet?",
+    "delete_warning": "Ez a művelet nem vonható vissza!",
+    "delete_button": "🗑️ Törlés",
+    "categories": {
+      "general": "Általános",
+      "passwords": "Jelszavak",
+      "ideas": "Ötletek",
+      "important": "Fontos",
+      "work": "Munka",
+      "personal": "Személyes"
+    }
+  },
+  "calendar": {
+    "title": "🗓️ Naptár",
+    "new_event": "Új esemény",
+    "upcoming_events": "📅 Közelgő események",
+    "no_upcoming": "Nincs közelgő esemény",
+    "event_title": "Esemény címe",
+    "event_date": "Dátum",
+    "event_time": "Időpont",
+    "event_description": "Leírás",
+    "event_type": "Esemény típusa",
+    "all_day": "Egész nap",
+    "reminder": "Emlékeztető",
+    "reminder_time": "Emlékeztető ideje",
+    "save_event": "Esemény mentése",
+    "cancel": "Mégse",
+    "delete_event": "Esemény törlése",
+    "event_name_placeholder": "Esemény neve...",
+    "event_desc_placeholder": "Esemény leírása...",
+    "date_label": "📅 Dátum:",
+    "time_label": "⏰ Idő:",
+    "type_label": "🎯 Típus:",
+    "reminder_label": "🔔 Emlékeztető beállítása",
+    "reminder_times": {
+      "0": "Esemény időpontjában",
+      "15": "15 perccel előtte",
+      "30": "30 perccel előtte", 
+      "60": "1 órával előtte",
+      "1440": "1 nappal előtte"
+    },
+    "event_types": {
+      "birthday": "🎂 Születésnap",
+      "meeting": "💼 Megbeszélés",
+      "reminder": "⏰ Emlékeztető",
+      "appointment": "🏥 Időpont",
+      "event": "🎉 Esemény",
+      "deadline": "📝 Határidő"
+    }
+  },
+  "modals": {
+    "quick_task": {
+      "title": "⚡ Gyors feladat hozzáadása",
+      "placeholder": "Írd be a feladatot...",
+      "select_list": "Válassz listát...",
+      "add": "Hozzáadás",
+      "cancel": "Mégse"
+    },
+    "quick_add": {
+      "title": "⚡ Gyors elem hozzáadása",
+      "placeholder": "Írd be az elemet...",
+      "select_list": "Válassz listát...",
+      "add": "Hozzáadás",
+      "cancel": "Mégse"
+    },
+    "confirm_delete_list": "Biztosan törlöd ezt a listát?",
+    "confirm_delete_item": "Biztosan törlöd ezt a listaelemet?",
+    "yes": "Igen",
+    "no": "Nem"
+  },
+  "notifications": {
+    "task_added": "✅ Feladat sikeresen hozzáadva!",
+    "note_saved": "📒 Jegyzet sikeresen mentve!",
+    "note_updated": "✏️ Jegyzet sikeresen frissítve!",
+    "note_deleted": "🗑️ Jegyzet sikeresen törölve!",
+    "note_pinned": "📌 Jegyzet kiemelt!",
+    "note_unpinned": "📌 Kiemelés eltávolítva!",
+    "task_pinned": "📌 Feladat kiemelt!",
+    "task_unpinned": "📌 Kiemelés eltávolítva!",
+    "task_completed": "✅ Feladat teljesítve!",
+    "list_pinned": "📌 Lista kiemelt!",
+    "list_unpinned": "📌 Kiemelés eltávolítva!",
+    "level_up": "🎉 Szint {level} elérve! Gratulálunk!",
+    "login_required": "⚠️ Be kell jelentkezned a funkció használatához!",
+    "theme_applied": "Téma alkalmazva",
+    "logout_success": "Sikeres kijelentkezés"
+  },
+  "achievements": {
+    "first_task": {
+      "title": "Első lépés",
+      "description": "Teljesítsd az első feladatod"
+    },
+    "task_master": {
+      "title": "Feladat mester", 
+      "description": "Teljesíts 10 feladatot"
+    },
+    "list_creator": {
+      "title": "Lista készítő",
+      "description": "Hozz létre 3 listát"
+    },
+    "note_taker": {
+      "title": "Jegyzet készítő",
+      "description": "Írj 5 jegyzetet"
+    },
+    "level_up": {
+      "title": "Szint emelkedés",
+      "description": "Érj el 2. szintet"
+    },
+    "streak_3": {
+      "title": "Kitartó",
+      "description": "3 napos sorozat"
+    },
+    "streak_7": {
+      "title": "Legenda", 
+      "description": "7 napos sorozat"
+    },
+    "explorer": {
+      "title": "Felfedező",
+      "description": "Próbáld ki az összes funkciót"
+    }
+  }
+} 

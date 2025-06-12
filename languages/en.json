@@ -1,0 +1,212 @@
+{
+  "navigation": {
+    "dashboard": "🏠 Dashboard",
+    "overview": "📊 Overview", 
+    "lists": "📝 Lists",
+    "notes": "📒 Notes",
+    "calendar": "🗓️ Calendar"
+  },
+  "dashboard": {
+    "welcome": "👋 Welcome back!",
+    "overview_text": "Here's your daily overview",
+    "streak_label": "day streak",
+    "quick_actions": "⚡ Quick Actions",
+    "quick_task": "+ Quick Task",
+    "quick_note": "+ Quick Note", 
+    "quick_event": "+ Event",
+    "daily_inspiration": "💡 Daily Inspiration",
+    "today_events": "📅 Today's Events",
+    "no_events": "No events today",
+    "pinned_items": "📌 Pinned Items",
+    "notes": "Notes",
+    "tasks": "Tasks",
+    "no_pinned_notes": "No pinned notes",
+    "no_pinned_tasks": "Use the 📌 button on lists",
+    "urgent_tasks": "⚠️ Urgent Tasks",
+    "no_urgent": "🎉 No urgent tasks!",
+    "item_placeholder": "Add new item..."
+  },
+  "overview": {
+    "title": "📊 Overview & Statistics",
+    "statistics": "📈 Statistics",
+    "lists": "List",
+    "items": "Item", 
+    "completed": "Done",
+    "completion": "Completion",
+    "level": "🌟 Your Level",
+    "activity_graph": "📊 Activity Graph",
+    "activity_less": "Less",
+    "activity_medium": "Medium",
+    "activity_high": "High",
+    "activity_total": "Total days",
+    "activity_streak": "Best streak",
+    "activity_avg": "Average/day",
+    "achievements": "🏅 Achievements",
+    "productivity": "🔍 Productivity Insights"
+  },
+  "auth": {
+    "title": "Registration / Login",
+    "email_placeholder": "Email address",
+    "password_placeholder": "Password",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "lists": {
+    "title": "📝 To-Do Lists",
+    "reorder": "Reorder",
+    "create_new": "✨ Create New List",
+    "list_name": "List Name",
+    "list_name_placeholder": "e.g. Shopping List, Work Tasks...",
+    "category": "Category", 
+    "category_placeholder": "e.g. Home, Work, Hobby...",
+    "create_list": "Create List",
+    "filter_search": "🔍 Filter and Search",
+    "filter_category": "Category Filter:",
+    "all_categories": "All Categories",
+    "search": "Search:",
+    "search_placeholder": "🔍 Search in lists and items...",
+    "no_lists": "📝 You don't have any lists yet",
+    "create_first": "Create your first list with the button above!",
+    "pin_list": "Pin list",
+    "unpin_list": "Unpin list",
+    "delete_list": "Delete list",
+    "add_item": "Add item"
+  },
+  "notes": {
+    "title": "📒 Notes",
+    "new_note": "New Note",
+    "note_title": "📒 New Note",
+    "edit_note": "✏️ Edit Note",
+    "title_placeholder": "Note title...",
+    "content_placeholder": "Write detailed notes, passwords, or anything you don't want to forget here...",
+    "category_label": "🏷️ Category:",
+    "private_note": "🔒 Private note (password protected)",
+    "save": "Save",
+    "update": "Update",
+    "cancel": "Cancel",
+    "no_notes": "📒 You don't have any notes yet",
+    "create_first": "Create your first note with the button above!",
+    "delete_note": "🗑️ Delete Note",
+    "delete_confirm": "Are you sure you want to delete this note?",
+    "delete_warning": "This action cannot be undone!",
+    "delete_button": "🗑️ Delete",
+    "categories": {
+      "general": "General",
+      "passwords": "Passwords",
+      "ideas": "Ideas",
+      "important": "Important",
+      "work": "Work",
+      "personal": "Personal"
+    }
+  },
+  "calendar": {
+    "title": "🗓️ Calendar",
+    "new_event": "New Event",
+    "upcoming_events": "📅 Upcoming Events",
+    "no_upcoming": "No upcoming events",
+    "event_title": "Event title",
+    "event_date": "Date",
+    "event_time": "Time",
+    "event_description": "Description",
+    "event_type": "Event type",
+    "all_day": "All day",
+    "reminder": "Reminder",
+    "reminder_time": "Reminder time",
+    "save_event": "Save event",
+    "cancel": "Cancel",
+    "delete_event": "Delete event",
+    "event_name_placeholder": "Event name...",
+    "event_desc_placeholder": "Event description...",
+    "date_label": "📅 Date:",
+    "time_label": "⏰ Time:",
+    "type_label": "🎯 Type:",
+    "reminder_label": "🔔 Set reminder",
+    "reminder_times": {
+      "0": "At event time",
+      "15": "15 minutes before",
+      "30": "30 minutes before", 
+      "60": "1 hour before",
+      "1440": "1 day before"
+    },
+    "event_types": {
+      "birthday": "🎂 Birthday",
+      "meeting": "💼 Meeting",
+      "reminder": "⏰ Reminder",
+      "appointment": "🏥 Appointment",
+      "event": "🎉 Event",
+      "deadline": "📝 Deadline"
+    }
+  },
+  "modals": {
+    "quick_task": {
+      "title": "⚡ Add Quick Task",
+      "placeholder": "Enter the task...",
+      "select_list": "Choose list...",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "quick_add": {
+      "title": "⚡ Add Quick Item",
+      "placeholder": "Enter the item...",
+      "select_list": "Choose list...",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "confirm_delete_list": "Are you sure you want to delete this list?",
+    "confirm_delete_item": "Are you sure you want to delete this item?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "notifications": {
+    "task_added": "✅ Task successfully added!",
+    "note_saved": "📒 Note successfully saved!",
+    "note_updated": "✏️ Note successfully updated!",
+    "note_deleted": "🗑️ Note successfully deleted!",
+    "note_pinned": "📌 Note pinned!",
+    "note_unpinned": "📌 Pin removed!",
+    "task_pinned": "📌 Task pinned!",
+    "task_unpinned": "📌 Pin removed!",
+    "task_completed": "✅ Task completed!",
+    "list_pinned": "📌 List pinned!",
+    "list_unpinned": "📌 Pin removed!",
+    "level_up": "🎉 Level {level} reached! Congratulations!",
+    "login_required": "⚠️ You need to log in to use this feature!",
+    "theme_applied": "Theme applied",
+    "logout_success": "Successfully logged out"
+  },
+  "achievements": {
+    "first_task": {
+      "title": "First Step",
+      "description": "Complete your first task"
+    },
+    "task_master": {
+      "title": "Task Master", 
+      "description": "Complete 10 tasks"
+    },
+    "list_creator": {
+      "title": "List Creator",
+      "description": "Create 3 lists"
+    },
+    "note_taker": {
+      "title": "Note Taker",
+      "description": "Write 5 notes"
+    },
+    "level_up": {
+      "title": "Level Up",
+      "description": "Reach level 2"
+    },
+    "streak_3": {
+      "title": "Persistent",
+      "description": "3-day streak"
+    },
+    "streak_7": {
+      "title": "Legend", 
+      "description": "7-day streak"
+    },
+    "explorer": {
+      "title": "Explorer",
+      "description": "Try all features"
+    }
+  }
+} 
