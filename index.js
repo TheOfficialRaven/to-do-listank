@@ -1,6 +1,7 @@
 // === IMMEDIATE DEBUG LOGGING ===
-console.log('🚀 JavaScript file loading started...');
-console.log('📄 Script execution beginning at:', new Date().toLocaleTimeString());
+console.log('🟢 EXTERNAL JS FILE LOADING - index.js started');
+console.log('🟢 Script execution beginning at:', new Date().toLocaleTimeString());
+console.log('🟢 If you see this, the JS file is loading properly');
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -58,14 +59,21 @@ window.debugPWA = function() {
   console.log('🔧 debugPWA() called');
   const container = document.getElementById('pwa-floating-install');
   const btn = document.getElementById('pwa-install-btn');
+  const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
+  const userDismissedTime = localStorage.getItem('pwa-user-dismissed');
+  
   console.log('🔍 PWA DEBUG INFO:');
   console.log('  - container found:', !!container);
   console.log('  - button found:', !!btn);
   console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
   console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+  console.log('  - iOS standalone:', window.navigator.standalone === true);
   console.log('  - container display:', container ? container.style.display : 'N/A');
   console.log('  - DOM ready:', document.readyState);
+  console.log('  - recently installed:', wasRecentlyInstalled ? new Date(parseInt(wasRecentlyInstalled)).toLocaleString() : 'no');
+  console.log('  - user dismissed until:', userDismissedTime ? new Date(parseInt(userDismissedTime)).toLocaleString() : 'no');
   console.log('  - Current timestamp:', new Date().toLocaleTimeString());
+  console.log('💡 Use resetPWA() to clear localStorage flags');
 };
 
 window.installPWA = function() {
@@ -79,10 +87,18 @@ window.installPWA = function() {
   }
 };
 
+// PWA Reset funkció fejlesztéshez
+window.resetPWA = function() {
+  localStorage.removeItem('pwa-recently-installed');
+  localStorage.removeItem('pwa-user-dismissed');
+  console.log('🧹 PWA localStorage flags cleared');
+  console.log('🔄 Refresh the page to see install button again');
+};
+
 // Test hogy a függvények elérhetők-e
 console.log('✅ IMMEDIATE PWA functions defined successfully!');
 console.log('🔧 Test immediately: debugPWA()');
-console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA()');
+console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA()');
 
 // Immediate test
 setTimeout(() => {
@@ -137,10 +153,18 @@ window.addEventListener('beforeinstallprompt', (e) => {
   
   console.log('PWA install prompt ready');
   
-  // Megjelenítjük a floating install gombot
+  // Ellenőrizzük, hogy szabad-e megjeleníteni
   setTimeout(() => {
-    if (typeof pwaInstall !== 'undefined' && pwaInstall.showInstallButton) {
-      pwaInstall.showInstallButton();
+    const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
+    const userDismissedRecently = localStorage.getItem('pwa-user-dismissed');
+    
+    if (!wasRecentlyInstalled && !userDismissedRecently) {
+      if (typeof pwaInstall !== 'undefined' && pwaInstall.showInstallButton) {
+        pwaInstall.showInstallButton();
+        console.log('📱 PWA install button shown');
+      }
+    } else {
+      console.log('🔕 PWA install button not shown - user preference/status');
     }
   }, 500); // Kis késleltetés, hogy az elem biztosan létezzen
 });
@@ -150,6 +174,10 @@ window.addEventListener('appinstalled', (evt) => {
   console.log('✅ PWA was installed');
   showNotification('🎉 Alkalmazás sikeresen telepítve!');
   deferredPrompt = null;
+  
+  // Jegyezzük meg, hogy telepítették
+  localStorage.setItem('pwa-recently-installed', Date.now().toString());
+  console.log('📝 PWA installation marked in localStorage');
   
   // Elrejtjük a telepítési gombot
   if (typeof pwaInstall !== 'undefined' && pwaInstall.hideInstallButton) {
@@ -5400,11 +5428,25 @@ document.addEventListener('DOMContentLoaded', () => {
       return { showInstallButton: () => {}, hideInstallButton: () => {}, checkInstallStatus: () => false };
     }
     
-    // PWA telepíthetőség és mobil ellenőrzése
+    // PWA telepíthetőség és állapot ellenőrzése
     function canShowInstallButton() {
-      // Megjelenítjük minden eszközön, ha elérhető a PWA prompt
-      // De csak akkor, ha még nincs telepítve
-      return deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches;
+      // Csak akkor jelenítjük meg, ha:
+      // 1. Van elérhető install prompt (deferredPrompt)
+      // 2. NEM standalone módban vagyunk (nem telepített PWA)
+      // 3. NEM a getDisplayMode() szerint standalone
+      // 4. localStorage nem jelzi, hogy nemrég volt telepítve
+      
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isInstalled = window.navigator.standalone === true; // iOS Safari
+      const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
+      const userDismissedRecently = localStorage.getItem('pwa-user-dismissed');
+      
+      // Ha nemrég telepítették vagy elutasították, ne jelenjen meg
+      if (wasRecentlyInstalled || userDismissedRecently) {
+        return false;
+      }
+      
+      return deferredPrompt && !isStandalone && !isInstalled;
     }
     
     // Gomb megjelenítése
@@ -5431,13 +5473,15 @@ document.addEventListener('DOMContentLoaded', () => {
               console.log('✅ PWA installation accepted');
               showNotification('📱 App sikeresen telepítve!');
               hideInstallButton();
+              // Jegyezzük meg, hogy telepítették
+              localStorage.setItem('pwa-recently-installed', Date.now().toString());
             } else {
               console.log('❌ PWA installation declined');
-              // Elrejtjük egy időre, ha elutasították
+              // Jegyezzük meg, hogy elutasították (24 órára)
+              const dismissTime = Date.now() + (24 * 60 * 60 * 1000); // 24 óra
+              localStorage.setItem('pwa-user-dismissed', dismissTime.toString());
               hideInstallButton();
-              setTimeout(() => {
-                if (deferredPrompt) showInstallButton();
-              }, 60000); // 1 perc múlva újra megjelenik
+              console.log('🔕 PWA gomb elrejtve 24 órára felhasználói kérésre');
             }
             deferredPrompt = null;
           });
@@ -5449,12 +5493,41 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     
-    // PWA telepítési állapot ellenőrzése
+    // PWA telepítési állapot ellenőrzése és localStorage tisztítása
     function checkInstallStatus() {
+      // localStorage időzítések ellenőrzése és tisztítása
+      const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
+      const userDismissedTime = localStorage.getItem('pwa-user-dismissed');
+      
+      if (wasRecentlyInstalled) {
+        // Ha 30 napnál régebben telepítették, töröljük a jelölést
+        const installedTime = parseInt(wasRecentlyInstalled);
+        if (Date.now() - installedTime > (30 * 24 * 60 * 60 * 1000)) { // 30 nap
+          localStorage.removeItem('pwa-recently-installed');
+          console.log('🧹 PWA installed flag cleared after 30 days');
+        }
+      }
+      
+      if (userDismissedTime) {
+        // Ha lejárt az elutasítás időzítése, töröljük
+        const dismissTime = parseInt(userDismissedTime);
+        if (Date.now() > dismissTime) {
+          localStorage.removeItem('pwa-user-dismissed');
+          console.log('🧹 PWA dismissed flag cleared after timeout');
+        }
+      }
+      
       // Ha már telepítve van PWA módban, rejtjük a gombot
-      if (window.matchMedia('(display-mode: standalone)').matches) {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isInstalled = window.navigator.standalone === true; // iOS Safari
+      
+      if (isStandalone || isInstalled) {
         hideInstallButton();
         console.log('📱 PWA already installed - hiding install button');
+        // Jegyezzük meg, hogy telepítve van
+        if (!wasRecentlyInstalled) {
+          localStorage.setItem('pwa-recently-installed', Date.now().toString());
+        }
         return false;
       }
       return true;
@@ -5493,14 +5566,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('  - current display:', installContainer ? installContainer.style.display : 'N/A');
     };
     
-    // Automatikus megjelenítés teszteléshez 
+    // Automatikus megjelenítés teszteléshez (csak ha engedélyezett)
     console.log('🔧 No deferredPrompt available yet - use showPWAButton() to test UI');
-    // Minden esetben megmutatjuk 3 másodperc múlva tesztelés céljából
     setTimeout(() => {
-      if (!window.matchMedia('(display-mode: standalone)').matches) {
-        installContainer.style.display = 'block';
-        console.log('🔧 AUTO-SHOWING PWA button for testing purposes');
-        console.log('📱 PWA button should now be visible in bottom-right corner');
+      // Csak akkor jelenítjük meg automatikusan, ha minden feltétel teljesül
+      if (canShowInstallButton() || !deferredPrompt) {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
+        const userDismissed = localStorage.getItem('pwa-user-dismissed');
+        
+        if (!isStandalone && !wasRecentlyInstalled && !userDismissed) {
+          installContainer.style.display = 'block';
+          console.log('🔧 AUTO-SHOWING PWA button for testing purposes');
+          console.log('📱 PWA button should now be visible in bottom-left corner');
+        } else {
+          console.log('🔕 PWA button auto-show skipped - user preferences/status');
+        }
       }
     }, 3000);
     

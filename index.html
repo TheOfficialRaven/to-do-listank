@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="hu" id="html-root">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privát Teendőlista & Bevásárlólista</title>
+  
+  <!-- IMMEDIATE JAVASCRIPT TEST -->
+  <script>
+    console.log('🔴 IMMEDIATE HTML SCRIPT TEST - This should appear first');
+    console.log('🔴 Current time:', new Date().toLocaleTimeString());
+    window.testFunction = function() {
+      console.log('✅ testFunction works!');
+      return 'HTML script is working';
+    };
+    console.log('🔴 testFunction defined in HTML');
+  </script>
   
   <!-- Link a manifest fájlhoz (PWA támogatás) -->
   <link rel="manifest" href="manifest.json">
@@ -630,8 +641,7 @@
     </div>
   </div>
 
-  <!-- Firebase modulokat importáló script -->
-  <script type="module" src="index.js"></script>
+  <!-- Firebase modulokat importáló script - ÁTHELYEZVE A FÁJL VÉGÉRE -->
 
   <!-- Lebegő gyors hozzáadás gomb -->
   <div id="quick-add-fab" class="quick-add-fab" style="display: none;">
