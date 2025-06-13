@@ -5130,6 +5130,9 @@ function applyTheme(themeName, themeMode) {
   
   // Load theme CSS if needed
   loadThemeCSS(themeName);
+  
+  // Update PWA manifest colors based on theme
+  updateManifestColors(themeName, themeMode);
 }
 
 function loadThemeCSS(themeName) {
@@ -5149,6 +5152,170 @@ function loadThemeCSS(themeName) {
     link.href = 'modern-themes.css';
     document.head.appendChild(link);
   }
+}
+
+function updateManifestColors(themeName, themeMode) {
+  // Define theme colors for PWA manifest
+  const themeColors = {
+    'default': {
+      light: { background: '#ffffff', theme: '#10b981' },
+      dark: { background: '#1a1a1a', theme: '#10b981' }
+    },
+    'ocean-blue': {
+      light: { background: '#f0f8ff', theme: '#0ea5e9' },
+      dark: { background: '#0f172a', theme: '#38bdf8' }
+    },
+    'sakura-pink': {
+      light: { background: '#fef7f7', theme: '#e91e63' },
+      dark: { background: '#1a0d0d', theme: '#f48fb1' }
+    },
+    'forest-green': {
+      light: { background: '#f0f9f0', theme: '#2e7d32' },
+      dark: { background: '#0d1a0d', theme: '#66bb6a' }
+    },
+    'minimal-mono': {
+      light: { background: '#fafafa', theme: '#2d2d2d' },
+      dark: { background: '#0a0a0a', theme: '#ffffff' }
+    },
+    'sunset-orange': {
+      light: { background: '#fff8f0', theme: '#ff6f00' },
+      dark: { background: '#1a0f0a', theme: '#ffb74d' }
+    },
+    'royal-purple': {
+      light: { background: '#f8f5ff', theme: '#7b1fa2' },
+      dark: { background: '#1a0f1a', theme: '#ba68c8' }
+    }
+  };
+
+  // Get colors for current theme
+  const colors = themeColors[themeName] || themeColors['default'];
+  const modeColors = colors[themeMode] || colors['light'];
+
+  // Update meta theme-color tag
+  let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (!themeColorMeta) {
+    themeColorMeta = document.createElement('meta');
+    themeColorMeta.name = 'theme-color';
+    document.head.appendChild(themeColorMeta);
+  }
+  themeColorMeta.content = modeColors.theme;
+
+  // Update meta msapplication-TileColor tag
+  let tileColorMeta = document.querySelector('meta[name="msapplication-TileColor"]');
+  if (!tileColorMeta) {
+    tileColorMeta = document.createElement('meta');
+    tileColorMeta.name = 'msapplication-TileColor';
+    document.head.appendChild(tileColorMeta);
+  }
+  tileColorMeta.content = modeColors.background;
+
+  // Update manifest link to use dynamic colors
+  updateDynamicManifest(modeColors.background, modeColors.theme);
+}
+
+function updateDynamicManifest(backgroundColor, themeColor) {
+  // Create dynamic manifest object
+  const dynamicManifest = {
+    "name": "Todo & Shopping List - Personal Organizer",
+    "short_name": "TodoApp",
+    "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
+    "version": "2.0.0",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": backgroundColor,
+    "theme_color": themeColor,
+    "categories": ["productivity", "lifestyle", "utilities"],
+    "lang": "hu",
+    "dir": "ltr",
+    "icons": [
+      {
+        "src": "favicon-16x16.png",
+        "sizes": "16x16",
+        "type": "image/png",
+        "purpose": "favicon"
+      },
+      {
+        "src": "favicon-32x32.png",
+        "sizes": "32x32",
+        "type": "image/png",
+        "purpose": "favicon"
+      },
+      {
+        "src": "android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "apple-touch-icon.png",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "apple touch icon"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Quick Task",
+        "short_name": "Add Task",
+        "description": "Quickly add a new task to your lists",
+        "url": "./?action=quick-task",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+      },
+      {
+        "name": "New Note",
+        "short_name": "Add Note",
+        "description": "Create a new note",
+        "url": "./?action=quick-note",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+      },
+      {
+        "name": "Calendar",
+        "short_name": "Events",
+        "description": "View and add calendar events",
+        "url": "./?tab=calendar",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+      }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+      "preferred_width": 400
+    },
+    "launch_handler": {
+      "client_mode": "focus-existing"
+    }
+  };
+
+  // Convert to blob and create URL
+  const manifestBlob = new Blob([JSON.stringify(dynamicManifest, null, 2)], {
+    type: 'application/json'
+  });
+  const manifestURL = URL.createObjectURL(manifestBlob);
+
+  // Update or create manifest link
+  let manifestLink = document.querySelector('link[rel="manifest"]');
+  if (!manifestLink) {
+    manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    document.head.appendChild(manifestLink);
+  }
+  
+  // Revoke old URL to prevent memory leaks
+  if (manifestLink.href && manifestLink.href.startsWith('blob:')) {
+    URL.revokeObjectURL(manifestLink.href);
+  }
+  
+  manifestLink.href = manifestURL;
+  
+  console.log(`🎨 PWA manifest updated: background=${backgroundColor}, theme=${themeColor}`);
 }
 
 function updateActiveThemeCard() {
