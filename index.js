@@ -102,6 +102,22 @@ window.resetPWA = function() {
   }
 };
 
+// PWA állapot törlése (profil menüből)
+window.clearPWAState = function() {
+  localStorage.removeItem('pwa-recently-installed');
+  localStorage.removeItem('pwa-user-dismissed');
+  console.log('🧹 PWA state cleared');
+  
+  // Show the install button immediately
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'block';
+    console.log('📱 PWA install button shown after state clear');
+  }
+  
+  return true;
+};
+
 // Test hogy a függvények elérhetők-e
 console.log('✅ IMMEDIATE PWA functions defined successfully!');
 console.log('🔧 Test immediately: debugPWA()');
@@ -5566,11 +5582,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const userDismissedTime = localStorage.getItem('pwa-user-dismissed');
       
       if (wasRecentlyInstalled) {
-        // Ha 30 napnál régebben telepítették, töröljük a jelölést
+        // Ha 1 óránál régebben telepítették, töröljük a jelölést
         const installedTime = parseInt(wasRecentlyInstalled);
-        if (Date.now() - installedTime > (30 * 24 * 60 * 60 * 1000)) { // 30 nap
+        if (Date.now() - installedTime > (60 * 60 * 1000)) { // 1 óra
           localStorage.removeItem('pwa-recently-installed');
-          console.log('🧹 PWA installed flag cleared after 30 days');
+          console.log('🧹 PWA installed flag cleared after 1 hour');
         }
       }
       

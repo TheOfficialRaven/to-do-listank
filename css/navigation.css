@@ -330,15 +330,13 @@
 /* Mobile Navigation Responsive Design */
 @media (max-width: 768px) {
   .pwa-floating-install {
-    bottom: 140px;
-    left: 15px;
-    right: auto;
-    z-index: 999;
+    bottom: 100px;
+    right: 15px;
   }
   
   .pwa-floating-btn {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
   }
   
   .pwa-floating-btn .material-icons {
@@ -353,19 +351,17 @@
 
 @media (max-width: 480px) {
   .pwa-floating-install {
-    bottom: 120px;
-    left: 10px;
-    right: auto;
-    z-index: 999;
+    bottom: 80px;
+    right: 10px;
   }
   
   .pwa-floating-btn {
-    width: 42px;
-    height: 42px;
+    width: 45px;
+    height: 45px;
   }
   
   .pwa-floating-btn .material-icons {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 }
 
