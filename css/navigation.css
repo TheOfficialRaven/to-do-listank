@@ -21,7 +21,6 @@
   background: var(--bg-secondary);
   border-radius: 16px;
   padding: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .nav-tabs {
@@ -93,7 +92,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-primary-rgb), 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -286,9 +285,12 @@
 }
 
 .pwa-floating-btn:hover {
-  transform: scale(1.1);
-  box-shadow: var(--box-shadow-primary);
+  box-shadow: 0 8px 25px rgba(var(--accent-primary-rgb), 0.4);
   filter: brightness(1.1);
+}
+
+.pwa-floating-btn:hover .install-tooltip {
+  opacity: 1;
 }
 
 .pwa-floating-btn .material-icons {
@@ -297,7 +299,7 @@
 
 .install-tooltip {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 15px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-secondary);
@@ -308,9 +310,9 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
-  margin-bottom: 10px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   box-shadow: var(--box-shadow-primary);
+  z-index: 1001;
 }
 
 .install-tooltip::after {
@@ -323,16 +325,16 @@
   border-top-color: var(--bg-secondary);
 }
 
-.pwa-floating-btn:hover .install-tooltip {
-  opacity: 1;
-}
+/* Removed duplicate hover rule - now handled above */
 
 @keyframes gentle-pulse {
   0%, 100% {
     transform: scale(1);
+    box-shadow: var(--box-shadow-primary);
   }
   50% {
     transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(var(--accent-primary-rgb), 0.4);
   }
 }
 

@@ -17,6 +17,11 @@
   --success-color: #2d2d2d;
   --danger-color: #e74c3c;
   --warning-color: #f39c12;
+  --box-shadow-primary: 0 8px 32px rgba(45, 45, 45, 0.15);
+  --box-shadow-secondary: 0 4px 20px rgba(45, 45, 45, 0.12);
+  --box-shadow-light: 0 2px 8px rgba(45, 45, 45, 0.08);
+  --box-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --box-shadow-hover: 0 8px 25px rgba(45, 45, 45, 0.25);
 }
 
 .theme-minimal-mono[data-theme="dark"] {
@@ -47,6 +52,11 @@
   --success-color: #059669;
   --danger-color: #dc2626;
   --warning-color: #d97706;
+  --box-shadow-primary: 0 8px 32px rgba(14, 165, 233, 0.18);
+  --box-shadow-secondary: 0 4px 20px rgba(14, 165, 233, 0.15);
+  --box-shadow-light: 0 2px 8px rgba(14, 165, 233, 0.1);
+  --box-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --box-shadow-hover: 0 8px 25px rgba(14, 165, 233, 0.3);
 }
 
 .theme-ocean-blue[data-theme="dark"] {
