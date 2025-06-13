@@ -1,0 +1,49 @@
+/* Combined Styles - Import all CSS modules */
+
+/* Core styles */
+@import url('./css/variables.css');
+@import url('./css/base.css');
+@import url('./css/navigation.css');
+
+/* Import existing theme styles */
+@import url('./modern-themes.css');
+
+/* Quick fixes for language keys display */
+.note-content-overlay h4,
+.note-content-overlay p,
+.unlock-btn,
+.insight-text,
+.badge-title,
+.badge-description {
+  text-transform: none !important;
+  font-variant: normal !important;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  body {
+    padding: 0.5rem;
+    font-size: clamp(14px, 2.5vw, 18px);
+  }
+  
+  .quick-add-fab {
+    bottom: 80px;
+    right: 20px;
+    z-index: 999;
+  }
+  
+  .pwa-floating-install {
+    z-index: 1000;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0.25rem;
+  }
+  
+  .quick-add-fab {
+    bottom: 70px;
+    right: 15px;
+  }
+} 
