@@ -1587,6 +1587,124 @@ h1, h2 {
   position: relative;
 }
 
+/* PWA Floating Install Button - Nem zavaró jobb alsó sarok */
+.pwa-floating-install {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 1000;
+  display: none;
+}
+
+.pwa-floating-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+.pwa-floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+}
+
+.pwa-floating-btn .material-icons {
+  color: white;
+  font-size: 28px;
+}
+
+.install-tooltip {
+  position: absolute;
+  right: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  border: 1px solid var(--accent-primary);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.install-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: var(--accent-primary);
+}
+
+.pwa-floating-btn:hover .install-tooltip {
+  opacity: 1;
+}
+
+@keyframes gentle-pulse {
+  0%, 100% { 
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  }
+  50% { 
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5), 0 0 0 8px rgba(16, 185, 129, 0.1);
+  }
+}
+
+/* Mobil optimalizálás */
+@media (max-width: 768px) {
+  .pwa-floating-install {
+    bottom: 90px;
+    right: 15px;
+  }
+  
+  .pwa-floating-btn {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .pwa-floating-btn .material-icons {
+    font-size: 24px;
+  }
+  
+  .install-tooltip {
+    right: 65px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Kis képernyőkön még kompaktabb */
+@media (max-width: 480px) {
+  .pwa-floating-install {
+    bottom: 80px;
+    right: 10px;
+  }
+  
+  .pwa-floating-btn {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .pwa-floating-btn .material-icons {
+    font-size: 22px;
+  }
+}
+
 .nav-tab {
   padding: 1rem 1.5rem;
   background: var(--bg-tertiary);
@@ -4658,4 +4776,199 @@ h1, h2 {
 #privacy-effective-date {
   font-weight: 600;
   color: var(--accent-primary);
+}
+
+/* Event Notification Modal Styles */
+.event-notification-content {
+  max-width: 500px;
+  border-radius: 20px;
+  background: var(--bg-primary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: bounceIn 0.5s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-notification-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+}
+
+.event-notification-content .modal-header {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 20px 20px 0 0;
+  position: relative;
+}
+
+.event-notification-content .modal-header h3 {
+  margin: 0;
+  font-size: 1.4em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.event-notification-content .modal-body {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.event-notification-icon {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+.event-notification-icon .material-icons {
+  font-size: 3rem;
+  color: white;
+}
+
+.event-notification-details {
+  flex: 1;
+}
+
+.event-notification-details h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.event-notification-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.event-notification-time .material-icons {
+  font-size: 1.2rem;
+}
+
+.event-notification-description p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.event-notification-content .modal-footer {
+  padding: 1.5rem 2rem;
+  background: var(--bg-secondary);
+  border-radius: 0 0 20px 20px;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.event-notification-content .modal-footer button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#event-notification-snooze {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+#event-notification-snooze:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+#event-notification-dismiss {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+}
+
+#event-notification-dismiss:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+/* Animációk */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .event-notification-content {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .event-notification-content .modal-body {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .event-notification-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .event-notification-icon .material-icons {
+    font-size: 2rem;
+  }
+  
+  .event-notification-content .modal-footer {
+    flex-direction: column;
+  }
+  
+  .event-notification-content .modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
 }

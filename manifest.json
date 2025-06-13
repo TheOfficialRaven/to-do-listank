@@ -1,20 +1,99 @@
 {
-    "name": "Privát Teendőlista & Bevásárlólista",
-    "short_name": "Teendők",
-    "start_url": "./index.html",
-    "display": "standalone",
-    "background_color": "#1F2937",
-    "theme_color": "#10B981",
-    "icons": [
-      {
-        "src": "android-chrome-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "android-chrome-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
+  "name": "Todo & Shopping List - Personal Organizer",
+  "short_name": "TodoApp",
+  "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
+  "version": "2.0.0",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#10B981",
+  "theme_color": "#059669",
+  "categories": ["productivity", "lifestyle", "utilities"],
+  "lang": "hu",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "favicon"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "favicon"
+    },
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Todo & Shopping List App Dashboard"
+    }
+  ],
+  "features": [
+    "Cross-platform Progressive Web App",
+    "Offline functionality with local storage",
+    "Real-time Firebase synchronization",
+    "Multi-language support (Hungarian, English, German)",
+    "Password-protected notes with encryption",
+    "Calendar with event notifications",
+    "Multiple theme options",
+    "Shopping and todo lists management",
+    "User progress tracking and achievements",
+    "Push notifications for events"
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Task",
+      "short_name": "Add Task",
+      "description": "Quickly add a new task to your lists",
+      "url": "./?action=quick-task",
+      "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "New Note",
+      "short_name": "Add Note",
+      "description": "Create a new note",
+      "url": "./?action=quick-note",
+      "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Calendar",
+      "short_name": "Events",
+      "description": "View and add calendar events",
+      "url": "./?tab=calendar",
+      "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
   }
+}

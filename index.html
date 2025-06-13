@@ -266,6 +266,9 @@
           </button>
         </div>
         
+        <!-- PWA Telepítés gomb (nem használt, eltávolítjuk) -->
+        <!-- REMOVED: nav install button -->
+        
         <!-- Profil dropdown -->
         <div class="profile-menu">
           <button id="profile-btn" class="profile-btn">
@@ -886,5 +889,58 @@
       </div>
     </div>
   </div>
+
+  <!-- Esemény értesítés modal -->
+  <div id="event-notification-modal" class="modal" style="display: none;">
+    <div class="modal-content event-notification-content">
+      <div class="modal-header">
+        <h3 id="event-notification-title">🔔 Esemény emlékeztető</h3>
+        <button class="close-btn" id="event-notification-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="event-notification-icon">
+          <span class="material-icons">event_available</span>
+        </div>
+        <div class="event-notification-details">
+          <h4 id="event-notification-event-title">Esemény címe</h4>
+          <div class="event-notification-time">
+            <span class="material-icons">schedule</span>
+            <span id="event-notification-time-text">12:00</span>
+          </div>
+          <div class="event-notification-description">
+            <p id="event-notification-description-text">Esemény leírása</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="event-notification-snooze" class="secondary-btn">
+          <span class="material-icons">snooze</span>
+          Elhalasztás (5 perc)
+        </button>
+        <button id="event-notification-dismiss" class="primary-btn">
+          <span class="material-icons">check</span>
+          Rendben
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hang fájl az értesítéshez -->
+  <audio id="notification-sound" preload="auto" loop style="display: none;">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiS2PLNF2wNKnfM+9f1/LRuHwY1LDjU7VnbyhzS3MJKKvQtwOlCm/N1V/+lhvzM2Q0LAAAfLvTq2Av3k5S6yWKOQDUJvOxMc/9tMYHV8aeMVz1VV" type="audio/wav">
+  </audio>
+
+  <!-- PWA Floating Install Button (nem zavaró, jobb alsó sarok) -->
+  <div id="pwa-floating-install" class="pwa-floating-install" style="display: none;">
+    <button id="pwa-install-btn" class="pwa-floating-btn" title="Alkalmazás telepítése">
+      <span class="material-icons">install_mobile</span>
+      <span class="install-tooltip" data-i18n="common.install">Telepítés</span>
+    </button>
+  </div>
+
+  <!-- JavaScript fájlok -->
+  <script type="module" src="index.js"></script>
 </body>
 </html>

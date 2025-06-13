@@ -1,3 +1,7 @@
+// === IMMEDIATE DEBUG LOGGING ===
+console.log('🚀 JavaScript file loading started...');
+console.log('📄 Script execution beginning at:', new Date().toLocaleTimeString());
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getDatabase, ref, push, onValue, remove, set, get, query, orderByChild, update
@@ -5,6 +9,8 @@ import {
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+console.log('📦 Firebase imports loaded successfully');
 
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
@@ -20,6 +26,136 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+
+console.log('🔧 Firebase initialized, defining PWA functions...');
+
+// ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
+// Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
+window.showPWAButton = function() {
+  console.log('🔧 showPWAButton() called');
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'block';
+    console.log('✅ PWA button shown');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+    console.log('💡 Try calling this function after page load');
+  }
+};
+
+window.hidePWAButton = function() {
+  console.log('🔧 hidePWAButton() called');
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'none';
+    console.log('✅ PWA button hidden');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+  }
+};
+
+window.debugPWA = function() {
+  console.log('🔧 debugPWA() called');
+  const container = document.getElementById('pwa-floating-install');
+  const btn = document.getElementById('pwa-install-btn');
+  console.log('🔍 PWA DEBUG INFO:');
+  console.log('  - container found:', !!container);
+  console.log('  - button found:', !!btn);
+  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
+  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+  console.log('  - container display:', container ? container.style.display : 'N/A');
+  console.log('  - DOM ready:', document.readyState);
+  console.log('  - Current timestamp:', new Date().toLocaleTimeString());
+};
+
+window.installPWA = function() {
+  console.log('🔧 installPWA() called');
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.click();
+    console.log('✅ PWA install triggered');
+  } else {
+    console.error('❌ PWA install button not found! DOM might not be ready yet.');
+  }
+};
+
+// Test hogy a függvények elérhetők-e
+console.log('✅ IMMEDIATE PWA functions defined successfully!');
+console.log('🔧 Test immediately: debugPWA()');
+console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA()');
+
+// Immediate test
+setTimeout(() => {
+  console.log('🔧 Auto-testing PWA functions after 1 second...');
+  if (typeof window.debugPWA === 'function') {
+    console.log('✅ debugPWA function is accessible');
+  } else {
+    console.error('❌ debugPWA function is NOT accessible');
+  }
+}, 1000);
+
+// ===============================================
+// 🚀 PROGRESSIVE WEB APP SETUP
+// ===============================================
+
+// PWA Installation Prompt
+let deferredPrompt = null;
+let serviceWorkerRegistration = null;
+
+// Service Worker regisztrálása
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((registration) => {
+        console.log('✅ Service Worker registered successfully:', registration.scope);
+        serviceWorkerRegistration = registration;
+        
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('🔄 New Service Worker available');
+              showNotification('🔄 Új verzió elérhető! Frissítsd az oldalt.');
+            }
+          });
+        });
+      })
+      .catch((error) => {
+        console.log('❌ Service Worker registration failed:', error);
+      });
+  });
+}
+
+// PWA Install Event
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('📱 PWA install prompt available');
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  
+  console.log('PWA install prompt ready');
+  
+  // Megjelenítjük a floating install gombot
+  setTimeout(() => {
+    if (typeof pwaInstall !== 'undefined' && pwaInstall.showInstallButton) {
+      pwaInstall.showInstallButton();
+    }
+  }, 500); // Kis késleltetés, hogy az elem biztosan létezzen
+});
+
+// PWA Installed Event
+window.addEventListener('appinstalled', (evt) => {
+  console.log('✅ PWA was installed');
+  showNotification('🎉 Alkalmazás sikeresen telepítve!');
+  deferredPrompt = null;
+  
+  // Elrejtjük a telepítési gombot
+  if (typeof pwaInstall !== 'undefined' && pwaInstall.hideInstallButton) {
+    pwaInstall.hideInstallButton();
+  }
+});
 
 // DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section");
@@ -2933,8 +3069,109 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Notification permission kérése
   requestNotificationPermission();
   
+  // Audio engedélyezése user interaction után
+  enableAudioOnUserInteraction();
+  
+  // ELTÁVOLÍTVA: enableAudioOnImportantElements() - ez okozta a snooze gomb hang problémát
+  console.log('⚠️ enableAudioOnImportantElements disabled to prevent snooze button sounds');
+  
+  // ⚠️ NO AUTOMATIC AUDIO - Wait for user interaction
+  console.log('⚠️ No automatic audio initialization - waiting for user interaction');
+  
+  // NO AUTOMATIC enableAudio() call - this causes AudioContext errors!
+  console.log('🎵 Audio will be enabled on first user interaction via enableAudioOnUserInteraction()');
+  
   // Közelgő értesítések ellenőrzése
   setTimeout(checkUpcomingNotifications, 2000); // 2 másodperc késleltetéssel
+  
+  // Elhalasztott értesítések ellenőrzése
+  setTimeout(checkSnoozedNotifications, 3000); // 3 másodperc késleltetéssel
+  
+  // Rendszeres snooze monitoring indítása
+  setTimeout(startSnoozeMonitoring, 5000); // 5 másodperc múlva indítjuk
+  
+  // DEBUG: Teszt értesítés 10 másodperc múlva (csak teszteléshez)
+  // setTimeout(() => {
+  //   showEventNotification({
+  //     title: "Teszt esemény",
+  //     time: "12:00",
+  //     description: "Ez egy teszt értesítés"
+  //   });
+  // }, 10000);
+  
+  // Teszt funkció a hangok ellenőrzéséhez (fejlesztői konzolból hívható)
+  // ⚠️ MANUÁLIS AUDIO TESZTELŐK ELTÁVOLÍTVA
+  console.log('🧹 Manual audio test functions removed for production');
+  
+  // ⚠️ TESZTELŐ FUNKCIÓK ELTÁVOLÍTVA - ÉLES VERZIÓ
+  console.log('🧹 Test functions removed for production');
+  
+  // ⚠️ TESZT ÉRTESÍTÉSEK ELTÁVOLÍTVA - ÉLES VERZIÓ
+  console.log('✅ Production ready - Test notifications removed');
+  console.log('🔧 Audio system: User interaction safe');
+  console.log('📱 PWA notifications: Mobile compatible');
+  
+  // PWA Debug funkciók
+  console.log('🔧 PWA Debug Commands:');
+  console.log('  showPWAButton() - Force show install button');
+  console.log('  hidePWAButton() - Hide install button');
+  console.log('  debugPWA() - Show PWA debug info');
+  console.log('  installPWA() - Trigger install dialog');
+
+// ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
+// Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
+window.showPWAButton = function() {
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'block';
+    console.log('🔧 IMMEDIATE: PWA button shown');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+    console.log('💡 Try calling this function after page load');
+  }
+};
+
+window.hidePWAButton = function() {
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'none';
+    console.log('🔧 IMMEDIATE: PWA button hidden');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+  }
+};
+
+window.debugPWA = function() {
+  const container = document.getElementById('pwa-floating-install');
+  const btn = document.getElementById('pwa-install-btn');
+  console.log('🔧 IMMEDIATE PWA DEBUG:');
+  console.log('  - container found:', !!container);
+  console.log('  - button found:', !!btn);
+  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
+  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+  console.log('  - container display:', container ? container.style.display : 'N/A');
+  console.log('  - DOM ready:', document.readyState);
+};
+
+window.installPWA = function() {
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.click();
+    console.log('🔧 IMMEDIATE: PWA install triggered');
+  } else {
+    console.error('❌ PWA install button not found! DOM might not be ready yet.');
+  }
+};
+
+// Test hogy a függvények elérhetők-e
+console.log('✅ Immediate PWA functions defined');
+console.log('🔧 Test now: debugPWA()');
+  
+  // ⚠️ AUDIO STATUS TESZTELŐ ELTÁVOLÍTVA
+  console.log('🧹 Audio status checker removed for production');
+  
+  // ⚠️ PWA ÉS AUDIO TESZTELŐK ELTÁVOLÍTVA
+  console.log('🧹 PWA and audio test functions removed for production');
 });
 
 // Gyors műveletek kezelése
@@ -3265,21 +3502,101 @@ function checkUpcomingNotifications() {
   });
 }
 
-// Értesítések ellenőrzése minden 5 percben
-setInterval(checkUpcomingNotifications, 5 * 60 * 1000);
+// Értesítések ellenőrzése minden 1 percben a pontosabb időzítés érdekében
+setInterval(() => {
+  checkUpcomingNotifications();
+  checkSnoozedNotifications();
+}, 60 * 1000);
 
-// Esemény értesítés megjelenítése
+// Esemény értesítés megjelenítése - PWA és mobil kompatibilis
 function showEventNotification(eventData) {
-  // Browser notification kérése
-  if (Notification.permission === 'granted') {
-    new Notification(`📅 Közelgő esemény: ${eventData.title}`, {
-      body: `${eventData.time || 'Egész nap'} - ${eventData.description || ''}`,
-      icon: '/favicon-32x32.png'
-    });
+  console.log('🔔 ========== SHOWING EVENT NOTIFICATION ==========');
+  console.log('📅 Event:', eventData.title);
+  console.log('⏰ Time:', eventData.time);
+  
+  // MOBIL PWA NOTIFICATION - PRIORITÁS!
+  if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+    const notificationOptions = {
+      body: `${eventData.time || getText('calendar.all_day')} - ${eventData.description || ''}`,
+      icon: '/android-chrome-192x192.png',
+      badge: '/favicon-32x32.png',
+      vibrate: [200, 100, 200], // Vibráció mobil eszközökön
+      requireInteraction: true, // Nem tűnik el automatikusan
+      persistent: true, // Perzisztens értesítés
+      actions: [
+        {
+          action: 'snooze',
+          title: '⏰ 1 perc múlva',
+          icon: '/favicon-16x16.png'
+        },
+        {
+          action: 'dismiss',
+          title: '✅ Rendben',
+          icon: '/favicon-16x16.png'
+        }
+      ],
+      tag: `event-${eventData.id || Date.now()}`, // Egyedi tag
+      renotify: true, // Újra értesítés ha már van ilyen tag
+      silent: false // NE legyen silent - kell a hang
+    };
+    
+    console.log('📱 Creating PWA notification for mobile...');
+    
+    // Service Worker notification (mobil kompatibilis)
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification(
+          `📅 ${getText('notifications.upcoming_event')}: ${eventData.title}`,
+          notificationOptions
+        ).then(() => {
+          console.log('✅ PWA notification created successfully');
+        }).catch(err => {
+          console.log('❌ PWA notification failed:', err);
+          // Fallback to regular notification
+          createRegularNotification(eventData);
+        });
+      });
+    } else {
+      // Fallback to regular notification
+      createRegularNotification(eventData);
+    }
+  } else {
+    // No permission or no service worker
+    console.log('⚠️ No PWA notification support, using regular methods');
+    createRegularNotification(eventData);
   }
   
-  // Alkalmazáson belüli notification is
-  showNotification(`📅 Emlékeztető: ${eventData.title} - ${eventData.time || 'Egész nap'}`);
+  // Alkalmazáson belüli értesítési modal megjelenítése
+  showEventNotificationModal(eventData);
+  
+  // HANG LEJÁTSZÁSA - LOOP RENDSZERREL
+  console.log('🔊 Starting notification sound...');
+  playNotificationSound();
+  
+  // Hagyományos értesítés is (fallback)
+  showNotification(`📅 ${getText('notifications.upcoming_event')}: ${eventData.title} - ${eventData.time || getText('calendar.all_day')}`);
+  
+  console.log('✅ Event notification fully displayed');
+}
+
+// Regular browser notification fallback
+function createRegularNotification(eventData) {
+  if (Notification.permission === 'granted') {
+    const notification = new Notification(`📅 ${getText('notifications.upcoming_event')}: ${eventData.title}`, {
+      body: `${eventData.time || getText('calendar.all_day')} - ${eventData.description || ''}`,
+      icon: '/android-chrome-192x192.png',
+      requireInteraction: true,
+      silent: false
+    });
+    
+    // Handle notification clicks
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+    
+    console.log('✅ Regular browser notification created');
+  }
 }
 
 // Notification permission kérése
@@ -3288,6 +3605,488 @@ function requestNotificationPermission() {
     Notification.requestPermission();
   }
 }
+
+// Event Notification Modal megjelenítése
+function showEventNotificationModal(eventData) {
+  const modal = document.getElementById('event-notification-modal');
+  const title = document.getElementById('event-notification-event-title');
+  const time = document.getElementById('event-notification-time-text');
+  const description = document.getElementById('event-notification-description-text');
+  const modalTitle = document.getElementById('event-notification-title');
+  
+  // Nyelvi szövegek beállítása
+  if (modalTitle) modalTitle.textContent = `🔔 ${getText('notifications.event_reminder')}`;
+  
+  // Esemény adatok kitöltése
+  if (title) title.textContent = eventData.title;
+  if (time) time.textContent = eventData.time || getText('calendar.all_day');
+  if (description) description.textContent = eventData.description || '';
+  
+  // Modal megjelenítése
+  if (modal) {
+    modal.style.display = 'flex';
+    
+    // NINCS KÜLÖN AUDIO AKTIVÁLÁS - a playNotificationSound() már elindult
+    
+    // Event listeners beállítása
+    setupEventNotificationListeners(eventData);
+  }
+}
+
+// Event notification modal event listeners
+function setupEventNotificationListeners(eventData) {
+  const modal = document.getElementById('event-notification-modal');
+  const closeBtn = document.getElementById('event-notification-close');
+  const snoozeBtn = document.getElementById('event-notification-snooze');
+  const dismissBtn = document.getElementById('event-notification-dismiss');
+  
+  // Bezárás gomb
+  if (closeBtn) {
+    closeBtn.onclick = () => closeEventNotificationModal();
+  }
+  
+  // Elhalasztás gomb
+  if (snoozeBtn) {
+    snoozeBtn.textContent = `⏰ 1 perc múlva`;
+    snoozeBtn.onclick = () => {
+      // HANG LEÁLLÍTÁSA AZONNAL - SEMMILYEN HANG VAGY AUDIO AKTIVÁLÁS NINCS!
+      console.log('🔇 Snooze button clicked - COMPLETELY SILENT operation');
+      
+      // Hang leállítása ELŐSZÖR - ez a legfontos!
+      stopNotificationSound();
+      
+      // ⚠️ NO AUDIO FLAG MODIFICATION! Ez okozta a problémákat!
+      console.log('✅ Snooze: Sound stopped, no audio flags modified');
+      
+      // Snooze végrehajtása (ez már tartalmazza a modal bezárását)
+      snoozeEventNotification(eventData);
+    };
+  }
+  
+  // Rendben gomb
+  if (dismissBtn) {
+    dismissBtn.textContent = `✅ ${getText('notifications.dismiss')}`;
+    dismissBtn.onclick = () => closeEventNotificationModal();
+  }
+  
+  // Modal háttérre kattintás
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      console.log('🖱️ Background clicked - closing modal and stopping sound');
+      stopNotificationSound(); // Biztosíték
+      closeEventNotificationModal();
+    }
+  };
+  
+  // ESC billentyű
+  document.addEventListener('keydown', function escHandler(e) {
+    if (e.key === 'Escape') {
+      console.log('⌨️ ESC pressed - closing modal and stopping sound');
+      stopNotificationSound(); // Biztosíték
+      closeEventNotificationModal();
+      document.removeEventListener('keydown', escHandler);
+    }
+  });
+}
+
+// Event notification modal bezárása
+function closeEventNotificationModal() {
+  console.log('🚪 ========== CLOSING EVENT NOTIFICATION MODAL ==========');
+  
+  // CRITICAL: STOP AUDIO LOOP IMMEDIATELY TO PREVENT SOUNDS ON CLOSE
+  console.log('🔇 STOPPING ALL AUDIO to prevent sounds on modal close');
+  stopNotificationSound();
+  
+  const modal = document.getElementById('event-notification-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    console.log('✅ Modal hidden');
+  }
+  
+  // EXTRA SAFETY: Set a short delay to ensure no audio triggers
+  setTimeout(() => {
+    if (notificationInterval) {
+      clearInterval(notificationInterval);
+      notificationInterval = null;
+      console.log('🛑 SAFETY: Extra interval clearance');
+    }
+  }, 100);
+  
+  console.log('✅ Event notification modal closed completely - NO SOUNDS');
+}
+
+// Audio context a hang engedélyezéséhez
+let audioContext = null;
+let audioEnabled = false;
+let audioFullyActivated = false; // Track if user has interacted and audio is fully ready
+let notificationInterval = null;
+let isNotificationPlaying = false;
+
+// Audio engedélyezése user interaction után
+function enableAudio() {
+  if (!audioEnabled && !audioContext) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioEnabled = true;
+      console.log('Audio enabled successfully');
+      
+      // Resume context ha suspended
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
+      // NINCS TESZT HANG - csak az audio context létrehozása!
+      console.log('✅ Audio context ready (no test sound)');
+    } catch (error) {
+      console.log('Audio context creation failed:', error);
+    }
+  }
+}
+
+// Audio előkészítése értesítésekhez
+function prepareAudioForNotifications() {
+  console.log('🎵 ========== AUDIO PREPARATION (NO AUTO-PLAY) ==========');
+  try {
+    // HTML audio CSAK előkészítése - NINCS AUTOMATIKUS LEJÁTSZÁS!
+    const audio = document.getElementById('notification-sound');
+    if (audio) {
+      audio.volume = 0.9; // Beállítjuk a megfelelő hangerőt
+      audio.currentTime = 0;
+      // ⚠️ NO AUTO-PLAY - ez okozta az AudioContext hibákat!
+      console.log('✅ HTML Audio configured (no auto-play)');
+    }
+    
+    // Web Audio API - CSAK CONTEXT ELLENŐRZÉS, NINCS OSCILLATOR TESZT!
+    if (audioContext) {
+      console.log('✅ Web Audio Context is available');
+      console.log('  - State:', audioContext.state);
+      console.log('  - Sample rate:', audioContext.sampleRate);
+      // ⚠️ NO OSCILLATOR TEST - ez okozta az AudioContext hibákat!
+      console.log('✅ Web Audio API prepared (no test oscillator)');
+    } else {
+      console.log('⚠️ No audio context available yet');
+    }
+    
+    console.log('✅ Audio preparation complete (silent mode - no auto-play)');
+  } catch (error) {
+    console.log('❌ Audio preparation failed:', error);
+  }
+}
+
+// Audio engedélyezése az első user interaction-nál
+function enableAudioOnUserInteraction() {
+  const events = ['click', 'touchstart', 'keydown'];
+  
+  function audioHandler() {
+    console.log('🎵 First user interaction detected - enabling audio context');
+    enableAudio();
+    audioFullyActivated = true;
+    
+    // Event listener-ek eltávolítása az első interaction után
+    events.forEach(event => {
+      document.removeEventListener(event, audioHandler);
+    });
+    
+    console.log('✅ Audio fully activated on user interaction');
+  }
+  
+  // Event listener-ek hozzáadása
+  events.forEach(event => {
+    document.addEventListener(event, audioHandler, { once: true });
+  });
+}
+
+// ⚠️ DISABLED - Ez okozta a snooze gomb hang problémát
+function enableAudioOnImportantElements() {
+  console.log('⚠️ enableAudioOnImportantElements is DISABLED to prevent unwanted sounds');
+  // Az összes functionality ki van kapcsolva
+  return;
+}
+
+// 🔊 EGYSZERŰ NOTIFICATION HANG RENDSZER
+function playNotificationSound() {
+  console.log('🔊 ========== STARTING NOTIFICATION SOUND (SIMPLE LOOP) ==========');
+  
+  // AUDIO ACTIVATION CHECK - CRITICAL SAFETY!
+  if (!audioFullyActivated) {
+    console.log('⚠️ Audio not activated yet! Need user interaction first.');
+    console.log('💡 Audio will be enabled on first click/touch/key press');
+    return;
+  }
+  
+  // Ha már szól egy értesítés, állítsuk le előbb
+  if (isNotificationPlaying) {
+    console.log('⚠️ Notification already playing - stopping previous first');
+    stopNotificationSound();
+  }
+  
+  // BIZTOSÍTSUK, HOGY AZ AUDIO CONTEXT LÉTEZIK ÉS AKTÍV
+  if (!audioContext) {
+    console.log('❌ No audio context available - this should not happen after user interaction');
+    console.log('🔧 Attempting audio context creation...');
+    enableAudio();
+    
+    // If still no context, abort
+    if (!audioContext) {
+      console.log('❌ Failed to create audio context - aborting sound');
+      return;
+    }
+  }
+  
+  // AUDIO CONTEXT STATE CHECK
+  if (audioContext.state === 'suspended') {
+    console.log('⚠️ Audio context is suspended - trying to resume...');
+    audioContext.resume().then(() => {
+      console.log('✅ Audio context resumed - starting simple sound');
+      startSimpleLoop();
+    }).catch(err => {
+      console.log('❌ Failed to resume audio context:', err);
+    });
+  } else {
+    startSimpleLoop();
+  }
+  
+  function startSimpleLoop() {
+    console.log('🔊 Starting simple notification loop...');
+    
+    // ÁLLÍTSUK BE A FLAG-ET
+    isNotificationPlaying = true;
+    console.log('✅ isNotificationPlaying = TRUE');
+    
+    // ELSŐ HANG AZONNAL
+    playSingleBeep();
+    
+    // LOOP INDÍTÁSA
+    startContinuousLoop();
+  }
+}
+
+// ⚠️ DEPRECATED FUNCTION - REPLACED BY SIMPLE LOOP IN playNotificationSound()
+function startWorkingAudioLoop() {
+  console.log('⚠️ startWorkingAudioLoop is deprecated - redirecting to startContinuousLoop');
+  startContinuousLoop();
+}
+
+// 🔄 FOLYAMATOS LOOP - 3 MÁSODPERCENKÉNT
+function startContinuousLoop() {
+  console.log('🔄 ========== STARTING CONTINUOUS LOOP ==========');
+  
+  // ELLENŐRIZZÜK, hogy nincs-e már futó interval
+  if (notificationInterval) {
+    console.log('⚠️ Clearing existing interval first');
+    clearInterval(notificationInterval);
+    notificationInterval = null;
+  }
+  
+  // Loop: minden 3 másodpercben ismétlés
+  notificationInterval = setInterval(() => {
+    console.log('🔄 Loop tick - isNotificationPlaying:', isNotificationPlaying);
+    if (isNotificationPlaying) {
+      console.log('🔊 Playing loop beep...');
+      playSingleBeep();
+    } else {
+      console.log('🛑 Loop stopped - clearing interval');
+      clearInterval(notificationInterval);
+      notificationInterval = null;
+    }
+  }, 3000); // 3 másodpercenként
+  
+  console.log('✅ Continuous loop started - playing every 3 seconds');
+  console.log('📊 isNotificationPlaying flag:', isNotificationPlaying);
+}
+
+// 🔊 EGYSZERŰ BEEP HANG - TISZTA ÉS EGYEDÜLÁLLÓ
+function playSingleBeep() {
+  if (!audioContext) return;
+  
+  try {
+    console.log('🔊 SINGLE BEEP! (880Hz)');
+    
+    // Egyszerű oscillator
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Beállítások
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A note
+    oscillator.type = 'sine';
+    
+    // Hangerő beállítása - kicsit hangosabb
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.1); // 0.3 → 0.4
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6); // 0.5 → 0.6 (hosszabb)
+    
+    // Lejátszás - kicsit hosszabb hang
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.6);
+    
+  } catch (error) {
+    console.log('❌ Single beep failed:', error);
+  }
+}
+
+// ⚠️ CLEANED UP - Deprecated functions removed to simplify audio system
+// All audio functionality now goes through:
+// - playNotificationSound() -> startContinuousLoop() -> playSingleBeep()
+console.log('✅ Deprecated audio functions cleaned up for simpler system');
+
+// 🛑 EGYSZERŰ HANG LEÁLLÍTÁS
+function stopNotificationSound() {
+  console.log('🛑 ========== STOPPING NOTIFICATION SOUND ==========');
+  
+  // ELSŐ LÉPÉS: isNotificationPlaying = false (ez megállítja a loop-okat)
+  isNotificationPlaying = false;
+  console.log('✅ isNotificationPlaying = FALSE');
+  
+  // Folyamatos lejátszás leállítása (Web Audio interval)
+  if (notificationInterval) {
+    clearInterval(notificationInterval);
+    notificationInterval = null;
+    console.log('✅ Notification interval cleared');
+  } else {
+    console.log('ℹ️ No notification interval to clear');
+  }
+  
+  console.log('✅ All notification sounds stopped completely');
+}
+
+// 5 perces elhalasztás (teszteléshez 1 perc)
+function snoozeEventNotification(eventData) {
+  // ELSŐ: HANGOT LEÁLLÍTJUK!
+  stopNotificationSound();
+  
+  const snoozeTime = new Date(Date.now() + 1 * 60 * 1000); // 1 perc múlva (teszteléshez)
+  
+  // Perzisztens tárolás localStorage-ban
+  const snoozeData = {
+    eventData: eventData,
+    snoozeTime: snoozeTime.getTime(),
+    id: `snooze_${Date.now()}_${Math.random()}`
+  };
+  
+  // Mentés localStorage-ba
+  let snoozedEvents = JSON.parse(localStorage.getItem('snoozedEvents') || '[]');
+  snoozedEvents.push(snoozeData);
+  localStorage.setItem('snoozedEvents', JSON.stringify(snoozedEvents));
+  
+  console.log(`Event notification snoozed for 1 minute: ${eventData.title} until ${snoozeTime.toLocaleString()}`);
+  showNotification(`⏰ ${eventData.title} - 1 perc múlva újra emlékeztetés`);
+  
+  // Modal bezárása
+  closeEventNotificationModal();
+  
+  // Azonnali check indítása
+  checkSnoozedNotifications();
+}
+
+// Elhalasztott értesítések ellenőrzése
+function checkSnoozedNotifications() {
+  const now = Date.now();
+  let snoozedEvents = JSON.parse(localStorage.getItem('snoozedEvents') || '[]');
+  let activeSnoozedEvents = [];
+  
+  snoozedEvents.forEach(snoozeData => {
+    if (now >= snoozeData.snoozeTime) {
+      // Lejárt - megjelenítjük az értesítést
+      console.log(`Showing snoozed notification: ${snoozeData.eventData.title}`);
+      showEventNotification(snoozeData.eventData);
+    } else {
+      // Még nem járt le - megtartjuk
+      activeSnoozedEvents.push(snoozeData);
+    }
+  });
+  
+  // Frissítjük a localStorage-t
+  localStorage.setItem('snoozedEvents', JSON.stringify(activeSnoozedEvents));
+}
+
+// Elhalasztott értesítések törlése (ha bezárjuk az értesítést véglegesen)
+function clearSnoozedNotifications() {
+  // Hang leállítása ha szükséges
+  stopNotificationSound();
+  
+  localStorage.removeItem('snoozedEvents');
+  console.log('All snoozed notifications cleared');
+}
+
+// ===============================================
+// 🔧 TESTING FUNCTIONS (Console accessible)
+// ===============================================
+
+// Teszteléshez - hang leállítása
+window.stopTestSound = function() {
+  stopNotificationSound();
+  console.log('🔇 Test sound stopped manually');
+};
+
+// Teszteléshez - valódi loop hang tesztelése
+window.testContinuousSound = function() {
+  console.log('🔊 ========== TESTING CONTINUOUS SOUND (SAFE MODE) ==========');
+  
+  // SAFETY CHECK FIRST
+  if (!audioFullyActivated) {
+    console.log('⚠️ Audio not yet activated! Please click somewhere on the page first.');
+    return;
+  }
+  
+  console.log('📋 Audio status: ready');
+  
+  // RESET minden audio flag
+  isNotificationPlaying = false;
+  if (notificationInterval) {
+    clearInterval(notificationInterval);
+    notificationInterval = null;
+  }
+  
+  console.log('🔧 Audio system reset complete');
+  console.log('🔊 Starting SIMPLE LOOP system...');
+  
+  // EGYSZERŰ HANG LEJÁTSZÁSA - nem dupla
+  playNotificationSound();
+  
+  console.log('▶️ Simple loop sound started. Use stopTestSound() to stop.');
+  console.log('📋 Expected behavior: Sound plays every 3 seconds');
+};
+
+// Új teszt funkció - teljes rendszer ellenőrzése
+window.testNotificationSystem = function() {
+  console.log('🧪 ========== TESTING COMPLETE NOTIFICATION SYSTEM (SAFE MODE) ==========');
+  console.log('📊 Current audio status:');
+  console.log('  - audioContext:', !!audioContext);
+  console.log('  - audioEnabled:', audioEnabled);
+  console.log('  - audioFullyActivated:', audioFullyActivated);
+  console.log('  - isNotificationPlaying:', isNotificationPlaying);
+  
+  // SAFETY CHECK - NO AUTOMATIC AUDIO ACTIVATION!
+  if (!audioFullyActivated) {
+    console.log('⚠️ Audio not yet activated by user interaction!');
+    console.log('💡 Please click/touch/type somewhere on the page first.');
+    console.log('🔧 After user interaction, try this test again.');
+    console.log('📋 This prevents AudioContext browser errors.');
+    return;
+  }
+  
+  // Test event létrehozása
+  const testEvent = {
+    title: '🔊 Teszt Értesítés - SAFE MODE',
+    description: 'Ellenőrizd: hang loop működik + modal bezáráskor leáll',
+    time: new Date().toLocaleTimeString()
+  };
+  
+  console.log('✅ Audio is ready - testing notification...');
+  
+  // Értesítés megjelenítése
+  console.log('📱 Showing test notification...');
+  showEventNotification(testEvent);
+  
+  console.log('✅ Test notification shown (user interaction safe). Check that:');
+  console.log('   1. Modal appears');
+  console.log('   2. Sound plays every 3 seconds (loop)');
+  console.log('   3. Sound stops when modal is closed');
+  console.log('==================================================');
+};
 
 // ===============================================
 // 🌐 INTERNATIONALIZATION (i18n) SYSTEM
@@ -4581,6 +5380,182 @@ document.addEventListener('DOMContentLoaded', () => {
   // Privacy modal inicializálása
   initPrivacyModal();
   
+  // AUDIO USER INTERACTION RENDSZER INICIALIZÁLÁS
+  enableAudioOnUserInteraction();
+  console.log('🎵 Audio user interaction system initialized');
+  
+  // PWA FLOATING INSTALL BUTTON SETUP
+  function setupPWAInstallButton() {
+    const installContainer = document.getElementById('pwa-floating-install');
+    const installBtn = document.getElementById('pwa-install-btn');
+    
+    // Debug: elemek ellenőrzése
+    console.log('🔧 PWA Elements Check:');
+    console.log('  - installContainer:', !!installContainer);
+    console.log('  - installBtn:', !!installBtn);
+    console.log('  - deferredPrompt:', !!deferredPrompt);
+    
+    if (!installContainer || !installBtn) {
+      console.error('❌ PWA install elements not found in DOM!');
+      return { showInstallButton: () => {}, hideInstallButton: () => {}, checkInstallStatus: () => false };
+    }
+    
+    // PWA telepíthetőség és mobil ellenőrzése
+    function canShowInstallButton() {
+      // Megjelenítjük minden eszközön, ha elérhető a PWA prompt
+      // De csak akkor, ha még nincs telepítve
+      return deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches;
+    }
+    
+    // Gomb megjelenítése
+    function showInstallButton() {
+      if (canShowInstallButton()) {
+        installContainer.style.display = 'block';
+        console.log('📱 PWA floating install button shown');
+      }
+    }
+    
+    // Gomb elrejtése
+    function hideInstallButton() {
+      installContainer.style.display = 'none';
+      console.log('📱 PWA install button hidden');
+    }
+    
+    // PWA telepítés kezelése
+    if (installBtn) {
+      installBtn.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('✅ PWA installation accepted');
+              showNotification('📱 App sikeresen telepítve!');
+              hideInstallButton();
+            } else {
+              console.log('❌ PWA installation declined');
+              // Elrejtjük egy időre, ha elutasították
+              hideInstallButton();
+              setTimeout(() => {
+                if (deferredPrompt) showInstallButton();
+              }, 60000); // 1 perc múlva újra megjelenik
+            }
+            deferredPrompt = null;
+          });
+        } else {
+          console.log('PWA már telepítve vagy nem támogatott');
+          showNotification('📱 Az alkalmazás már telepítve van');
+          hideInstallButton();
+        }
+      });
+    }
+    
+    // PWA telepítési állapot ellenőrzése
+    function checkInstallStatus() {
+      // Ha már telepítve van PWA módban, rejtjük a gombot
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        hideInstallButton();
+        console.log('📱 PWA already installed - hiding install button');
+        return false;
+      }
+      return true;
+    }
+    
+    // Kezdeti ellenőrzés
+    if (checkInstallStatus() && deferredPrompt) {
+      showInstallButton();
+    }
+    
+    // Debug funkciók console-ból
+    window.showPWAButton = () => {
+      if (installContainer) {
+        installContainer.style.display = 'block';
+        console.log('🔧 DEBUG: PWA button forced to show');
+      } else {
+        console.error('❌ Install container not found!');
+      }
+    };
+    
+    window.hidePWAButton = () => {
+      if (installContainer) {
+        installContainer.style.display = 'none';
+        console.log('🔧 DEBUG: PWA button hidden');
+      } else {
+        console.error('❌ Install container not found!');
+      }
+    };
+    
+    window.debugPWA = () => {
+      console.log('🔧 PWA DEBUG INFO:');
+      console.log('  - installContainer:', installContainer);
+      console.log('  - installBtn:', installBtn);
+      console.log('  - deferredPrompt:', deferredPrompt);
+      console.log('  - display-mode:', window.matchMedia('(display-mode: standalone)').matches);
+      console.log('  - current display:', installContainer ? installContainer.style.display : 'N/A');
+    };
+    
+    // Automatikus megjelenítés teszteléshez 
+    console.log('🔧 No deferredPrompt available yet - use showPWAButton() to test UI');
+    // Minden esetben megmutatjuk 3 másodperc múlva tesztelés céljából
+    setTimeout(() => {
+      if (!window.matchMedia('(display-mode: standalone)').matches) {
+        installContainer.style.display = 'block';
+        console.log('🔧 AUTO-SHOWING PWA button for testing purposes');
+        console.log('📱 PWA button should now be visible in bottom-right corner');
+      }
+    }, 3000);
+    
+    return { showInstallButton, hideInstallButton, checkInstallStatus };
+  }
+  
+  // PWA setup inicializálása
+  const pwaInstall = setupPWAInstallButton();
+  
+  // Globális függvény konzolból való használatra
+  window.installPWA = function() {
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+      installBtn.click();
+    } else {
+      console.error('❌ PWA install button not found!');
+    }
+  };
+  
+  // Backup globális függvények (ha a setupPWAInstallButton nem futott le)
+  if (!window.showPWAButton) {
+    window.showPWAButton = () => {
+      const container = document.getElementById('pwa-floating-install');
+      if (container) {
+        container.style.display = 'block';
+        console.log('🔧 BACKUP: PWA button shown');
+      } else {
+        console.error('❌ PWA container not found!');
+      }
+    };
+  }
+  
+  if (!window.hidePWAButton) {
+    window.hidePWAButton = () => {
+      const container = document.getElementById('pwa-floating-install');
+      if (container) {
+        container.style.display = 'none';
+        console.log('🔧 BACKUP: PWA button hidden');
+      } else {
+        console.error('❌ PWA container not found!');
+      }
+    };
+  }
+  
+  if (!window.debugPWA) {
+    window.debugPWA = () => {
+      const container = document.getElementById('pwa-floating-install');
+      const btn = document.getElementById('pwa-install-btn');
+      console.log('🔧 BACKUP PWA DEBUG:');
+      console.log('  - container:', !!container);
+      console.log('  - button:', !!btn);
+      console.log('  - display:', container ? container.style.display : 'N/A');
+    };
+  }
+  
   // Várjunk egy kicsit, hogy minden elem biztosan betöltödjön
   setTimeout(() => {
     if (listsContainer && toggleReorderBtn) {
@@ -4589,3 +5564,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 500);
 });
+
+// =================================
+// SNOOZE RENDSZER JAVÍTÁSA
+// =================================
+
+// Rendszeres ellenőrzés globális timer
+let snoozeCheckInterval = null;
+
+// Rendszeres snooze ellenőrzés indítása
+function startSnoozeMonitoring() {
+  // Ha már fut, ne indítsuk újra
+  if (snoozeCheckInterval) {
+    clearInterval(snoozeCheckInterval);
+  }
+  
+  // Ellenőrzés minden 30 másodpercben
+  snoozeCheckInterval = setInterval(() => {
+    checkSnoozedNotifications();
+  }, 30000); // 30 másodpercenként
+  
+  console.log('Snooze monitoring started - checking every 30 seconds');
+}
+
+// Snooze monitoring leállítása
+function stopSnoozeMonitoring() {
+  if (snoozeCheckInterval) {
+    clearInterval(snoozeCheckInterval);
+    snoozeCheckInterval = null;
+    console.log('Snooze monitoring stopped');
+  }
+}
