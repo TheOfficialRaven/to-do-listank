@@ -1,0 +1,193 @@
+/* Base Styles and Resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: clamp(16px, 2vw, 22px);
+  padding: 1rem;
+  transition: all 0.3s ease;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Common box-shadow applications */
+.theme-modal-content,
+.modal-content,
+.list-box,
+.note-card,
+.stat-card,
+.level-card,
+.achievements-list,
+.activity-graph,
+.productivity-insights,
+.quick-add-modal-content,
+.welcome-card,
+.quick-actions,
+.daily-quote,
+.modern-card,
+.upcoming-events,
+.stats-section {
+  box-shadow: var(--box-shadow-primary) !important;
+}
+
+.primary-btn,
+.secondary-btn,
+.action-btn,
+#custom-new-list-btn,
+.profile-btn,
+.nav-tab,
+.nav-control-btn {
+  box-shadow: var(--box-shadow-primary);
+}
+
+/* Hover effects */
+.list-box:hover,
+.note-card:hover,
+.stat-card:hover,
+.level-card:hover,
+.achievements-list:hover,
+.activity-graph:hover,
+.productivity-insights:hover,
+.quick-add-modal-content:hover,
+.welcome-card:hover,
+.quick-actions:hover,
+.daily-quote:hover,
+.modern-card:hover,
+.upcoming-events:hover,
+.stats-section:hover {
+  box-shadow: 0 16px 48px var(--box-shadow-primary, rgba(16,185,129,0.22));
+}
+
+/* Special states */
+.achievement-badge.unlocked {
+  box-shadow: 0 0 20px var(--box-shadow-primary, rgba(16,185,129,0.3));
+}
+
+.note-card.pinned {
+  box-shadow: 0 8px 25px var(--box-shadow-primary, rgba(16,185,129,0.2));
+}
+
+/* FAB */
+.quick-add-fab {
+  box-shadow: 0 4px 12px var(--box-shadow-primary, rgba(16,185,129,0.3));
+}
+
+.quick-add-fab:hover {
+  box-shadow: 0 8px 20px var(--box-shadow-primary, rgba(16,185,129,0.4));
+}
+
+/* Active states */
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
+.nav-tab:active {
+  transform: scale(0.98);
+}
+
+.stat-card:active {
+  transform: scale(0.98);
+}
+
+.note-card:active {
+  transform: scale(0.98);
+}
+
+.achievement-badge:active {
+  transform: scale(0.98);
+}
+
+/* Light theme specific overrides */
+[data-theme="light"] .modal {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="light"] .nav-tab {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="light"] .nav-tab:hover {
+  background-color: var(--bg-tertiary);
+}
+
+[data-theme="light"] .welcome-card,
+[data-theme="light"] .modern-card,
+[data-theme="light"] .stats-section {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="light"] .welcome-card:hover,
+[data-theme="light"] .modern-card:hover,
+[data-theme="light"] .stats-section:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Tab transitions */
+.tab-content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.xp-fill, .progress-fill {
+  background: linear-gradient(90deg, 
+    var(--accent-primary) 0%, 
+    var(--accent-secondary) 50%, 
+    var(--accent-primary) 100%);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+.xp-fill::before, .progress-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.3) 50%, 
+    transparent 100%);
+  animation: shimmer 2s infinite linear;
+} 

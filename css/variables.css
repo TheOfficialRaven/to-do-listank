@@ -1,0 +1,93 @@
+/* CSS Variables and Theme System */
+:root {
+  /* Sötét téma (alapértelmezett) */
+  --bg-primary: #1F2937;
+  --bg-secondary: #2B3849;
+  --bg-tertiary: #374151;
+  --text-primary: #F8FAFC;
+  --text-secondary: #D1D5DB;
+  --accent-primary: #10B981;
+  --accent-secondary: #059669;
+  --border-color: #10B981;
+  --box-shadow-primary: 0 8px 32px rgba(16, 185, 129, 0.18);
+}
+
+[data-theme="light"] {
+  /* Világos téma */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --accent-primary: #059669;
+  --accent-secondary: #10B981;
+  --border-color: #059669;
+  --box-shadow-primary: 0 8px 32px rgba(16, 185, 129, 0.10);
+}
+
+/* Theme-specific box shadows */
+.theme-ocean-blue {
+  --box-shadow-primary: 0 8px 32px rgba(14, 165, 233, 0.18);
+}
+.theme-ocean-blue[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(56, 189, 248, 0.22);
+}
+.theme-sakura-pink {
+  --box-shadow-primary: 0 8px 32px rgba(233, 30, 99, 0.18);
+}
+.theme-sakura-pink[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(244, 143, 177, 0.22);
+}
+.theme-forest-green {
+  --box-shadow-primary: 0 8px 32px rgba(46, 125, 50, 0.18);
+}
+.theme-forest-green[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(102, 187, 106, 0.22);
+}
+.theme-minimal-mono {
+  --box-shadow-primary: 0 8px 32px rgba(45, 45, 45, 0.10);
+}
+.theme-minimal-mono[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(255, 255, 255, 0.10);
+}
+.theme-sunset-orange {
+  --box-shadow-primary: 0 8px 32px rgba(255, 111, 0, 0.18);
+}
+.theme-sunset-orange[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(255, 183, 77, 0.22);
+}
+.theme-royal-purple {
+  --box-shadow-primary: 0 8px 32px rgba(123, 31, 162, 0.18);
+}
+.theme-royal-purple[data-theme="dark"] {
+  --box-shadow-primary: 0 8px 32px rgba(186, 104, 200, 0.22);
+}
+
+/* Theme gradients */
+.default-gradient {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.ocean-blue-gradient {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+
+.sakura-pink-gradient {
+  background: linear-gradient(135deg, #e91e63, #ad1457);
+}
+
+.forest-green-gradient {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+}
+
+.minimal-mono-gradient {
+  background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+}
+
+.sunset-orange-gradient {
+  background: linear-gradient(135deg, #ff6f00, #e65100);
+}
+
+.royal-purple-gradient {
+  background: linear-gradient(135deg, #7b1fa2, #4a148c);
+} 

@@ -1,10 +1,22 @@
 {
-  "navigation": {
+    "navigation": {
     "dashboard": "🏠 Dashboard",
-    "overview": "📊 Overview", 
+    "overview": "📊 Overview",
     "lists": "📝 Lists",
     "notes": "📒 Notes",
-    "calendar": "🗓️ Calendar"
+    "calendar": "🗓️ Calendar",
+    "privacy": "Privacy"
+  },
+  "common": {
+    "theme": "Theme",
+    "install": "Install",
+    "cancel": "Cancel",
+    "language_switch": "Switch Language",
+    "theme_switch": "Switch Theme",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "done": "Done"
   },
   "dashboard": {
     "welcome": "👋 Welcome back!",
@@ -17,6 +29,7 @@
     "daily_inspiration": "💡 Daily Inspiration",
     "today_events": "📅 Today's Events",
     "no_events": "No events today",
+    "no_upcoming_events": "No upcoming events",
     "pinned_items": "📌 Pinned Items",
     "notes": "Notes",
     "tasks": "Tasks",
@@ -42,7 +55,14 @@
     "activity_streak": "Best streak",
     "activity_avg": "Average/day",
     "achievements": "🏅 Achievements",
-    "productivity": "🔍 Productivity Insights"
+    "productivity": "🔍 Productivity Insights",
+    "productivity_insights": {
+      "completion": "Completion: {rate}% ({completed}/{total} tasks)",
+      "managing_lists": "Managing {count} active lists",
+      "streak_active": "{days} day streak active!",
+      "streak_start": "Start a new streak today!",
+      "level_progress": "Level {level} - {xp} XP total"
+    }
   },
   "auth": {
     "title": "Registration / Login",
@@ -71,7 +91,9 @@
     "pin_list": "Pin list",
     "unpin_list": "Unpin list",
     "delete_list": "Delete list",
-    "add_item": "Add item"
+    "add_item": "Add",
+    "list_name_required": "Please enter a list name!",
+    "disable_reorder": "Disable Reordering"
   },
   "notes": {
     "title": "📒 Notes",
@@ -82,8 +104,26 @@
     "content_placeholder": "Write detailed notes, passwords, or anything you don't want to forget here...",
     "category_label": "🏷️ Category:",
     "private_note": "🔒 Private note (password protected)",
+    "password_label": "🔐 This password will be required to view the note",
+    "password_placeholder": "Enter password to protect the note...",
+    "password_required": "Password is required for private notes!",
+    "password_needed": "🔒 Password Required",
+    "password_prompt": "This is a private note. Please enter the password to view:",
+    "password_edit_prompt": "Password required to edit this note:",
+    "password_placeholder_input": "Password...",
+    "password_error_empty": "❌ Please enter the password!",
+    "password_error_wrong": "❌ Wrong password! Please try again.",
+    "password_error_decrypt": "❌ Error decrypting content!",
+    "password_error_access": "❌ Error accessing the note!",
+    "password_submit": "Submit",
+    "password_cancel": "Cancel",
+    "protected_content": "Protected Content",
+    "password_required_view": "Password required to view",
+    "unlock_note": "Enter Password",
     "save": "Save",
     "update": "Update",
+    "edit": "Edit",
+    "close": "Close",
     "cancel": "Cancel",
     "no_notes": "📒 You don't have any notes yet",
     "create_first": "Create your first note with the button above!",
@@ -104,6 +144,29 @@
     "title": "🗓️ Calendar",
     "new_event": "New Event",
     "upcoming_events": "📅 Upcoming Events",
+    "months": {
+      "january": "January",
+      "february": "February", 
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "days": {
+      "monday": "M",
+      "tuesday": "T", 
+      "wednesday": "W",
+      "thursday": "T",
+      "friday": "F",
+      "saturday": "S",
+      "sunday": "S"
+    },
     "no_upcoming": "No upcoming events",
     "event_title": "Event title",
     "event_date": "Date",
@@ -153,10 +216,93 @@
       "add": "Add",
       "cancel": "Cancel"
     },
+    "theme": {
+      "title": "🎨 Theme Selection",
+      "themes": {
+        "default": {
+          "name": "Default",
+          "description": "Classic green theme"
+        },
+        "ocean_blue": {
+          "name": "Ocean Blue",
+          "description": "Refreshing ocean blue"
+        },
+        "sakura_pink": {
+          "name": "Sakura Pink",
+          "description": "Gentle cherry blossom"
+        },
+        "forest_green": {
+          "name": "Forest Green",
+          "description": "Natural forest green"
+        },
+        "minimal_mono": {
+          "name": "Minimal Mono",
+          "description": "Clean monochrome"
+        },
+        "sunset_orange": {
+          "name": "Sunset Orange",
+          "description": "Warm sunset orange"
+        },
+        "royal_purple": {
+          "name": "Royal Purple",
+          "description": "Elegant royal purple"
+        }
+      },
+      "modes": {
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "apply": "Apply",
+      "cancel": "Cancel"
+    },
     "confirm_delete_list": "Are you sure you want to delete this list?",
     "confirm_delete_item": "Are you sure you want to delete this item?",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "privacy": {
+      "title": "🔒 Privacy Policy",
+      "intro_title": "📋 Introduction",
+      "intro_content": "This policy outlines how we handle and protect your personal data when using our Chrome Extension Mobile application.",
+      "controller_title": "🏢 Data Controller",
+      "controller_content": "Data Controller: Chrome Extension Mobile Development Team",
+      "data_title": "📊 Data We Collect",
+      "data_email": "Email address (for registration and login purposes)",
+      "data_lists": "To-do lists and their items",
+      "data_notes": "Notes (including private/encrypted notes)",
+      "data_events": "Calendar events",
+      "data_settings": "Application settings (theme, language)",
+      "data_usage": "Usage statistics (XP, level, streak)",
+      "purpose_title": "🎯 Purpose of Data Processing",
+      "purpose_service": "Providing and operating the service",
+      "purpose_sync": "Synchronizing data across devices",
+      "purpose_security": "Account security and authentication",
+      "purpose_features": "Personalizing application features",
+      "legal_title": "⚖️ Legal Basis",
+      "legal_content": "The legal basis for data processing is your consent (GDPR Article 6(1)(a)) and contract performance (GDPR Article 6(1)(b)).",
+      "storage_title": "💾 Data Storage",
+      "storage_content": "Your data is securely stored in Google Firebase database. Private notes are protected with additional encryption.",
+      "retention_title": "⏱️ Data Retention",
+      "retention_content": "We retain your data as long as your account is active. Upon account deletion, all personal data is permanently deleted.",
+      "rights_title": "👤 Your Rights",
+      "right_access": "Access: you can view your stored data",
+      "right_rectification": "Rectification: you can modify your data",
+      "right_erasure": "Erasure: you can request data deletion",
+      "right_portability": "Data portability: you can export your data",
+      "right_objection": "Objection: you can object to data processing",
+      "security_title": "🔐 Data Security",
+      "security_encryption": "End-to-end encryption for sensitive data",
+      "security_firebase": "Google Firebase secure infrastructure",
+      "security_https": "HTTPS encrypted connection",
+      "security_access": "Restricted access to data",
+      "contact_title": "📧 Contact",
+      "contact_content": "For questions, please contact us through the in-app contact options.",
+      "changes_title": "📝 Changes",
+      "changes_content": "We reserve the right to modify this policy. Users will be notified of significant changes.",
+      "effective_title": "📅 Effective Date",
+      "effective_content": "This policy is effective from December 19, 2024.",
+      "accept": "I Understand",
+      "close": "Close"
+    }
   },
   "notifications": {
     "task_added": "✅ Task successfully added!",
@@ -173,7 +319,11 @@
     "level_up": "🎉 Level {level} reached! Congratulations!",
     "login_required": "⚠️ You need to log in to use this feature!",
     "theme_applied": "Theme applied",
-    "logout_success": "Successfully logged out"
+    "logout_success": "Successfully logged out",
+    "event_reminder": "Event reminder",
+    "upcoming_event": "Upcoming event",
+    "snooze_5min": "Snooze (5 min)",
+    "dismiss": "Dismiss"
   },
   "achievements": {
     "first_task": {

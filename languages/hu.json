@@ -4,7 +4,19 @@
     "overview": "📊 Áttekintés",
     "lists": "📝 Listák",
     "notes": "📒 Jegyzetek",
-    "calendar": "🗓️ Naptár"
+    "calendar": "🗓️ Naptár",
+    "privacy": "Adatvédelem"
+  },
+  "common": {
+    "theme": "Téma",
+    "install": "Telepítés",
+    "cancel": "Mégse",
+    "language_switch": "Nyelv váltása",
+    "theme_switch": "Téma váltása",
+    "pin": "Kiemelés",
+    "unpin": "Kiemelés eltávolítása",
+    "delete": "Törlés",
+    "done": "Kész"
   },
   "dashboard": {
     "welcome": "👋 Üdvözlünk újra!",
@@ -17,6 +29,7 @@
     "daily_inspiration": "💡 Mai inspiráció",
     "today_events": "📅 Mai események",
     "no_events": "Nincs mai esemény",
+    "no_upcoming_events": "Nincs közelgő esemény",
     "pinned_items": "📌 Kiemelt elemek",
     "notes": "Jegyzetek",
     "tasks": "Feladatok",
@@ -44,8 +57,11 @@
     "achievements": "🏅 Elért eredmények",
     "productivity": "🔍 Produktivitási betekintés",
     "productivity_insights": {
-      "week_progress": "Ez a hét: +23% produktivitás!",
-      "best_day": "Legjobb nap: Hétfő (8 kész feladat)"
+      "completion": "Teljesítés: {rate}% ({completed}/{total} feladat)",
+      "managing_lists": "{count} aktív lista kezelése",
+      "streak_active": "{days} napos sorozat aktív!",
+      "streak_start": "Kezdj új sorozatot ma!",
+      "level_progress": "{level}. szint - {xp} XP összesen"
     }
   },
   "auth": {
@@ -75,7 +91,9 @@
     "pin_list": "Lista kiemelése",
     "unpin_list": "Kiemelés eltávolítása",
     "delete_list": "Lista törlése",
-    "add_item": "Elem hozzáadása"
+    "add_item": "Hozzáadás",
+    "list_name_required": "Kérjük, add meg a lista nevét!",
+    "disable_reorder": "Átrendezés letiltása"
   },
   "notes": {
     "title": "📒 Jegyzetek",
@@ -86,8 +104,26 @@
     "content_placeholder": "Itt írhatsz részletes jegyzeteket, jelszavakat, vagy bármit amit nem szeretnél elfelejteni...",
     "category_label": "🏷️ Kategória:",
     "private_note": "🔒 Bizalmas jegyzet (jelszóval védett)",
+    "password_label": "🔐 Ez a jelszó szükséges lesz a jegyzet megtekintéséhez",
+    "password_placeholder": "Jelszó megadása a jegyzet védelméhez...",
+    "password_required": "Bizalmas jegyzethez jelszó megadása kötelező!",
+    "password_needed": "🔒 Jelszó szükséges",
+    "password_prompt": "Ez egy bizalmas jegyzet. Kérjük, adja meg a jelszót a megtekintéshez:",
+    "password_edit_prompt": "Jelszó szükséges a jegyzet szerkesztéséhez:",
+    "password_placeholder_input": "Jelszó...",
+    "password_error_empty": "❌ Kérjük, adja meg a jelszót!",
+    "password_error_wrong": "❌ Hibás jelszó! Próbálja újra.",
+    "password_error_decrypt": "❌ Hiba a tartalom visszafejtése során!",
+    "password_error_access": "❌ Hiba történt a jegyzet elérése során!",
+    "password_submit": "Megerősítés",
+    "password_cancel": "Mégse",
+    "protected_content": "Védett tartalom",
+    "password_required_view": "Jelszó szükséges a megtekintéshez",
+    "unlock_note": "Jelszó megadása",
     "save": "Mentés",
     "update": "Frissítés",
+    "edit": "Szerkesztés",
+    "close": "Bezárás",
     "cancel": "Mégse",
     "no_notes": "📒 Még nincsenek jegyzeteid",
     "create_first": "Hozz létre az első jegyzetedet a fenti gombbal!",
@@ -108,6 +144,29 @@
     "title": "🗓️ Naptár",
     "new_event": "Új esemény",
     "upcoming_events": "📅 Közelgő események",
+    "months": {
+      "january": "Január",
+      "february": "Február", 
+      "march": "Március",
+      "april": "Április",
+      "may": "Május",
+      "june": "Június",
+      "july": "Július",
+      "august": "Augusztus",
+      "september": "Szeptember",
+      "october": "Október",
+      "november": "November",
+      "december": "December"
+    },
+    "days": {
+      "monday": "H",
+      "tuesday": "K", 
+      "wednesday": "Sz",
+      "thursday": "Cs",
+      "friday": "P",
+      "saturday": "Sz",
+      "sunday": "V"
+    },
     "no_upcoming": "Nincs közelgő esemény",
     "event_title": "Esemény címe",
     "event_date": "Dátum",
@@ -157,10 +216,93 @@
       "add": "Hozzáadás",
       "cancel": "Mégse"
     },
+    "theme": {
+      "title": "🎨 Téma választás",
+      "themes": {
+        "default": {
+          "name": "Alapértelmezett",
+          "description": "Klasszikus zöld téma"
+        },
+        "ocean_blue": {
+          "name": "Ocean Blue",
+          "description": "Frissítő óceán kék"
+        },
+        "sakura_pink": {
+          "name": "Sakura Pink", 
+          "description": "Gyengéd cseresznyevirág"
+        },
+        "forest_green": {
+          "name": "Forest Green",
+          "description": "Természetes erdő zöld"
+        },
+        "minimal_mono": {
+          "name": "Minimal Mono",
+          "description": "Letisztult monokróm"
+        },
+        "sunset_orange": {
+          "name": "Sunset Orange",
+          "description": "Meleg naplemente narancssárga"
+        },
+        "royal_purple": {
+          "name": "Royal Purple",
+          "description": "Elegáns királyi lila"
+        }
+      },
+      "modes": {
+        "light": "Világos",
+        "dark": "Sötét"
+      },
+      "apply": "Alkalmaz",
+      "cancel": "Mégse"
+    },
     "confirm_delete_list": "Biztosan törlöd ezt a listát?",
     "confirm_delete_item": "Biztosan törlöd ezt a listaelemet?",
     "yes": "Igen",
-    "no": "Nem"
+    "no": "Nem",
+    "privacy": {
+      "title": "🔒 Adatkezelési Tájékoztató",
+      "intro_title": "📋 Bevezetés",
+      "intro_content": "Ez a tájékoztató ismerteti, hogyan kezeljük és védjük az Ön személyes adatait Chrome Extension Mobile alkalmazásunk használata során.",
+      "controller_title": "🏢 Adatkezelő",
+      "controller_content": "Adatkezelő: Chrome Extension Mobile fejlesztői csapat",
+      "data_title": "📊 Kezelt Adatok",
+      "data_email": "Email cím (regisztráció és bejelentkezés céljából)",
+      "data_lists": "Teendőlisták és azok elemei",
+      "data_notes": "Jegyzetek (beleértve a bizalmas/titkosított jegyzeteket)",
+      "data_events": "Naptári események",
+      "data_settings": "Alkalmazás beállítások (téma, nyelv)",
+      "data_usage": "Használati statisztikák (XP, szint, streak)",
+      "purpose_title": "🎯 Adatkezelés Célja",
+      "purpose_service": "Szolgáltatás nyújtása és működtetése",
+      "purpose_sync": "Adatok szinkronizálása eszközök között",
+      "purpose_security": "Fiók biztonság és hitelesítés",
+      "purpose_features": "Alkalmazás funkciók személyre szabása",
+      "legal_title": "⚖️ Jogalap",
+      "legal_content": "Az adatkezelés jogalapja az Ön hozzájárulása (GDPR 6. cikk (1) bekezdés a) pont) és a szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont).",
+      "storage_title": "💾 Adattárolás",
+      "storage_content": "Adatait biztonságosan tároljuk a Google Firebase adatbázisában. A bizalmas jegyzetek további titkosítással vannak védve.",
+      "retention_title": "⏱️ Adatmegőrzés",
+      "retention_content": "Adatait a fiók aktív állapotáig őrizzük meg. Fiók törlésekor minden személyes adat véglegesen törlésre kerül.",
+      "rights_title": "👤 Az Ön Jogai",
+      "right_access": "Hozzáférés: betekinthet tárolt adataiba",
+      "right_rectification": "Helyesbítés: módosíthatja adatait",
+      "right_erasure": "Törlés: kérheti adatai törlését",
+      "right_portability": "Adathordozhatóság: exportálhatja adatait",
+      "right_objection": "Tiltakozás: tiltakozhat az adatkezelés ellen",
+      "security_title": "🔐 Adatbiztonság",
+      "security_encryption": "End-to-end titkosítás bizalmas adatoknál",
+      "security_firebase": "Google Firebase biztonságos infrastruktúra",
+      "security_https": "HTTPS titkosított kapcsolat",
+      "security_access": "Korlátozott hozzáférés az adatokhoz",
+      "contact_title": "📧 Kapcsolat",
+      "contact_content": "Kérdései esetén forduljon hozzánk bizalommal az alkalmazáson belüli kapcsolatfelvételi lehetőségeken keresztül.",
+      "changes_title": "📝 Változások",
+      "changes_content": "Fenntartjuk a jogot a jelen tájékoztató módosítására. Jelentős változásokról értesítjük felhasználóinkat.",
+      "effective_title": "📅 Hatálybalépés",
+      "effective_content": "Jelen tájékoztató 2024. december 19-től hatályos.",
+      "accept": "Megértettem",
+      "close": "Bezárás"
+    }
   },
   "notifications": {
     "task_added": "✅ Feladat sikeresen hozzáadva!",
@@ -177,7 +319,11 @@
     "level_up": "🎉 Szint {level} elérve! Gratulálunk!",
     "login_required": "⚠️ Be kell jelentkezned a funkció használatához!",
     "theme_applied": "Téma alkalmazva",
-    "logout_success": "Sikeres kijelentkezés"
+    "logout_success": "Sikeres kijelentkezés",
+    "event_reminder": "Esemény emlékeztető",
+    "upcoming_event": "Közelgő esemény",
+    "snooze_5min": "Elhalasztás (5 perc)",
+    "dismiss": "Rendben"
   },
   "achievements": {
     "first_task": {

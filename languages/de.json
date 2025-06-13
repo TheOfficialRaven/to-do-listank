@@ -1,10 +1,22 @@
 {
-  "navigation": {
+    "navigation": {
     "dashboard": "🏠 Dashboard",
-    "overview": "📊 Übersicht", 
+    "overview": "📊 Übersicht",
     "lists": "📝 Listen",
     "notes": "📒 Notizen",
-    "calendar": "🗓️ Kalender"
+    "calendar": "🗓️ Kalender",
+    "privacy": "Datenschutz"
+  },
+  "common": {
+    "theme": "Thema",
+    "install": "Installieren",
+    "cancel": "Abbrechen",
+    "language_switch": "Sprache wechseln",
+    "theme_switch": "Thema wechseln",
+    "pin": "Anheften",
+    "unpin": "Lösen",
+    "delete": "Löschen",
+    "done": "Erledigt"
   },
   "dashboard": {
     "welcome": "👋 Willkommen zurück!",
@@ -17,6 +29,7 @@
     "daily_inspiration": "💡 Tägliche Inspiration",
     "today_events": "📅 Heutige Ereignisse",
     "no_events": "Keine heutigen Ereignisse",
+    "no_upcoming_events": "Keine kommenden Ereignisse",
     "pinned_items": "📌 Wichtige Elemente",
     "notes": "Notizen",
     "tasks": "Aufgaben",
@@ -42,7 +55,14 @@
     "activity_streak": "Beste Serie",
     "activity_avg": "Durchschnitt/Tag",
     "achievements": "🏅 Errungenschaften",
-    "productivity": "🔍 Produktivitäts-Einblicke"
+    "productivity": "🔍 Produktivitäts-Einblicke",
+    "productivity_insights": {
+      "completion": "Abschluss: {rate}% ({completed}/{total} Aufgaben)",
+      "managing_lists": "Verwaltung von {count} aktiven Listen",
+      "streak_active": "{days} Tage Streak aktiv!",
+      "streak_start": "Starte heute einen neuen Streak!",
+      "level_progress": "Level {level} - {xp} XP gesamt"
+    }
   },
   "auth": {
     "title": "Registrierung / Anmeldung",
@@ -71,7 +91,9 @@
     "pin_list": "Liste anheften",
     "unpin_list": "Liste lösen",
     "delete_list": "Liste löschen",
-    "add_item": "Element hinzufügen"
+    "add_item": "Hinzufügen",
+    "list_name_required": "Bitte geben Sie einen Listennamen ein!",
+    "disable_reorder": "Umordnung deaktivieren"
   },
   "notes": {
     "title": "📒 Notizen",
@@ -82,8 +104,26 @@
     "content_placeholder": "Schreibe hier detaillierte Notizen, Passwörter oder alles was du nicht vergessen möchtest...",
     "category_label": "🏷️ Kategorie:",
     "private_note": "🔒 Private Notiz (passwortgeschützt)",
+    "password_label": "🔐 Dieses Passwort wird benötigt, um die Notiz anzuzeigen",
+    "password_placeholder": "Passwort zum Schutz der Notiz eingeben...",
+    "password_required": "Passwort ist für private Notizen erforderlich!",
+    "password_needed": "🔒 Passwort Erforderlich",
+    "password_prompt": "Dies ist eine private Notiz. Bitte geben Sie das Passwort ein:",
+    "password_edit_prompt": "Passwort zum Bearbeiten dieser Notiz erforderlich:",
+    "password_placeholder_input": "Passwort...",
+    "password_error_empty": "❌ Bitte geben Sie das Passwort ein!",
+    "password_error_wrong": "❌ Falsches Passwort! Bitte versuchen Sie es erneut.",
+    "password_error_decrypt": "❌ Fehler beim Entschlüsseln des Inhalts!",
+    "password_error_access": "❌ Fehler beim Zugriff auf die Notiz!",
+    "password_submit": "Bestätigen",
+    "password_cancel": "Abbrechen",
+    "protected_content": "Geschützter Inhalt",
+    "password_required_view": "Passwort zum Anzeigen erforderlich",
+    "unlock_note": "Passwort Eingeben",
     "save": "Speichern",
     "update": "Aktualisieren",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
     "cancel": "Abbrechen",
     "no_notes": "📒 Du hast noch keine Notizen",
     "create_first": "Erstelle deine erste Notiz mit dem Button oben!",
@@ -104,6 +144,29 @@
     "title": "🗓️ Kalender",
     "new_event": "Neues Ereignis",
     "upcoming_events": "📅 Kommende Ereignisse",
+    "months": {
+      "january": "Januar",
+      "february": "Februar", 
+      "march": "März",
+      "april": "April",
+      "may": "Mai",
+      "june": "Juni",
+      "july": "Juli",
+      "august": "August",
+      "september": "September",
+      "october": "Oktober",
+      "november": "November",
+      "december": "Dezember"
+    },
+    "days": {
+      "monday": "M",
+      "tuesday": "D", 
+      "wednesday": "M",
+      "thursday": "D",
+      "friday": "F",
+      "saturday": "S",
+      "sunday": "S"
+    },
     "no_upcoming": "Keine kommenden Ereignisse",
     "event_title": "Ereignistitel",
     "event_date": "Datum",
@@ -153,10 +216,93 @@
       "add": "Hinzufügen",
       "cancel": "Abbrechen"
     },
+    "theme": {
+      "title": "🎨 Thema-Auswahl",
+      "themes": {
+        "default": {
+          "name": "Standard",
+          "description": "Klassisches grünes Thema"
+        },
+        "ocean_blue": {
+          "name": "Ocean Blue",
+          "description": "Erfrischendes Ozeanblau"
+        },
+        "sakura_pink": {
+          "name": "Sakura Pink",
+          "description": "Sanfte Kirschblüte"
+        },
+        "forest_green": {
+          "name": "Forest Green",
+          "description": "Natürliches Waldgrün"
+        },
+        "minimal_mono": {
+          "name": "Minimal Mono",
+          "description": "Cleanes Monochrom"
+        },
+        "sunset_orange": {
+          "name": "Sunset Orange",
+          "description": "Warmes Sonnenuntergang-Orange"
+        },
+        "royal_purple": {
+          "name": "Royal Purple",
+          "description": "Elegantes Königslila"
+        }
+      },
+      "modes": {
+        "light": "Hell",
+        "dark": "Dunkel"
+      },
+      "apply": "Anwenden",
+      "cancel": "Abbrechen"
+    },
     "confirm_delete_list": "Sind Sie sicher, dass Sie diese Liste löschen möchten?",
     "confirm_delete_item": "Sind Sie sicher, dass Sie dieses Element löschen möchten?",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "privacy": {
+      "title": "🔒 Datenschutzerklärung",
+      "intro_title": "📋 Einführung",
+      "intro_content": "Diese Erklärung beschreibt, wie wir Ihre persönlichen Daten bei der Nutzung unserer Chrome Extension Mobile-Anwendung handhaben und schützen.",
+      "controller_title": "🏢 Datenverantwortlicher",
+      "controller_content": "Datenverantwortlicher: Chrome Extension Mobile Entwicklungsteam",
+      "data_title": "📊 Erhobene Daten",
+      "data_email": "E-Mail-Adresse (für Registrierung und Anmeldung)",
+      "data_lists": "To-Do-Listen und deren Elemente",
+      "data_notes": "Notizen (einschließlich privater/verschlüsselter Notizen)",
+      "data_events": "Kalenderereignisse",
+      "data_settings": "Anwendungseinstellungen (Theme, Sprache)",
+      "data_usage": "Nutzungsstatistiken (XP, Level, Streak)",
+      "purpose_title": "🎯 Zweck der Datenverarbeitung",
+      "purpose_service": "Bereitstellung und Betrieb des Dienstes",
+      "purpose_sync": "Datensynchronisation zwischen Geräten",
+      "purpose_security": "Kontosicherheit und Authentifizierung",
+      "purpose_features": "Personalisierung von Anwendungsfunktionen",
+      "legal_title": "⚖️ Rechtsgrundlage",
+      "legal_content": "Die Rechtsgrundlage für die Datenverarbeitung ist Ihre Einwilligung (DSGVO Artikel 6(1)(a)) und Vertragserfüllung (DSGVO Artikel 6(1)(b)).",
+      "storage_title": "💾 Datenspeicherung",
+      "storage_content": "Ihre Daten werden sicher in der Google Firebase-Datenbank gespeichert. Private Notizen sind mit zusätzlicher Verschlüsselung geschützt.",
+      "retention_title": "⏱️ Datenaufbewahrung",
+      "retention_content": "Wir bewahren Ihre Daten auf, solange Ihr Konto aktiv ist. Bei Kontolöschung werden alle persönlichen Daten dauerhaft gelöscht.",
+      "rights_title": "👤 Ihre Rechte",
+      "right_access": "Zugang: Sie können Ihre gespeicherten Daten einsehen",
+      "right_rectification": "Berichtigung: Sie können Ihre Daten ändern",
+      "right_erasure": "Löschung: Sie können die Löschung Ihrer Daten verlangen",
+      "right_portability": "Datenportabilität: Sie können Ihre Daten exportieren",
+      "right_objection": "Widerspruch: Sie können der Datenverarbeitung widersprechen",
+      "security_title": "🔐 Datensicherheit",
+      "security_encryption": "Ende-zu-Ende-Verschlüsselung für sensible Daten",
+      "security_firebase": "Google Firebase sichere Infrastruktur",
+      "security_https": "HTTPS verschlüsselte Verbindung",
+      "security_access": "Eingeschränkter Zugang zu Daten",
+      "contact_title": "📧 Kontakt",
+      "contact_content": "Bei Fragen wenden Sie sich bitte über die In-App-Kontaktoptionen an uns.",
+      "changes_title": "📝 Änderungen",
+      "changes_content": "Wir behalten uns das Recht vor, diese Erklärung zu ändern. Nutzer werden über wesentliche Änderungen informiert.",
+      "effective_title": "📅 Inkrafttreten",
+      "effective_content": "Diese Erklärung gilt ab dem 19. Dezember 2024.",
+      "accept": "Verstanden",
+      "close": "Schließen"
+    }
   },
   "notifications": {
     "task_added": "✅ Aufgabe erfolgreich hinzugefügt!",
@@ -173,7 +319,11 @@
     "level_up": "🎉 Level {level} erreicht! Glückwunsch!",
     "login_required": "⚠️ Sie müssen sich anmelden, um diese Funktion zu nutzen!",
     "theme_applied": "Thema angewendet",
-    "logout_success": "Erfolgreich abgemeldet"
+    "logout_success": "Erfolgreich abgemeldet",
+    "event_reminder": "Ereignis-Erinnerung",
+    "upcoming_event": "Bevorstehendes Ereignis",
+    "snooze_5min": "Schlummern (5 Min)",
+    "dismiss": "OK"
   },
   "achievements": {
     "first_task": {
