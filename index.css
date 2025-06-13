@@ -1298,31 +1298,7 @@ h1, h2 {
   position: relative;
 }
 
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, .2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, .2) 50%,
-    rgba(255, 255, 255, .2) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 50px 50px;
-  animation: move 2s linear infinite;
-}
-
-@keyframes move {
-  0% { background-position: 0 0; }
-  100% { background-position: 50px 50px; }
-}
+/* Removed the diagonal stripes animation - keeping only the shimmer effect */
 
 /* Kördiagram stílus */
 .completion-card {
@@ -2617,21 +2593,7 @@ h1, h2 {
   overflow: hidden;
 }
 
-.xp-fill::before, .progress-fill::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
+/* Removed shimmer animation - progress bars are now static */
 
 /* Tab váltás simább animáció */
 .tab-content {
@@ -3434,30 +3396,12 @@ h1, h2 {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   border-radius: 6px;
-  transition: width 2s ease;
+  transition: width 1.5s ease-out;
   position: relative;
+  width: 0%;
 }
 
-.xp-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, .2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, .2) 50%,
-    rgba(255, 255, 255, .2) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 50px 50px;
-  animation: move 2s linear infinite;
-}
+/* Removed XP fill diagonal stripes animation - keeping only shimmer */
 
 .achievements-list {
   background: var(--bg-secondary);
@@ -3558,16 +3502,7 @@ h1, h2 {
   position: relative;
 }
 
-.achievement-progress .progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: shimmer 2s infinite;
-}
+/* Removed achievement progress shimmer animation */
 
 .progress-text {
   font-size: 0.8rem;
@@ -4018,30 +3953,12 @@ h1, h2 {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   border-radius: 6px;
-  transition: width 2s ease;
+  transition: width 1.5s ease-out;
   position: relative;
+  width: 0%;
 }
 
-.xp-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, .2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, .2) 50%,
-    rgba(255, 255, 255, .2) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 50px 50px;
-  animation: move 2s linear infinite;
-}
+/* Removed second XP fill diagonal stripes animation */
 
 .xp-text {
   color: var(--text-secondary);
@@ -4212,8 +4129,9 @@ h1, h2 {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   border-radius: 5px; /* 6px-ről csökkentve */
-  transition: width 2s ease;
+  transition: width 1.5s ease-out;
   position: relative;
+  width: 0%;
 }
 
 .xp-fill::after {

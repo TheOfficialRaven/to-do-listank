@@ -1559,9 +1559,14 @@ function updateLevelDisplay() {
   
   const currentLevelXP = userXP % 100;
   const nextLevelXP = 100;
+  const percentage = (currentLevelXP / nextLevelXP) * 100;
   
   if (xpProgressElement) {
-    xpProgressElement.style.width = `${(currentLevelXP / nextLevelXP) * 100}%`;
+    // Reset width first, then animate
+    xpProgressElement.style.width = '0%';
+    setTimeout(() => {
+      xpProgressElement.style.width = `${percentage}%`;
+    }, 100);
   }
   
   if (xpTextElement) {
@@ -1975,9 +1980,10 @@ function updateProgressBar(elementId, value, maxValue) {
   
   const percentage = Math.min((value / maxValue) * 100, 100);
   
+  // Smooth animation to target percentage
   setTimeout(() => {
     element.style.width = percentage + '%';
-  }, 300);
+  }, 100);
 }
 
 function updateCircularProgress(percentage) {

@@ -3,8 +3,8 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.0.3';
-const OFFLINE_CACHE = 'todo-offline-v2.0.3';
+const CACHE_NAME = 'todo-app-v2.0.7';
+const OFFLINE_CACHE = 'todo-offline-v2.0.7';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
