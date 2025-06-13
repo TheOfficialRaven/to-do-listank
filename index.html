@@ -24,105 +24,195 @@
 
 
 
-  <!-- Téma modal -->
+  <!-- Modern Téma modal -->
   <div id="theme-modal" class="modal" style="display: none;">
-    <div class="modal-content theme-modal-content">
-      <div class="modal-header">
-        <h3 id="theme-modal-title">🎨 Téma választás</h3>
-        <button class="close-btn" id="theme-modal-close">
+    <div class="modal-content modern-theme-modal-content">
+      <div class="modern-theme-header">
+        <h2>🎨 Téma választás</h2>
+        <button class="modern-close-btn" id="theme-modal-close">
           <span class="material-icons">close</span>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="theme-options">
-          <div class="theme-group">
-            <h5>Alapértelmezett</h5>
-            <div class="theme-option" data-theme="default" data-mode="light" title="Alapértelmezett világos">
-              <div class="theme-preview default-light"></div>
-              <span>Világos</span>
-            </div>
-            <div class="theme-option" data-theme="default" data-mode="dark" title="Alapértelmezett sötét">
-              <div class="theme-preview default-dark"></div>
-              <span>Sötét</span>
-            </div>
-          </div>
+      <div class="modern-theme-body">
+        <div class="modern-theme-grid">
           
-          <div class="theme-group">
-            <h5>Ocean Blue</h5>
-            <div class="theme-option" data-theme="ocean-blue" data-mode="light" title="Ocean Blue világos">
-              <div class="theme-preview ocean-blue-light"></div>
-              <span>Világos</span>
+          <!-- Alapértelmezett téma kártya -->
+          <div class="modern-theme-card" data-theme="default">
+            <div class="theme-card-header">
+              <div class="theme-preview-large default-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
             </div>
-            <div class="theme-option" data-theme="ocean-blue" data-mode="dark" title="Ocean Blue sötét">
-              <div class="theme-preview ocean-blue-dark"></div>
-              <span>Sötét</span>
-            </div>
-          </div>
-          
-          <div class="theme-group">
-            <h5>Sakura Pink</h5>
-            <div class="theme-option" data-theme="sakura-pink" data-mode="light" title="Sakura Pink világos">
-              <div class="theme-preview sakura-pink-light"></div>
-              <span>Világos</span>
-            </div>
-            <div class="theme-option" data-theme="sakura-pink" data-mode="dark" title="Sakura Pink sötét">
-              <div class="theme-preview sakura-pink-dark"></div>
-              <span>Sötét</span>
-            </div>
-          </div>
-          
-          <div class="theme-group">
-            <h5>Forest Green</h5>
-            <div class="theme-option" data-theme="forest-green" data-mode="light" title="Forest Green világos">
-              <div class="theme-preview forest-green-light"></div>
-              <span>Világos</span>
-            </div>
-            <div class="theme-option" data-theme="forest-green" data-mode="dark" title="Forest Green sötét">
-              <div class="theme-preview forest-green-dark"></div>
-              <span>Sötét</span>
+            <div class="theme-card-content">
+              <h3>Alapértelmezett</h3>
+              <p>Klasszikus zöld téma</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                  
+                </button>
+              </div>
             </div>
           </div>
-          
-          <div class="theme-group">
-            <h5>Minimal Mono</h5>
-            <div class="theme-option" data-theme="minimal-mono" data-mode="light" title="Minimal Mono világos">
-              <div class="theme-preview minimal-mono-light"></div>
-              <span>Világos</span>
+
+          <!-- Ocean Blue téma kártya -->
+          <div class="modern-theme-card" data-theme="ocean-blue">
+            <div class="theme-card-header">
+              <div class="theme-preview-large ocean-blue-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
             </div>
-            <div class="theme-option" data-theme="minimal-mono" data-mode="dark" title="Minimal Mono sötét">
-              <div class="theme-preview minimal-mono-dark"></div>
-              <span>Sötét</span>
-            </div>
-          </div>
-          
-          <div class="theme-group">
-            <h5>Sunset Orange</h5>
-            <div class="theme-option" data-theme="sunset-orange" data-mode="light" title="Sunset Orange világos">
-              <div class="theme-preview sunset-orange-light"></div>
-              <span>Világos</span>
-            </div>
-            <div class="theme-option" data-theme="sunset-orange" data-mode="dark" title="Sunset Orange sötét">
-              <div class="theme-preview sunset-orange-dark"></div>
-              <span>Sötét</span>
-            </div>
-          </div>
-          
-          <div class="theme-group">
-            <h5>Royal Purple</h5>
-            <div class="theme-option" data-theme="royal-purple" data-mode="light" title="Royal Purple világos">
-              <div class="theme-preview royal-purple-light"></div>
-              <span>Világos</span>
-            </div>
-            <div class="theme-option" data-theme="royal-purple" data-mode="dark" title="Royal Purple sötét">
-              <div class="theme-preview royal-purple-dark"></div>
-              <span>Sötét</span>
+            <div class="theme-card-content">
+              <h3>Ocean Blue</h3>
+              <p>Frissítő óceán kék</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                  
+                </button>
+              </div>
             </div>
           </div>
+
+          <!-- Sakura Pink téma kártya -->
+          <div class="modern-theme-card" data-theme="sakura-pink">
+            <div class="theme-card-header">
+              <div class="theme-preview-large sakura-pink-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
+            </div>
+            <div class="theme-card-content">
+              <h3>Sakura Pink</h3>
+              <p>Gyengéd cseresznyevirág</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                  
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forest Green téma kártya -->
+          <div class="modern-theme-card" data-theme="forest-green">
+            <div class="theme-card-header">
+              <div class="theme-preview-large forest-green-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
+            </div>
+            <div class="theme-card-content">
+              <h3>Forest Green</h3>
+              <p>Természetes erdő zöld</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                  
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Minimal Mono téma kártya -->
+          <div class="modern-theme-card" data-theme="minimal-mono">
+            <div class="theme-card-header">
+              <div class="theme-preview-large minimal-mono-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
+            </div>
+            <div class="theme-card-content">
+              <h3>Minimal Mono</h3>
+              <p>Letisztult monokróm</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                  
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sunset Orange téma kártya -->
+          <div class="modern-theme-card" data-theme="sunset-orange">
+            <div class="theme-card-header">
+              <div class="theme-preview-large sunset-orange-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
+            </div>
+            <div class="theme-card-content">
+              <h3>Sunset Orange</h3>
+              <p>Meleg naplemente narancssárga</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                  
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+              
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Royal Purple téma kártya -->
+          <div class="modern-theme-card" data-theme="royal-purple">
+            <div class="theme-card-header">
+              <div class="theme-preview-large royal-purple-gradient"></div>
+              <div class="theme-check-icon">
+                <span class="material-icons">check_circle</span>
+              </div>
+            </div>
+            <div class="theme-card-content">
+              <h3>Royal Purple</h3>
+              <p>Elegáns királyi lila</p>
+              <div class="theme-mode-toggle">
+                <button class="theme-mode-btn" data-mode="light">
+                  <span class="material-icons">light_mode</span>
+                </button>
+                <button class="theme-mode-btn" data-mode="dark">
+                  <span class="material-icons">dark_mode</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <div class="modal-footer">
-        <button id="theme-apply-btn" class="primary-btn">Alkalmaz</button>
-        <button id="theme-cancel-btn" class="secondary-btn">Mégse</button>
+      <div class="modern-theme-footer">
+        <button id="theme-apply-btn" class="modern-apply-btn">
+          <span class="material-icons">check</span>
+          Alkalmaz
+        </button>
+        <button id="theme-cancel-btn" class="modern-cancel-btn">
+          <span class="material-icons">close</span>
+          Mégse
+        </button>
       </div>
     </div>
   </div>
@@ -131,7 +221,7 @@
   <section id="auth-section" style="display: none;">
     <h1>Regisztráció / Bejelentkezés</h1>
     <input type="email" id="email-input" placeholder="Email cím" required>
-    <input type="password" id="password-input" placeholder="Jelszó" required>
+    <input type="password" id="auth-password-input" placeholder="Jelszó" required>
     <div class="auth-buttons">
       <button id="login-btn">Bejelentkezés</button>
       <button id="register-btn">Regisztráció</button>
@@ -172,7 +262,7 @@
         <div class="nav-theme-selector">
           <button id="theme-selector-btn" class="nav-control-btn">
             <span class="material-icons">palette</span>
-            <span class="theme-text">Téma</span>
+            <span class="theme-text" data-i18n="common.theme">Téma</span>
           </button>
         </div>
         
@@ -182,6 +272,10 @@
             <span class="material-icons">account_circle</span>
           </button>
           <div id="profile-dropdown" class="profile-dropdown">
+            <button id="privacy-btn" class="privacy-menu-btn">
+              <span class="material-icons">privacy_tip</span>
+              Adatvédelem
+            </button>
             <button id="logout-btn" class="logout-menu-btn">
               <span class="material-icons">logout</span>
               Kijelentkezés
@@ -219,14 +313,14 @@
       
       <div class="daily-quote">
         <h3>💡 Mai inspiráció</h3>
-        <p id="quote-text">"A legnagyobb dicsőség nem abban van, hogy sosem bukunk el, hanem abban, hogy minden bukás után felkelünk."</p>
-        <small id="quote-author">- Konfuciusz</small>
+        <p id="quote-text"></p>
+        <small id="quote-author"></small>
       </div>
       
       <div class="today-events">
         <h3>📅 Mai események</h3>
         <div id="today-events-list" class="events-preview">
-          <p class="no-events">Nincs mai esemény</p>
+          <p class="no-events"></p>
         </div>
       </div>
       
@@ -245,7 +339,7 @@
       <div class="urgent-tasks">
         <h3>⚠️ Sürgős feladatok</h3>
         <div id="urgent-tasks-list" class="urgent-list">
-          <p class="no-urgent">Nincs sürgős feladat</p>
+          <p class="no-urgent" data-tab="dashboard" ></p>
         </div>
       </div>
     </div>
@@ -600,11 +694,140 @@
             <span class="checkmark"></span>
             🔒 Bizalmas jegyzet (jelszóval védett)
           </label>
+          <div id="note-password-section" style="display: none; margin-top: 10px;">
+            <input type="password" id="note-password" placeholder="Jelszó megadása a jegyzet védelméhez..." maxlength="50">
+            <small id="note-password-label" style="color: var(--text-secondary); font-size: 0.8em; display: block; margin-top: 5px;">
+              🔐 Ez a jelszó szükséges lesz a jegyzet megtekintéséhez
+            </small>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="save-note" class="primary-btn">Mentés</button>
         <button id="cancel-note" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jelszó bekérő modal -->
+  <div id="password-modal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="password-modal-title">🔒 Jelszó szükséges</h3>
+        <button class="close-btn" id="password-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="password-modal-message">Ez egy bizalmas jegyzet. Kérjük, adja meg a jelszót a megtekintéshez:</p>
+        <input type="password" id="password-input" placeholder="Jelszó..." maxlength="50" style="width: 100%; margin: 15px 0;">
+        <div id="password-error" style="color: #ef4444; font-size: 0.9em; display: none; margin-top: 10px;">
+          ❌ Hibás jelszó! Próbálja újra.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="password-submit" class="primary-btn">Megerősítés</button>
+        <button id="password-cancel" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adatkezelési tájékoztató modal -->
+  <div id="privacy-modal" class="modal" style="display: none;">
+    <div class="modal-content privacy-modal-content">
+      <div class="modal-header">
+        <h3 id="privacy-modal-title">🔒 Adatkezelési Tájékoztató</h3>
+        <button class="close-btn" id="privacy-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body privacy-modal-body">
+        <div class="privacy-section">
+          <h4 id="privacy-intro-title">📋 Bevezetés</h4>
+          <p id="privacy-intro-content">Ez a tájékoztató ismerteti, hogyan kezeljük és védjük az Ön személyes adatait Chrome Extension Mobile alkalmazásunk használata során.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-controller-title">🏢 Adatkezelő</h4>
+          <p id="privacy-controller-content">Adatkezelő: Chrome Extension Mobile fejlesztői csapat</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-data-title">📊 Kezelt Adatok</h4>
+          <ul id="privacy-data-list">
+            <li id="privacy-data-email">Email cím (regisztráció és bejelentkezés céljából)</li>
+            <li id="privacy-data-lists">Teendőlisták és azok elemei</li>
+            <li id="privacy-data-notes">Jegyzetek (beleértve a bizalmas/titkosított jegyzeteket)</li>
+            <li id="privacy-data-events">Naptári események</li>
+            <li id="privacy-data-settings">Alkalmazás beállítások (téma, nyelv)</li>
+            <li id="privacy-data-usage">Használati statisztikák (XP, szint, streak)</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-purpose-title">🎯 Adatkezelés Célja</h4>
+          <ul id="privacy-purpose-list">
+            <li id="privacy-purpose-service">Szolgáltatás nyújtása és működtetése</li>
+            <li id="privacy-purpose-sync">Adatok szinkronizálása eszközök között</li>
+            <li id="privacy-purpose-security">Fiók biztonság és hitelesítés</li>
+            <li id="privacy-purpose-features">Alkalmazás funkciók személyre szabása</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-legal-title">⚖️ Jogalap</h4>
+          <p id="privacy-legal-content">Az adatkezelés jogalapja az Ön hozzájárulása (GDPR 6. cikk (1) bekezdés a) pont) és a szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont).</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-storage-title">💾 Adattárolás</h4>
+          <p id="privacy-storage-content">Adatait biztonságosan tároljuk a Google Firebase adatbázisában. A bizalmas jegyzetek további titkosítással vannak védve.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-retention-title">⏱️ Adatmegőrzés</h4>
+          <p id="privacy-retention-content">Adatait a fiók aktív állapotáig őrizzük meg. Fiók törlésekor minden személyes adat véglegesen törlésre kerül.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-rights-title">👤 Az Ön Jogai</h4>
+          <ul id="privacy-rights-list">
+            <li id="privacy-right-access">Hozzáférés: betekinthet tárolt adataiba</li>
+            <li id="privacy-right-rectification">Helyesbítés: módosíthatja adatait</li>
+            <li id="privacy-right-erasure">Törlés: kérheti adatai törlését</li>
+            <li id="privacy-right-portability">Adathordozhatóság: exportálhatja adatait</li>
+            <li id="privacy-right-objection">Tiltakozás: tiltakozhat az adatkezelés ellen</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-security-title">🔐 Adatbiztonság</h4>
+          <ul id="privacy-security-list">
+            <li id="privacy-security-encryption">End-to-end titkosítás bizalmas adatoknál</li>
+            <li id="privacy-security-firebase">Google Firebase biztonságos infrastruktúra</li>
+            <li id="privacy-security-https">HTTPS titkosított kapcsolat</li>
+            <li id="privacy-security-access">Korlátozott hozzáférés az adatokhoz</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-contact-title">📧 Kapcsolat</h4>
+          <p id="privacy-contact-content">Kérdései esetén forduljon hozzánk bizalommal az alkalmazáson belüli kapcsolatfelvételi lehetőségeken keresztül.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-changes-title">📝 Változások</h4>
+          <p id="privacy-changes-content">Fenntartjuk a jogot a jelen tájékoztató módosítására. Jelentős változásokról értesítjük felhasználóinkat.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h4 id="privacy-effective-title">📅 Hatálybalépés</h4>
+          <p id="privacy-effective-content">Jelen tájékoztató <span id="privacy-effective-date">2024. december 19-től</span> hatályos.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="privacy-accept" class="primary-btn">Megértettem</button>
+        <button id="privacy-close" class="secondary-btn">Bezárás</button>
       </div>
     </div>
   </div>

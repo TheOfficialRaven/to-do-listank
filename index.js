@@ -24,7 +24,7 @@ const auth = getAuth(app);
 // DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section");
 const emailInput = document.getElementById("email-input");
-const passwordInput = document.getElementById("password-input");
+const authPasswordInput = document.getElementById("auth-password-input");
 const registerBtn = document.getElementById("register-btn");
 const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
@@ -88,6 +88,11 @@ const actionButtons = document.querySelectorAll('.action-btn');
 let userLevel = 1;
 let userXP = 0;
 let currentStreak = 0;
+
+// Globális változók elérhetővé tétele
+window.userLevel = userLevel;
+window.userXP = userXP;
+window.currentStreak = currentStreak;
 
 // Gyors hozzáadás FAB
 const quickAddFab = document.getElementById("quick-add-fab");
@@ -246,71 +251,92 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Sortable inicializálása és kezelése
-function initializeSortable() {
-  if (sortableInstance) {
-    sortableInstance.destroy();
-  }
-  
-  if (isReorderingEnabled) {
-    sortableInstance = Sortable.create(listsContainer, {
-      animation: 150,
-      ghostClass: 'sortable-ghost',
-      onEnd: function(evt) {
-        console.log("Drag end event fired");
-        const children = Array.from(listsContainer.children);
-        const updatePromises = children.map((child, index) => {
-          const listId = child.getAttribute("data-list-id");
-          console.log("Child index:", index, "ListID:", listId);
-          if (listId && auth.currentUser) {
-            console.log("Updating order for list", listId, "to", index + 1);
-            return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
-          } else {
-            return Promise.resolve();
-          }
-        });
-        Promise.all(updatePromises)
-          .then(() => {
-            console.log("All order updates complete");
-            loadUserLists(auth.currentUser.uid);
-          })
-          .catch((error) => {
-            console.error("Error updating order for one or more lists:", error);
-          });
+  // Segédfüggvény a sortable példány biztonságos megsemmisítésére
+  function destroySortableInstance() {
+    if (sortableInstance) {
+      try {
+        // Ellenőrizzük, hogy a sortable példány még érvényes-e
+        if (sortableInstance.el && sortableInstance.el.parentNode) {
+          sortableInstance.destroy();
+        }
+      } catch (error) {
+        console.warn('Error destroying sortable instance:', error);
       }
-    });
+      sortableInstance = null;
+    }
+  }
+
+  // Sortable inicializálása és kezelése
+    function initializeSortable() {
+    // Biztonságosan megsemmisítjük a meglévő példányt
+    destroySortableInstance();
+  
+  // Ellenőrizzük, hogy a listsContainer létezik és van benne elem
+  if (isReorderingEnabled && listsContainer && listsContainer.parentNode) {
+    try {
+      sortableInstance = Sortable.create(listsContainer, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function(evt) {
+          console.log("Drag end event fired");
+          if (!listsContainer || !listsContainer.children) {
+            console.warn("Lists container no longer exists");
+            return;
+          }
+          
+          const children = Array.from(listsContainer.children);
+          const updatePromises = children.map((child, index) => {
+            const listId = child.getAttribute("data-list-id");
+            console.log("Child index:", index, "ListID:", listId);
+            if (listId && auth.currentUser) {
+              console.log("Updating order for list", listId, "to", index + 1);
+              return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
+            } else {
+              return Promise.resolve();
+            }
+          });
+          Promise.all(updatePromises)
+            .then(() => {
+              console.log("All order updates complete");
+              if (auth.currentUser) {
+                loadUserLists(auth.currentUser.uid);
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating order for one or more lists:", error);
+            });
+        }
+      });
+    } catch (error) {
+      console.error('Error creating sortable instance:', error);
+      sortableInstance = null;
+    }
   }
 }
 
 // Toggle gomb eseménykezelő
-toggleReorderBtn.addEventListener("click", () => {
-  isReorderingEnabled = !isReorderingEnabled;
-  const lang = document.documentElement.lang || "hu";
-  
-  if (isReorderingEnabled) {
-    if (lang === "en") {
-      toggleReorderBtn.textContent = "Disable List Reordering";
-    } else if (lang === "de") {
-      toggleReorderBtn.textContent = "Listenumordnung deaktivieren";
+if (toggleReorderBtn) {
+  toggleReorderBtn.addEventListener("click", () => {
+    isReorderingEnabled = !isReorderingEnabled;
+    
+    if (isReorderingEnabled) {
+      // Használjuk a getText függvényt a lokalizációhoz
+      updateButtonText(toggleReorderBtn, getText('lists.disable_reorder') || "Átrendezés letiltása");
+      toggleReorderBtn.classList.add("active");
+      if (listsContainer) {
+        listsContainer.classList.add("reorder-enabled");
+      }
     } else {
-      toggleReorderBtn.textContent = "Lista átrendezés letiltása";
+      updateButtonText(toggleReorderBtn, getText('lists.reorder') || "Átrendezés");
+      toggleReorderBtn.classList.remove("active");
+      if (listsContainer) {
+        listsContainer.classList.remove("reorder-enabled");
+      }
     }
-    toggleReorderBtn.classList.add("active");
-    listsContainer.classList.add("reorder-enabled");
-  } else {
-    if (lang === "en") {
-      toggleReorderBtn.textContent = "Enable List Reordering";
-    } else if (lang === "de") {
-      toggleReorderBtn.textContent = "Listenumordnung aktivieren";
-    } else {
-      toggleReorderBtn.textContent = "Lista átrendezés engedélyezése";
-    }
-    toggleReorderBtn.classList.remove("active");
-    listsContainer.classList.remove("reorder-enabled");
-  }
-  
-  initializeSortable();
-});
+    
+    initializeSortable();
+  });
+}
 
 // Régi téma rendszer eltávolítva - modern theme selector használata
 
@@ -443,18 +469,293 @@ function openNoteModal(noteId = null) {
     
     if (noteId) {
       // Szerkesztés mód
-      loadNoteForEdit(noteId);
+      editNote(noteId);
     } else {
       // Új jegyzet mód
       clearNoteModal();
+      // Visszaállítjuk a mentés gombot új jegyzet módra
+      const saveBtn = document.getElementById('save-note');
+      if (saveBtn) {
+        // Eltávolítjuk a régi event listener-t
+        saveBtn.removeEventListener('click', saveNote);
+        // Új event listener hozzáadása
+        saveBtn.addEventListener('click', saveNote);
+        saveBtn.textContent = getText ? getText('notes.save') : 'Mentés';
+      }
+      // Modal cím visszaállítása
+      const noteModalTitle = document.getElementById('note-modal-title');
+      if (noteModalTitle) {
+        noteModalTitle.textContent = getText ? getText('notes.note_title') : '📒 Új jegyzet';
+      }
     }
+    
+    // Jelszó mező megjelenítés/elrejtés beállítása
+    setupPasswordToggle();
+  }
+}
+
+// Jelszó mező megjelenítés/elrejtés beállítása
+function setupPasswordToggle() {
+  const privateCheckbox = document.getElementById('note-private');
+  const passwordSection = document.getElementById('note-password-section');
+  const passwordInput = document.getElementById('note-password');
+  
+  if (!privateCheckbox || !passwordSection || !passwordInput) return;
+  
+  // Kezdeti állapot beállítása
+  togglePasswordSection();
+  
+  // Eseménykezelő a checkbox-ra (csak egyszer adjuk hozzá)
+  privateCheckbox.removeEventListener('change', togglePasswordSection);
+  privateCheckbox.addEventListener('change', togglePasswordSection);
+  
+  function togglePasswordSection() {
+    if (privateCheckbox.checked) {
+      passwordSection.style.display = 'block';
+      passwordInput.required = true;
+    } else {
+      passwordSection.style.display = 'none';
+      passwordInput.required = false;
+      passwordInput.value = '';
+    }
+  }
+}
+
+function editNote(noteId) {
+  if (!auth.currentUser) return;
+  
+  const notesRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
+  get(notesRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const noteData = snapshot.val();
+      
+      // Ha jelszóval védett, kérjük be a jelszót
+      if (noteData.hasPassword && noteData.isPrivate) {
+        requestPasswordForEdit(noteId, noteData);
+      } else {
+        // Normál jegyzet szerkesztése
+        openEditModal(noteData, noteId);
+      }
+    }
+  });
+}
+
+// Közvetlen szerkesztés már feloldott tartalommal (jelszó modal nélkül)
+function editNoteDirectly(noteId, title, content, category) {
+  if (!auth.currentUser) return;
+  
+  const notesRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
+  get(notesRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const noteData = snapshot.val();
+      
+      // Feloldott tartalommal építjük az editableNoteData-t
+      const editableNoteData = {
+        ...noteData,
+        title: title,
+        content: content,
+        category: category
+      };
+      
+      // Közvetlenül megnyitjuk a szerkesztő modal-t jelszó nélkül
+      openEditModal(editableNoteData, noteId);
+    }
+  });
+}
+
+// Jelszó bekérése szerkesztéshez
+function requestPasswordForEdit(noteId, noteData) {
+  const passwordModal = document.getElementById('password-modal');
+  const passwordInput = document.getElementById('password-input');
+  const passwordError = document.getElementById('password-error');
+  const passwordMessage = document.getElementById('password-modal-message');
+  
+  // Modal megjelenítése
+  passwordModal.style.display = 'flex';
+  passwordMessage.textContent = getText('notes.password_edit_prompt');
+  
+  // Input mező tisztítása és fókusz
+  passwordInput.value = '';
+  passwordError.style.display = 'none';
+  setTimeout(() => passwordInput.focus(), 100);
+  
+  // Enter lenyomására is működjön
+  passwordInput.onkeypress = (e) => {
+    if (e.key === 'Enter') {
+      attemptEditUnlock(noteId, noteData);
+    }
+  };
+  
+  // Modal gombjai
+  document.getElementById('password-submit').onclick = () => attemptEditUnlock(noteId, noteData);
+  document.getElementById('password-cancel').onclick = closePasswordModal;
+  document.getElementById('password-modal-close').onclick = closePasswordModal;
+}
+
+// Szerkesztési feloldás kísérlet
+async function attemptEditUnlock(noteId, noteData) {
+  const passwordInput = document.getElementById('password-input');
+  const passwordError = document.getElementById('password-error');
+  const inputPassword = passwordInput.value.trim();
+  
+  if (!inputPassword) {
+    passwordError.textContent = getText('notes.password_error_empty');
+    passwordError.style.display = 'block';
+    return;
+  }
+  
+  try {
+    // Jelszó ellenőrzése
+    const isValidPassword = await verifyPassword(inputPassword, noteData.passwordHash);
+    
+    if (isValidPassword) {
+      // Sikeres feloldás - tartalom visszafejtése és szerkesztő modal megnyitása
+      const decryptedContent = decryptContent(noteData.content, inputPassword);
+      
+      if (decryptedContent !== null) {
+        closePasswordModal();
+        // Visszafejtett tartalommal töltjük fel a szerkesztő modal-t
+        const editableNoteData = {
+          ...noteData,
+          content: decryptedContent
+        };
+        openEditModal(editableNoteData, noteId, inputPassword);
+              } else {
+          passwordError.textContent = getText('notes.password_error_decrypt');
+          passwordError.style.display = 'block';
+        }
+      } else {
+        passwordError.textContent = getText('notes.password_error_wrong');
+        passwordError.style.display = 'block';
+        passwordInput.select();
+      }
+  } catch (error) {
+    console.error('Hiba a jegyzet feloldása során:', error);
+    passwordError.textContent = getText('notes.password_error_access');
+    passwordError.style.display = 'block';
+  }
+}
+
+// Szerkesztő modal megnyitása
+function openEditModal(noteData, noteId, currentPassword = '') {
+  // Modal megnyitása szerkesztési módban
+  if (noteModal) {
+    noteModal.style.display = 'flex';
+    
+    // Adatok betöltése
+    document.getElementById('note-title').value = noteData.title || '';
+    document.getElementById('note-content').value = noteData.content || '';
+    document.getElementById('note-category').value = noteData.category || 'general';
+    document.getElementById('note-private').checked = noteData.isPrivate || false;
+    
+    // Ha van jelenlegi jelszó, töltsük be
+    if (currentPassword) {
+      document.getElementById('note-password').value = currentPassword;
+    } else {
+      // Ha nincs jelszó, hagyjuk üresen 
+      document.getElementById('note-password').value = '';
+    }
+    
+    // Modal címének változtatása
+    document.getElementById('note-modal-title').textContent = getText ? getText('notes.edit_note') : '✏️ Jegyzet szerkesztése';
+    
+    // Mentés gomb átállítása
+    const saveBtn = document.getElementById('save-note');
+    if (saveBtn) {
+      // Klónozzuk a gombot hogy minden event listener eltávolodjon
+      const newSaveBtn = saveBtn.cloneNode(true);
+      saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+      // Új event listener hozzáadása
+      newSaveBtn.addEventListener('click', () => updateNote(noteId));
+      newSaveBtn.textContent = getText ? getText('notes.update') : 'Frissítés';
+    }
+    
+    // Jelszó mező megjelenítés/elrejtés beállítása
+    setupPasswordToggle();
+  }
+}
+
+async function updateNote(noteId) {
+  const title = document.getElementById('note-title').value.trim();
+  const content = document.getElementById('note-content').value.trim();
+  const category = document.getElementById('note-category').value;
+  const isPrivate = document.getElementById('note-private').checked;
+  const password = document.getElementById('note-password').value.trim();
+  
+  if (!title || !content) {
+    showNotification('Kérjük, töltsd ki a címet és a tartalmat!', 'error');
+    return;
+  }
+  
+  if (isPrivate && !password) {
+    showNotification(getText('notes.password_required'), 'error');
+    return;
+  }
+  
+  if (!auth.currentUser) {
+    showNotification('Be kell jelentkezned a jegyzet frissítéséhez!', 'error');
+    return;
+  }
+  
+  const noteRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
+  
+  try {
+    // Ellenőrizzük, hogy a jegyzet létezik-e
+    const snapshot = await get(noteRef);
+    if (snapshot.exists()) {
+      // Ha bizalmas, akkor titkosítjuk a tartalmat
+      let finalContent = content;
+      let hashedPassword = null;
+      
+      if (isPrivate && password) {
+        finalContent = encryptContent(content, password);
+        hashedPassword = await hashPassword(password);
+      }
+      
+      const updatedData = {
+        title,
+        content: finalContent,
+        category,
+        isPrivate,
+        hasPassword: isPrivate && !!password,
+        passwordHash: hashedPassword,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Csak akkor frissítjük, ha a jegyzet létezik
+      await update(noteRef, updatedData);
+      closeNoteModal();
+      loadNotes();
+      showNotification('✏️ Jegyzet sikeresen frissítve!');
+    } else {
+      showNotification('A jegyzet nem található!', 'error');
+    }
+  } catch (error) {
+    console.error('Hiba a jegyzet frissítése során:', error);
+    showNotification('Hiba történt a jegyzet frissítése során.', 'error');
   }
 }
 
 function closeNoteModal() {
   if (noteModal) {
     noteModal.style.display = 'none';
+    // Visszaállítjuk a modal állapotát
     clearNoteModal();
+    // Visszaállítjuk a mentés gombot új jegyzet módra
+    const saveBtn = document.getElementById('save-note');
+    if (saveBtn) {
+      // Klónozzuk a gombot hogy minden event listener eltávolodjon
+      const newSaveBtn = saveBtn.cloneNode(true);
+      saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+      // Új event listener hozzáadása
+      newSaveBtn.addEventListener('click', saveNote);
+      newSaveBtn.textContent = getText ? getText('notes.save') : 'Mentés';
+    }
+    // Modal cím visszaállítása
+    const noteModalTitle = document.getElementById('note-modal-title');
+    if (noteModalTitle) {
+      noteModalTitle.textContent = getText ? getText('notes.note_title') : '📒 Új jegyzet';
+    }
   }
 }
 
@@ -463,16 +764,29 @@ function clearNoteModal() {
   document.getElementById('note-content').value = '';
   document.getElementById('note-category').value = 'general';
   document.getElementById('note-private').checked = false;
+  document.getElementById('note-password').value = '';
+  
+  // Jelszó mező elrejtése
+  const passwordSection = document.getElementById('note-password-section');
+  if (passwordSection) {
+    passwordSection.style.display = 'none';
+  }
 }
 
-function saveNote() {
+async function saveNote() {
   const title = document.getElementById('note-title').value.trim();
   const content = document.getElementById('note-content').value.trim();
   const category = document.getElementById('note-category').value;
   const isPrivate = document.getElementById('note-private').checked;
+  const password = document.getElementById('note-password').value.trim();
   
   if (!title || !content) {
     alert('Kérjük, töltsd ki a címet és a tartalmat!');
+    return;
+  }
+  
+  if (isPrivate && !password) {
+    alert(getText('notes.password_required'));
     return;
   }
   
@@ -482,16 +796,29 @@ function saveNote() {
   }
   
   const notesRef = ref(db, `users/${auth.currentUser.uid}/notes`);
-  const noteData = {
-    title,
-    content,
-    category,
-    isPrivate,
-    timestamp: Date.now(),
-    createdAt: new Date().toISOString()
-  };
   
-  push(notesRef, noteData).then(async () => {
+  try {
+    // Ha bizalmas, akkor titkosítjuk a tartalmat
+    let finalContent = content;
+    let hashedPassword = null;
+    
+    if (isPrivate && password) {
+      finalContent = encryptContent(content, password);
+      hashedPassword = await hashPassword(password);
+    }
+    
+    const noteData = {
+      title,
+      content: finalContent,
+      category,
+      isPrivate,
+      hasPassword: isPrivate && !!password,
+      passwordHash: hashedPassword,
+      timestamp: Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    
+    await push(notesRef, noteData);
     closeNoteModal();
     loadNotes();
     addXP(5); // XP jegyzet mentésért
@@ -499,10 +826,10 @@ function saveNote() {
     
     // Teljes adatfrissítés
     await forceRefreshAllData();
-  }).catch(error => {
+  } catch (error) {
     console.error('Hiba a jegyzet mentése során:', error);
     alert('Hiba történt a jegyzet mentése során.');
-  });
+  }
 }
 
 function loadNotes() {
@@ -542,6 +869,12 @@ function createNoteElement(note) {
   noteCard.className = 'note-card';
   if (note.pinned) noteCard.classList.add('pinned');
   
+  // Ha jelszóval védett, adjuk hozzá a védett osztályt
+  const isPasswordProtected = note.hasPassword && note.isPrivate;
+  if (isPasswordProtected) {
+    noteCard.classList.add('password-protected');
+  }
+  
   // Kategória ikon
   const categoryIcons = {
     general: '📝',
@@ -552,12 +885,32 @@ function createNoteElement(note) {
     personal: '👤'
   };
   
+  // Tartalom megjelenítése - védett vagy normal
+  let contentDisplay = note.content;
+  let overlayHtml = '';
+  
+  if (isPasswordProtected) {
+    contentDisplay = '🔒 Ez egy jelszóval védett bizalmas jegyzet. A tartalom megtekintéséhez szükséges a jelszó megadása.';
+    overlayHtml = `
+      <div class="note-content-overlay">
+        <div class="unlock-prompt">
+          <span class="material-icons">lock</span>
+          <h4>${getText('notes.protected_content')}</h4>
+          <p>${getText('notes.password_required_view')}</p>
+          <button class="unlock-btn" onclick="requestNotePassword('${note.id}')">
+            ${getText('notes.unlock_note')}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
   noteCard.innerHTML = `
     <div class="note-header">
       <h4 class="note-title">${categoryIcons[note.category] || '📝'} ${note.title}</h4>
       <span class="note-category">${note.category}</span>
     </div>
-    <div class="note-content">${note.content}</div>
+    <div class="note-content">${contentDisplay}</div>
     <div class="note-actions">
       <button onclick="togglePinNote('${note.id}')" title="${note.pinned ? 'Kiemelt eltávolítása' : 'Kiemelés'}">
         <span class="material-icons">${note.pinned ? 'push_pin' : 'radio_button_unchecked'}</span>
@@ -570,6 +923,7 @@ function createNoteElement(note) {
       </button>
       ${note.isPrivate ? '<span class="material-icons" style="color: var(--accent-primary);" title="Bizalmas">lock</span>' : ''}
     </div>
+    ${overlayHtml}
   `;
   
   return noteCard;
@@ -597,6 +951,203 @@ function togglePinNote(noteId) {
   });
 }
 
+// Jelszó bekérése a jegyzet megjelenítéséhez
+function requestNotePassword(noteId) {
+  const passwordModal = document.getElementById('password-modal');
+  const passwordInput = document.getElementById('password-input');
+  const passwordError = document.getElementById('password-error');
+  
+  // Modal megjelenítése
+  passwordModal.style.display = 'flex';
+  
+  // Szövegek beállítása
+  const passwordMessage = document.getElementById('password-modal-message');
+  if (passwordMessage) {
+    passwordMessage.textContent = getText('notes.password_prompt');
+  }
+  
+  // Input mező tisztítása és fókusz
+  passwordInput.value = '';
+  passwordError.style.display = 'none';
+  setTimeout(() => passwordInput.focus(), 100);
+  
+  // Enter lenyomására is működjön
+  passwordInput.onkeypress = (e) => {
+    if (e.key === 'Enter') {
+      attemptUnlockNote(noteId);
+    }
+  };
+  
+  // Modal gombjai
+  document.getElementById('password-submit').onclick = () => attemptUnlockNote(noteId);
+  document.getElementById('password-cancel').onclick = closePasswordModal;
+  document.getElementById('password-modal-close').onclick = closePasswordModal;
+}
+
+// Jegyzet feloldási kísérlet
+async function attemptUnlockNote(noteId) {
+  const passwordInput = document.getElementById('password-input');
+  const passwordError = document.getElementById('password-error');
+  const inputPassword = passwordInput.value.trim();
+  
+  if (!inputPassword) {
+    passwordError.textContent = getText('notes.password_error_empty');
+    passwordError.style.display = 'block';
+    return;
+  }
+  
+  if (!auth.currentUser) return;
+  
+  const noteRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
+  
+  try {
+    const snapshot = await get(noteRef);
+    if (snapshot.exists()) {
+      const noteData = snapshot.val();
+      
+      // Jelszó ellenőrzése
+      const isValidPassword = await verifyPassword(inputPassword, noteData.passwordHash);
+      
+      if (isValidPassword) {
+        // Sikeres feloldás - tartalom visszafejtése és megjelenítése
+        const decryptedContent = decryptContent(noteData.content, inputPassword);
+        
+        if (decryptedContent !== null) {
+          showUnlockedNote(noteId, noteData.title, decryptedContent, noteData.category);
+          closePasswordModal();
+        } else {
+          passwordError.textContent = getText('notes.password_error_decrypt');
+          passwordError.style.display = 'block';
+        }
+      } else {
+        passwordError.textContent = getText('notes.password_error_wrong');
+        passwordError.style.display = 'block';
+        passwordInput.select();
+      }
+    }
+  } catch (error) {
+    console.error('Hiba a jegyzet feloldása során:', error);
+    passwordError.textContent = getText('notes.password_error_access');
+    passwordError.style.display = 'block';
+  }
+}
+
+// Feloldott jegyzet megjelenítése
+function showUnlockedNote(noteId, title, content, category) {
+  const categoryIcons = {
+    general: '📝',
+    passwords: '🔒',
+    ideas: '💡',
+    important: '⭐',
+    work: '💼',
+    personal: '👤'
+  };
+  
+  // Új modal a feloldott tartalomhoz
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.style.display = 'flex';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>${categoryIcons[category] || '📝'} ${title}</h3>
+        <button class="close-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="white-space: pre-wrap; line-height: 1.6; color: var(--text-primary);">
+          ${content}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="primary-btn edit-note-btn">${getText('notes.edit')}</button>
+        <button class="secondary-btn close-modal-btn">${getText('notes.close')}</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Event listener-ek hozzáadása
+  const closeBtn = modal.querySelector('.close-btn');
+  const editBtn = modal.querySelector('.edit-note-btn');
+  const closeModalBtn = modal.querySelector('.close-modal-btn');
+  
+  closeBtn.addEventListener('click', () => modal.remove());
+  closeModalBtn.addEventListener('click', () => modal.remove());
+  editBtn.addEventListener('click', () => {
+    modal.remove(); // Bezárjuk a megtekintő modal-t
+    // Közvetlenül nyissuk meg a szerkesztő modal-t anélkül, hogy újra bekérnénk a jelszót
+    editNoteDirectly(noteId, title, content, category); // Szerkesztő modal megnyitása
+  });
+  
+  // Kattintás a modal háttérre bezárja
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+// Jelszó modal bezárása
+function closePasswordModal() {
+  const passwordModal = document.getElementById('password-modal');
+  passwordModal.style.display = 'none';
+  
+  // Eseménykezelők tisztítása
+  document.getElementById('password-input').onkeypress = null;
+  document.getElementById('password-submit').onclick = null;
+  document.getElementById('password-cancel').onclick = null;
+  document.getElementById('password-modal-close').onclick = null;
+}
+
+// ==============================================
+// 🔐 JEGYZET TITKOSÍTÁS
+// ==============================================
+
+// Egyszerű jelszó hash (SHA-256)
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Tartalom titkosítás (egyszerű XOR alapú)
+function encryptContent(content, password) {
+  let encrypted = '';
+  for (let i = 0; i < content.length; i++) {
+    const charCode = content.charCodeAt(i);
+    const keyChar = password.charCodeAt(i % password.length);
+    encrypted += String.fromCharCode(charCode ^ keyChar);
+  }
+  return btoa(encrypted); // Base64 kódolás
+}
+
+// Tartalom visszafejtés
+function decryptContent(encryptedContent, password) {
+  try {
+    const encrypted = atob(encryptedContent); // Base64 dekódolás
+    let decrypted = '';
+    for (let i = 0; i < encrypted.length; i++) {
+      const charCode = encrypted.charCodeAt(i);
+      const keyChar = password.charCodeAt(i % password.length);
+      decrypted += String.fromCharCode(charCode ^ keyChar);
+    }
+    return decrypted;
+  } catch (error) {
+    return null; // Hibás jelszó vagy sérült adat
+  }
+}
+
+// Jelszó ellenőrzés
+async function verifyPassword(inputPassword, storedHash) {
+  const inputHash = await hashPassword(inputPassword);
+  return inputHash === storedHash;
+}
+
 // ==============================================
 // 🗓️ NAPTÁR KEZELÉSE
 // ==============================================
@@ -618,17 +1169,19 @@ function renderCalendar() {
   const month = currentDate.getMonth();
   
   // Hónap név beállítása
-  const monthNames = [
-    'Január', 'Február', 'Március', 'Április', 'Május', 'Június',
-    'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'
+  const monthKeys = [
+    'january', 'february', 'march', 'april', 'may', 'june',
+    'july', 'august', 'september', 'october', 'november', 'december'
   ];
-  monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
+  const monthName = getText(`calendar.months.${monthKeys[month]}`);
+  monthYearDisplay.textContent = `${monthName} ${year}`;
   
   // Naptár rács törlése
   calendarGrid.innerHTML = '';
   
   // Hét napjai header
-  const dayNames = ['V', 'H', 'K', 'Sz', 'Cs', 'P', 'Sz'];
+  const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const dayNames = dayKeys.map(day => getText(`calendar.days.${day}`));
   dayNames.forEach(day => {
     const dayHeader = document.createElement('div');
     dayHeader.className = 'calendar-day-header';
@@ -682,6 +1235,14 @@ function isToday(date) {
   return date.toDateString() === today.toDateString();
 }
 
+// Timezone-safe dátum formázás YYYY-MM-DD formátumban
+function formatDateToString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function openEventModal(selectedDate = null, showExistingEvents = false) {
   if (!auth.currentUser) {
     showNotification('⚠️ Be kell jelentkezned az esemény kezeléséhez!');
@@ -695,7 +1256,7 @@ function openEventModal(selectedDate = null, showExistingEvents = false) {
     if (selectedDate) {
       const dateInput = document.getElementById('event-date');
       if (dateInput) {
-        const dateStr = selectedDate.toISOString().split('T')[0];
+        const dateStr = formatDateToString(selectedDate);
         dateInput.value = dateStr;
         
         // Csak akkor mutassuk meg a meglévő eseményeket, ha explicit kérjük
@@ -788,11 +1349,13 @@ function clearEventModal() {
 
 function addXP(amount) {
   userXP += amount;
+  window.userXP = userXP;
   
   // Szint ellenőrzése
   const newLevel = Math.floor(userXP / 100) + 1;
   if (newLevel > userLevel) {
     userLevel = newLevel;
+    window.userLevel = userLevel;
     showLevelUpNotification(newLevel);
   }
   
@@ -880,6 +1443,11 @@ function loadUserProgress() {
       userXP = data.xp || 0;
       currentStreak = data.streak || 0;
       
+      // Window objektumon is frissítjük
+      window.userLevel = userLevel;
+      window.userXP = userXP;
+      window.currentStreak = currentStreak;
+      
       updateLevelDisplay();
       updateStreakDisplay();
     }
@@ -898,7 +1466,7 @@ async function updateStreakDisplay() {
     let currentDate = new Date();
     
     while (true) {
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = formatDateToString(currentDate);
       const activity = getActivityLevelForDate(dateStr, userActivityData);
       
       if (activity > 0) {
@@ -914,10 +1482,12 @@ async function updateStreakDisplay() {
     
     streakElement.textContent = streak;
     currentStreak = streak;
+    window.currentStreak = currentStreak;
   } catch (error) {
     console.error('Error updating streak display:', error);
     streakElement.textContent = '0';
     currentStreak = 0;
+    window.currentStreak = currentStreak;
   }
 }
 
@@ -1109,7 +1679,12 @@ function updateAchievements() {
 
 // Event listeners hozzáadása
 if (newNoteBtn) newNoteBtn.addEventListener('click', () => openNoteModal());
-if (saveNoteBtn) saveNoteBtn.addEventListener('click', saveNote);
+if (saveNoteBtn) {
+  // Eltávolítjuk a régi event listener-t
+  saveNoteBtn.removeEventListener('click', saveNote);
+  // Új event listener hozzáadása
+  saveNoteBtn.addEventListener('click', saveNote);
+}
 if (cancelNoteBtn) cancelNoteBtn.addEventListener('click', closeNoteModal);
 if (noteModalClose) noteModalClose.addEventListener('click', closeNoteModal);
 
@@ -1349,7 +1924,7 @@ function populateQuickAddListSelect() {
 // Regisztráció
 registerBtn.addEventListener("click", () => {
   const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const password = authPasswordInput.value.trim();
   if (email && password) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -1368,7 +1943,7 @@ registerBtn.addEventListener("click", () => {
 // Bejelentkezés
 loginBtn.addEventListener("click", () => {
   const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const password = authPasswordInput.value.trim();
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -1480,14 +2055,8 @@ function loadUserLists(uid) {
 
 function updateFilterOptions(listsArray) {
   const currentValue = filterCategorySelect.value;
-  const lang = document.documentElement.lang || "hu";
   
-  let allOptionText = "Összes";
-  if (lang === "en") {
-    allOptionText = "All";
-  } else if (lang === "de") {
-    allOptionText = "Alle";
-  }
+  const allOptionText = getText('lists.all_categories');
   
   let optionsHTML = `<option value="all">${allOptionText}</option>`;
   const categories = new Set(listsArray.map(list => list.category));
@@ -1513,19 +2082,8 @@ function renderListBox(listId, listName, category, uid) {
   // Állítsuk be a data-list-id attribútumot
   box.setAttribute("data-list-id", listId);
 
-  const lang = document.documentElement.lang || "hu";
-  let placeholder, addButtonText;
-  
-  if (lang === "en") {
-    placeholder = "Add new item";
-    addButtonText = "Add";
-  } else if (lang === "de") {
-    placeholder = "Neues Element hinzufügen";
-    addButtonText = "Hinzufügen";
-  } else {
-    placeholder = "Új elem hozzáadása";
-    addButtonText = "Hozzáadás";
-  }
+  const placeholder = getText('dashboard.item_placeholder');
+  const addButtonText = getText('lists.add_item');
   
   box.innerHTML = `
     <h2>
@@ -1602,13 +2160,7 @@ customNewListBtn.addEventListener("click", () => {
   console.log("Custom lista hozzáadása:", listName, category);
 
   if (listName === "") {
-    const lang = document.documentElement.lang || "hu";
-    let errorMsg = "Kérjük, add meg a lista nevét!";
-    if (lang === "en") {
-      errorMsg = "Please enter a list name!";
-    } else if (lang === "de") {
-      errorMsg = "Bitte geben Sie einen Listennamen ein!";
-    }
+    const errorMsg = getText('lists.list_name_required') || "Kérjük, add meg a lista nevét!";
     alert(errorMsg);
     customListNameInput.focus();
     return;
@@ -1621,16 +2173,9 @@ customNewListBtn.addEventListener("click", () => {
   const userListsRef = ref(db, `users/${auth.currentUser.uid}/lists`);
   
   // Alapértelmezett kategória beállítása, ha üres
-  const lang = document.documentElement.lang || "hu";
   let finalCategory = category;
   if (!finalCategory) {
-    if (lang === "en") {
-      finalCategory = "General";
-    } else if (lang === "de") {
-      finalCategory = "Allgemein";
-    } else {
-      finalCategory = "Általános";
-    }
+    finalCategory = getText('notes.categories.general') || "Általános";
   }
   
   // Először lekérjük a meglévő listák maximum order értékét
@@ -1647,24 +2192,11 @@ customNewListBtn.addEventListener("click", () => {
     let fullName = listName;
     
     // Emoji hozzáadása kategória alapján
-    if (lang === "en") {
-      if (finalCategory.toLowerCase() === "shopping") {
-        fullName = "🛒 " + listName;
-      } else if (finalCategory.toLowerCase() === "tasks") {
-        fullName = "📋 " + listName;
-      }
-    } else if (lang === "de") {
-      if (finalCategory.toLowerCase() === "einkauf") {
-        fullName = "🛒 " + listName;
-      } else if (finalCategory.toLowerCase() === "aufgaben") {
-        fullName = "📋 " + listName;
-      }
-    } else {
-      if (finalCategory.toLowerCase() === "bevásárlás") {
-        fullName = "🛒 " + listName;
-      } else if (finalCategory.toLowerCase() === "feladatok") {
-        fullName = "📋 " + listName;
-      }
+    const categoryLower = finalCategory.toLowerCase();
+    if (categoryLower === "bevásárlás" || categoryLower === "shopping" || categoryLower === "einkauf") {
+      fullName = "🛒 " + listName;
+    } else if (categoryLower === "feladatok" || categoryLower === "tasks" || categoryLower === "aufgaben") {
+      fullName = "📋 " + listName;
     }
     // Az új lista order értéke: max + 1
     const newOrder = maxOrder + 1;
@@ -2088,24 +2620,20 @@ function updateUrgentTasks() {
     
     // Sürgős feladatok megjelenítése
     if (urgentTasks.length === 0) {
-      urgentTasksList.innerHTML = '<p class="no-urgent">🎉 Nincs sürgős feladat!</p>';
+      urgentTasksList.innerHTML = `<p class="no-urgent" data-i18n="dashboard.no_urgent">${getText('dashboard.no_urgent')}</p>`;
     } else {
-      urgentTasksList.innerHTML = urgentTasks.slice(0, 5).map(task => `
+      urgentTasksList.innerHTML = urgentTasks.map(task => `
         <div class="urgent-task ${task.pinned ? 'pinned' : ''}" data-task-id="${task.id}" data-list-id="${task.listId}">
           <div class="urgent-task-content">
             <span class="urgent-task-text">${task.text}</span>
             <span class="urgent-task-list">${task.listName}</span>
-            <div class="urgent-task-tags">
-              ${task.isOld ? '<span class="urgent-tag old">🕒 Régi</span>' : ''}
-              ${task.isImportant ? '<span class="urgent-tag important">⭐ Fontos</span>' : ''}
-            </div>
           </div>
           <div class="urgent-task-actions">
-            <button onclick="togglePinUrgentTask('${task.listId}', '${task.id}')" title="${task.pinned ? 'Kiemelés eltávolítása' : 'Kiemelés'}">
+            <button class="pin-btn" onclick="togglePinUrgentTask('${task.listId}', '${task.id}')" title="${getText('common.pin')}">
               ${task.pinned ? '📌' : '📍'}
             </button>
-            <button onclick="markUrgentTaskDone('${task.listId}', '${task.id}')" title="Kész">
-              ✅
+            <button class="done-btn" onclick="markUrgentTaskDone('${task.listId}', '${task.id}')" title="${getText('common.done')}">
+              ✓
             </button>
           </div>
         </div>
@@ -2142,7 +2670,7 @@ async function generateActivityCalendar() {
   for (let i = 0; i < daysToShow; i++) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = formatDateToString(date);
     
     // Tevékenység szint kiszámítása (0-4)
     const activityLevel = getActivityLevelForDate(dateStr, userActivityData);
@@ -2189,7 +2717,7 @@ async function getUserActivityData() {
             if (list.items) {
               Object.values(list.items).forEach(item => {
                 if (item.timestamp) {
-                  const date = new Date(item.timestamp).toISOString().split('T')[0];
+                  const date = formatDateToString(new Date(item.timestamp));
                   activityData[date] = (activityData[date] || 0) + 1;
                 }
               });
@@ -2205,7 +2733,7 @@ async function getUserActivityData() {
         if (snapshot.exists()) {
           Object.values(snapshot.val()).forEach(note => {
             if (note.timestamp) {
-              const date = new Date(note.timestamp).toISOString().split('T')[0];
+              const date = formatDateToString(new Date(note.timestamp));
               activityData[date] = (activityData[date] || 0) + 2;
             }
           });
@@ -2219,7 +2747,7 @@ async function getUserActivityData() {
         if (snapshot.exists()) {
           Object.values(snapshot.val()).forEach(event => {
             if (event.timestamp) {
-              const date = new Date(event.timestamp).toISOString().split('T')[0];
+              const date = formatDateToString(new Date(event.timestamp));
               activityData[date] = (activityData[date] || 0) + 1;
             }
           });
@@ -2280,69 +2808,43 @@ function updateProductivityInsights() {
   const completedItems = document.querySelectorAll('.list-box li.done').length;
   const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
   
-  // Lokalizált szövegek a jelenlegi nyelvhez
-  const currentLang = document.documentElement.lang || 'hu';
+  // Globális változók elérése (nem a lokális változóké)
+  const globalCurrentStreak = window.currentStreak || currentStreak || 0;
+  const globalUserLevel = window.userLevel || userLevel || 1;
+  const globalUserXP = window.userXP || userXP || 0;
   
-  let insights;
-  if (currentLang === 'en') {
-    insights = [
-      { 
-        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
-        text: `Completion: ${completionRate}% (${completedItems}/${totalItems} tasks)` 
-      },
-      { 
-        icon: '⭐', 
-        text: `Managing ${totalLists} active lists` 
-      },
-      { 
-        icon: currentStreak > 0 ? '🔥' : '💤', 
-        text: currentStreak > 0 ? `${currentStreak} day streak active!` : 'Start a new streak today!' 
-      },
-      { 
-        icon: userLevel >= 3 ? '🏆' : '🎯', 
-        text: `Level ${userLevel} - ${userXP} XP total` 
-      }
-    ];
-  } else if (currentLang === 'de') {
-    insights = [
-      { 
-        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
-        text: `Abschluss: ${completionRate}% (${completedItems}/${totalItems} Aufgaben)` 
-      },
-      { 
-        icon: '⭐', 
-        text: `Verwaltung von ${totalLists} aktiven Listen` 
-      },
-      { 
-        icon: currentStreak > 0 ? '🔥' : '💤', 
-        text: currentStreak > 0 ? `${currentStreak} Tage Streak aktiv!` : 'Starte heute einen neuen Streak!' 
-      },
-      { 
-        icon: userLevel >= 3 ? '🏆' : '🎯', 
-        text: `Level ${userLevel} - ${userXP} XP gesamt` 
-      }
-    ];
-  } else {
-    // Magyar (default)
-    insights = [
-      { 
-        icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
-        text: `Teljesítés: ${completionRate}% (${completedItems}/${totalItems} feladat)` 
-      },
-      { 
-        icon: '⭐', 
-        text: `${totalLists} aktív lista kezelése` 
-      },
-      { 
-        icon: currentStreak > 0 ? '🔥' : '💤', 
-        text: currentStreak > 0 ? `${currentStreak} napos sorozat aktív!` : 'Kezdj új sorozatot ma!' 
-      },
-      { 
-        icon: userLevel >= 3 ? '🏆' : '🎯', 
-        text: `${userLevel}. szint - ${userXP} XP összesen` 
-      }
-    ];
-  }
+
+  
+  // Lokalizált szövegek a getText függvénnyel
+  const insights = [
+    { 
+      icon: completionRate > 70 ? '📈' : completionRate > 40 ? '📊' : '📉', 
+      text: getText('overview.productivity_insights.completion', {
+        rate: completionRate,
+        completed: completedItems,
+        total: totalItems
+      })
+    },
+    { 
+      icon: '⭐', 
+      text: getText('overview.productivity_insights.managing_lists', {
+        count: totalLists
+      })
+    },
+    { 
+      icon: globalCurrentStreak > 0 ? '🔥' : '💤', 
+      text: globalCurrentStreak > 0 
+        ? getText('overview.productivity_insights.streak_active', { days: globalCurrentStreak })
+        : getText('overview.productivity_insights.streak_start')
+    },
+    { 
+      icon: globalUserLevel >= 3 ? '🏆' : '🎯', 
+      text: getText('overview.productivity_insights.level_progress', {
+        level: globalUserLevel,
+        xp: globalUserXP
+      })
+    }
+  ];
   
   insightsList.innerHTML = insights.map(insight => `
     <div class="insight-item">
@@ -2370,7 +2872,7 @@ function getCategoryIcon(category) {
   const icons = {
     general: '📝',
     passwords: '🔒',
-    ideas: '��',
+    ideas: '',
     important: '⭐',
     work: '💼',
     personal: '👤'
@@ -2464,74 +2966,6 @@ function handleQuickAction(action) {
 // Az események betöltése implementálva van lent
 
 // Jegyzetek szerkesztése és törlése
-function editNote(noteId) {
-  if (!auth.currentUser) return;
-  
-  const notesRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
-  get(notesRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const noteData = snapshot.val();
-      
-      // Modal megnyitása szerkesztési módban
-      if (noteModal) {
-        noteModal.style.display = 'flex';
-        
-        // Adatok betöltése
-        document.getElementById('note-title').value = noteData.title || '';
-        document.getElementById('note-content').value = noteData.content || '';
-        document.getElementById('note-category').value = noteData.category || 'general';
-        document.getElementById('note-private').checked = noteData.isPrivate || false;
-        
-        // Modal címének változtatása
-        document.getElementById('note-modal-title').textContent = '✏️ Jegyzet szerkesztése';
-        
-        // Mentés gomb átállítása
-        const saveBtn = document.getElementById('save-note');
-        saveBtn.textContent = 'Frissítés';
-        saveBtn.onclick = () => updateNote(noteId);
-      }
-    }
-  });
-}
-
-function updateNote(noteId) {
-  const title = document.getElementById('note-title').value.trim();
-  const content = document.getElementById('note-content').value.trim();
-  const category = document.getElementById('note-category').value;
-  const isPrivate = document.getElementById('note-private').checked;
-  
-  if (!title || !content) {
-    alert('Kérjük, töltsd ki a címet és a tartalmat!');
-    return;
-  }
-  
-  if (!auth.currentUser) return;
-  
-  const noteRef = ref(db, `users/${auth.currentUser.uid}/notes/${noteId}`);
-  const updatedData = {
-    title,
-    content,
-    category,
-    isPrivate,
-    updatedAt: new Date().toISOString()
-  };
-  
-  update(noteRef, updatedData).then(() => {
-    closeNoteModal();
-    loadNotes();
-    showNotification('✏️ Jegyzet sikeresen frissítve!');
-    
-    // Mentés gomb visszaállítása
-    const saveBtn = document.getElementById('save-note');
-    saveBtn.textContent = 'Mentés';
-    saveBtn.onclick = saveNote;
-    document.getElementById('note-modal-title').textContent = '📒 Új jegyzet';
-  }).catch(error => {
-    console.error('Hiba a jegyzet frissítése során:', error);
-    alert('Hiba történt a jegyzet frissítése során.');
-  });
-}
-
 function deleteNote(noteId) {
   if (!auth.currentUser) return;
   
@@ -2714,7 +3148,7 @@ function updateTodayEvents() {
   if (!todayEventsList) return;
   
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = formatDateToString(today);
   
   const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
   
@@ -2726,18 +3160,18 @@ function updateTodayEvents() {
         .sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
       
       if (todayEvents.length === 0) {
-        todayEventsList.innerHTML = '<p class="no-events">Nincs mai esemény</p>';
+        todayEventsList.innerHTML = `<p class="no-events" data-i18n="dashboard.no_events">${getText('dashboard.no_events')}</p>`;
       } else {
         todayEventsList.innerHTML = todayEvents.map(event => `
           <div class="event-preview">
-            <div class="event-time">${event.time || 'Egész nap'}</div>
+            <div class="event-time">${event.time || getText('calendar.all_day')}</div>
             <div class="event-title">${event.title}</div>
             <div class="event-type">${getEventTypeIcon(event.type)}</div>
           </div>
         `).join('');
       }
     } else {
-      todayEventsList.innerHTML = '<p class="no-events">Nincs mai esemény</p>';
+      todayEventsList.innerHTML = `<p class="no-events" data-i18n="dashboard.no_events">${getText('dashboard.no_events')}</p>`;
     }
   });
 }
@@ -2753,8 +3187,8 @@ function loadUpcomingEvents() {
   const nextWeek = new Date();
   nextWeek.setDate(today.getDate() + 7);
   
-  const todayStr = today.toISOString().split('T')[0];
-  const nextWeekStr = nextWeek.toISOString().split('T')[0];
+  const todayStr = formatDateToString(today);
+  const nextWeekStr = formatDateToString(nextWeek);
   
   const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
   
@@ -2772,21 +3206,21 @@ function loadUpcomingEvents() {
         });
       
       if (upcomingEvents.length === 0) {
-        upcomingEventsList.innerHTML = '<p class="no-events">Nincs közelgő esemény</p>';
+        upcomingEventsList.innerHTML = `<p class="no-events" data-i18n="dashboard.no_upcoming_events">${getText('dashboard.no_upcoming_events')}</p>`;
       } else {
         upcomingEventsList.innerHTML = upcomingEvents.map(event => `
           <div class="upcoming-event">
-            <div class="event-date">${new Date(event.date).toLocaleDateString('hu-HU')}</div>
+            <div class="event-date">${new Date(event.date).toLocaleDateString(currentLanguage === 'hu' ? 'hu-HU' : currentLanguage === 'de' ? 'de-DE' : 'en-US')}</div>
             <div class="event-title">${event.title}</div>
             <div class="event-type">${getEventTypeIcon(event.type)}</div>
-            <button class="delete-event-btn" onclick="deleteEvent('${event.id}')" title="Esemény törlése">
+            <button class="delete-event-btn" onclick="deleteEvent('${event.id}')" title="${getText('common.delete')}">
               <span class="material-icons">delete</span>
             </button>
           </div>
         `).join('');
       }
     } else {
-      upcomingEventsList.innerHTML = '<p class="no-events">Nincs közelgő esemény</p>';
+      upcomingEventsList.innerHTML = `<p class="no-events" data-i18n="dashboard.no_upcoming_events">${getText('dashboard.no_upcoming_events')}</p>`;
     }
   });
 }
@@ -2800,7 +3234,7 @@ function scheduleNotification(eventData) {
   const now = new Date();
   const timeUntilNotification = notificationTime.getTime() - now.getTime();
   
-  if (timeUntilNotification > 0 && timeUntilNotification <= 24 * 60 * 60 * 1000) { // 24 óráig előre
+  if (timeUntilNotification > 0) {
     setTimeout(() => {
       showEventNotification(eventData);
     }, timeUntilNotification);
@@ -2808,18 +3242,23 @@ function scheduleNotification(eventData) {
   }
 }
 
-// Rendszeres ellenőrzés közelgő eseményekre
+// Az oldal betöltésekor minden jövőbeli eseményre újraütemezünk
 function checkUpcomingNotifications() {
   if (!auth.currentUser) return;
-  
+
   const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
   get(eventsRef).then((snapshot) => {
     if (snapshot.exists()) {
       const events = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
-      
+      const now = new Date();
       events.forEach(event => {
         if (event.reminder && event.reminderTime) {
-          scheduleNotification(event);
+          const eventDateTime = new Date(`${event.date}T${event.time || '00:00'}`);
+          const reminderTime = event.reminderTime || 0;
+          const notificationTime = new Date(eventDateTime.getTime() - (reminderTime * 60000));
+          if (notificationTime > now) {
+            scheduleNotification(event);
+          }
         }
       });
     }
@@ -2909,11 +3348,21 @@ function getText(key, placeholders = {}) {
   // Placeholder-ek helyettesítése
   if (typeof value === 'string') {
     return value.replace(/\{(\w+)\}/g, (match, placeholder) => {
-      return placeholders[placeholder] || match;
+      return placeholders[placeholder] !== undefined ? placeholders[placeholder] : match;
     });
   }
   
   return value;
+}
+
+// Segédfüggvény a gomb szöveg frissítéséhez (text node alapú)
+function updateButtonText(button, text) {
+  if (!button) return;
+  
+  const textNodes = Array.from(button.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+  if (textNodes.length > 0) {
+    textNodes[textNodes.length - 1].textContent = text;
+  }
 }
 
 // UI szövegek frissítése
@@ -2934,14 +3383,14 @@ function updateUITexts() {
   // Auth szekció szövegek
   const authTitle = document.querySelector('#auth-section h1');
   const emailInput = document.getElementById('email-input');
-  const passwordInput = document.getElementById('password-input');
+  const authPasswordInput = document.getElementById('auth-password-input');
   const loginBtn = document.getElementById('login-btn');
   const registerBtn = document.getElementById('register-btn');
   const logoutBtn = document.getElementById('logout-btn');
   
   if (authTitle) authTitle.textContent = getText('auth.title');
   if (emailInput) emailInput.placeholder = getText('auth.email_placeholder');
-  if (passwordInput) passwordInput.placeholder = getText('auth.password_placeholder');
+  if (authPasswordInput) authPasswordInput.placeholder = getText('auth.password_placeholder');
   if (loginBtn) loginBtn.textContent = getText('auth.login');
   if (registerBtn) registerBtn.textContent = getText('auth.register');
   if (logoutBtn) logoutBtn.textContent = getText('auth.logout');
@@ -2994,11 +3443,13 @@ function updateUITexts() {
   const statisticsTitle = document.querySelector('#main-stats-panel h3');
   const levelTitle = document.querySelector('.level-card h3');
   const activityGraphTitle = document.querySelector('.activity-graph h3');
+  const productivityTitle = document.querySelector('.productivity-insights h3');
   
   if (overviewTitle) overviewTitle.textContent = getText('overview.title');
   if (statisticsTitle) statisticsTitle.textContent = getText('overview.statistics');
   if (levelTitle) levelTitle.textContent = getText('overview.level');
   if (activityGraphTitle) activityGraphTitle.textContent = getText('overview.activity_graph');
+  if (productivityTitle) productivityTitle.textContent = getText('overview.productivity');
   
   // Stat cards
   const statLabels = document.querySelectorAll('.stat-label');
@@ -3045,8 +3496,7 @@ function updateUITexts() {
   if (listCategoryInput) listCategoryInput.placeholder = getText('lists.category_placeholder');
   if (createListBtn) createListBtn.textContent = getText('lists.create_list');
   if (reorderBtn) {
-    const reorderText = reorderBtn.querySelector('span:not(.material-icons)');
-    if (reorderText) reorderText.textContent = getText('lists.reorder');
+    updateButtonText(reorderBtn, getText('lists.reorder'));
   }
   
   // Jegyzetek szekció fordítása
@@ -3093,6 +3543,8 @@ function updateUITexts() {
   if (saveNoteBtn) saveNoteBtn.textContent = getText('notes.save');
   if (cancelNoteBtn) cancelNoteBtn.textContent = getText('notes.cancel');
   
+
+  
   // Naptár hónapok és napok nevei (dinamikusan generált tartalom)
   updateCalendarLocales();
   
@@ -3110,8 +3562,7 @@ function updateUITexts() {
   if (createListNameInput) createListNameInput.placeholder = getText('lists.list_name_placeholder');
   if (createListCategoryInput) createListCategoryInput.placeholder = getText('lists.category_placeholder');
   if (customCreateListBtn) {
-    const buttonText = customCreateListBtn.querySelector('span:not(.material-icons)');
-    if (buttonText) buttonText.textContent = getText('lists.create_list');
+    updateButtonText(customCreateListBtn, getText('lists.create_list'));
   }
   
   // Filter panel fordítása
@@ -3128,10 +3579,8 @@ function updateUITexts() {
   if (allCategoriesOption) allCategoriesOption.textContent = getText('lists.all_categories');
   
   // Toggle reorder button fordítása
-  const toggleReorderBtn = document.getElementById('toggle-reorder-btn');
   if (toggleReorderBtn) {
-    const reorderText = toggleReorderBtn.querySelector('span:not(.material-icons)');
-    if (reorderText) reorderText.textContent = getText('lists.reorder');
+    updateButtonText(toggleReorderBtn, getText('lists.reorder'));
   }
   
   // Jegyzetek törlési modal fordítása
@@ -3208,7 +3657,7 @@ function updateUITexts() {
   if (modalEventTitleInput) modalEventTitleInput.placeholder = getText('calendar.event_name_placeholder');
   if (modalEventDescInput) modalEventDescInput.placeholder = getText('calendar.event_desc_placeholder');
   
-  // Produktivitási insights frissítése (már lokalizált)
+  // Produktivitási insights frissítése (lokalizált)
   updateProductivityInsights();
   
   // Confirm modal szövegek
@@ -3241,6 +3690,134 @@ function updateUITexts() {
   
   // Achievement szövegek frissítése
   updateAchievements();
+  
+  // Theme modal szövegek frissítése
+  const themeText = document.querySelector('.theme-text');
+  if (themeText) {
+    themeText.textContent = getText('common.theme');
+  }
+  
+  // Theme modal címe és gombok
+  const themeModalTitle = document.querySelector('#theme-modal .modern-theme-header h2');
+  const themeApplyBtn = document.getElementById('theme-apply-btn');
+  const themeCancelBtn = document.getElementById('theme-cancel-btn');
+  
+  if (themeModalTitle) themeModalTitle.textContent = getText('modals.theme.title');
+  if (themeApplyBtn) {
+    updateButtonText(themeApplyBtn, getText('modals.theme.apply'));
+  }
+  if (themeCancelBtn) {
+    updateButtonText(themeCancelBtn, getText('modals.theme.cancel'));
+  }
+  
+  // Theme kártya szövegek frissítése
+  updateThemeCardTexts();
+  
+  // Kategória szűrő frissítése (ha van felhasználó bejelentkezve)
+  if (auth.currentUser) {
+    loadUserLists(auth.currentUser.uid);
+  }
+  
+  // Profile menu gombok frissítése
+  const privacyMenuBtn = document.getElementById('privacy-btn');
+  if (privacyMenuBtn) {
+    updateButtonText(privacyMenuBtn, getText('navigation.privacy'));
+  }
+
+  // Modal select opciók frissítése
+  updateModalSelectOptions();
+}
+
+// Modal select opciók frissítése
+function updateModalSelectOptions() {
+  // Event típusok frissítése
+  const eventTypeOptions = document.querySelectorAll('#event-type option');
+  eventTypeOptions.forEach(option => {
+    const value = option.value;
+    if (value) {
+      option.textContent = getText(`calendar.event_types.${value}`);
+    }
+  });
+  
+  // Event emlékeztető opciók frissítése
+  const reminderOptions = document.querySelectorAll('#reminder-time option');
+  reminderOptions.forEach(option => {
+    const value = option.value;
+    if (value !== undefined) {
+      option.textContent = getText(`calendar.reminder_times.${value}`);
+    }
+  });
+  
+  // Note kategóriák frissítése
+  const noteCategoryOptions = document.querySelectorAll('#note-category option');
+  noteCategoryOptions.forEach(option => {
+    const value = option.value;
+    if (value) {
+      option.textContent = getText(`notes.categories.${value}`);
+    }
+  });
+  
+  // Event modal címkék frissítése
+  const eventDateLabelEl = document.querySelector('.date-time-group .input-group:first-child label');
+  const eventTimeLabelEl = document.querySelector('.date-time-group .input-group:last-child label');
+  const eventTypeLabelEl = document.querySelector('.event-categories label');
+  
+  if (eventDateLabelEl) eventDateLabelEl.textContent = getText('calendar.date_label');
+  if (eventTimeLabelEl) eventTimeLabelEl.textContent = getText('calendar.time_label');
+  if (eventTypeLabelEl) eventTypeLabelEl.textContent = getText('calendar.type_label');
+  
+  // Event emlékeztető címke frissítése
+  const eventReminderLabelEl = document.querySelector('.reminder-settings .checkbox-label');
+  if (eventReminderLabelEl) {
+    const textNode = Array.from(eventReminderLabelEl.childNodes).find(node => 
+      node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+    );
+    if (textNode) {
+      textNode.textContent = getText('calendar.reminder_label');
+    }
+  }
+  
+  // Note kategória címke frissítése
+  const noteCategoryLabelEl = document.querySelector('.note-categories label');
+  if (noteCategoryLabelEl) noteCategoryLabelEl.textContent = getText('notes.category_label');
+  
+  // Note private checkbox címke frissítése
+  const notePrivateLabelEl = document.querySelector('.note-security .checkbox-label');
+  if (notePrivateLabelEl) {
+    // Keressük meg az utolsó text node-ot (ami a checkbox szövege)
+    const textNodes = Array.from(notePrivateLabelEl.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+    if (textNodes.length > 0) {
+      const lastTextNode = textNodes[textNodes.length - 1];
+      lastTextNode.textContent = getText('notes.private_note');
+    }
+  }
+  
+  // Jelszó mezők frissítése
+  const notePasswordInput = document.getElementById('note-password');
+  const notePasswordLabel = document.getElementById('note-password-label');
+  const passwordModalTitle = document.getElementById('password-modal-title');
+  const passwordInput = document.getElementById('password-input');
+  const passwordSubmit = document.getElementById('password-submit');
+  const passwordCancel = document.getElementById('password-cancel');
+  
+  if (notePasswordInput) {
+    notePasswordInput.placeholder = getText('notes.password_placeholder');
+  }
+  if (notePasswordLabel) {
+    notePasswordLabel.textContent = getText('notes.password_label');
+  }
+  if (passwordModalTitle) {
+    passwordModalTitle.textContent = getText('notes.password_needed');
+  }
+  if (passwordInput) {
+    passwordInput.placeholder = getText('notes.password_placeholder_input');
+  }
+  if (passwordSubmit) {
+    passwordSubmit.textContent = getText('notes.password_submit');
+  }
+  if (passwordCancel) {
+    passwordCancel.textContent = getText('notes.password_cancel');
+  }
 }
 
 // Nyelv dropdown inicializálása
@@ -3255,12 +3832,20 @@ function initLanguageDropdown() {
     hamburgerIcon.addEventListener('click', (e) => {
       e.stopPropagation();
       languageDropdown.classList.toggle('show');
+      
+      // Ha megnyitjuk, távolítsuk el az inline style-t
+      if (languageDropdown.classList.contains('show')) {
+        languageDropdown.style.display = '';
+      } else {
+        languageDropdown.style.display = 'none';
+      }
     });
     
     // Kívülre kattintás esetén bezárás
     document.addEventListener('click', (e) => {
       if (!hamburgerIcon.contains(e.target) && !languageDropdown.contains(e.target)) {
         languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none';
       }
     });
     
@@ -3268,6 +3853,7 @@ function initLanguageDropdown() {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && languageDropdown.classList.contains('show')) {
         languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none';
       }
     });
     
@@ -3282,10 +3868,17 @@ function initLanguageDropdown() {
         
         // Dropdown azonnal bezárása a nyelv váltás előtt
         languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none'; // Erős override
         
         try {
           await loadLanguage(languageCode);
           markCurrentLanguage();
+          
+          // Biztonságos bezárás a nyelv váltás után is
+          setTimeout(() => {
+            languageDropdown.classList.remove('show');
+            languageDropdown.style.display = 'none';
+          }, 100);
         } catch (error) {
           console.error('Hiba a nyelv betöltése során:', error);
         }
@@ -3334,6 +3927,7 @@ window.deleteEvent = deleteEvent;
 window.togglePinList = togglePinList;
 window.switchToListsTab = switchToListsTab;
 window.openNoteForEdit = openNoteForEdit;
+window.requestNotePassword = requestNotePassword;
 
 // Lista kiemelés/kiemelés eltávolítása
 function togglePinList(listId) {
@@ -3490,6 +4084,71 @@ function updateItemInputPlaceholders() {
   }, 100);
 }
 
+// Theme kártya szövegek frissítése
+function updateThemeCardTexts() {
+  // Téma kártyák szövegei
+  const themeCards = {
+    'default': {
+      name: getText('modals.theme.themes.default.name'),
+      description: getText('modals.theme.themes.default.description')
+    },
+    'ocean-blue': {
+      name: getText('modals.theme.themes.ocean_blue.name'),
+      description: getText('modals.theme.themes.ocean_blue.description')
+    },
+    'sakura-pink': {
+      name: getText('modals.theme.themes.sakura_pink.name'),
+      description: getText('modals.theme.themes.sakura_pink.description')
+    },
+    'forest-green': {
+      name: getText('modals.theme.themes.forest_green.name'),
+      description: getText('modals.theme.themes.forest_green.description')
+    },
+    'minimal-mono': {
+      name: getText('modals.theme.themes.minimal_mono.name'),
+      description: getText('modals.theme.themes.minimal_mono.description')
+    },
+    'sunset-orange': {
+      name: getText('modals.theme.themes.sunset_orange.name'),
+      description: getText('modals.theme.themes.sunset_orange.description')
+    },
+    'royal-purple': {
+      name: getText('modals.theme.themes.royal_purple.name'),
+      description: getText('modals.theme.themes.royal_purple.description')
+    }
+  };
+  
+  // Frissítjük minden téma kártya szövegét
+  Object.keys(themeCards).forEach(themeKey => {
+    const themeCard = document.querySelector(`[data-theme="${themeKey}"]`);
+    if (themeCard) {
+      const nameElement = themeCard.querySelector('h3');
+      const descElement = themeCard.querySelector('p');
+      
+      if (nameElement) nameElement.textContent = themeCards[themeKey].name;
+      if (descElement) descElement.textContent = themeCards[themeKey].description;
+    }
+  });
+  
+  // Theme mode gombok szövegei
+  const lightModeButtons = document.querySelectorAll('.theme-mode-btn[data-mode="light"]');
+  const darkModeButtons = document.querySelectorAll('.theme-mode-btn[data-mode="dark"]');
+  
+  lightModeButtons.forEach(button => {
+    const textNode = Array.from(button.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+    if (textNode) {
+      textNode.textContent = ` ${getText('modals.theme.modes.light')}`;
+    }
+  });
+  
+  darkModeButtons.forEach(button => {
+    const textNode = Array.from(button.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+    if (textNode) {
+      textNode.textContent = ` ${getText('modals.theme.modes.dark')}`;
+    }
+  });
+}
+
 // Modern téma választó rendszer
 function initThemeSelector() {
   const themeSelector = document.getElementById('theme-selector-btn');
@@ -3497,7 +4156,8 @@ function initThemeSelector() {
   const themeModalClose = document.getElementById('theme-modal-close');
   const themeApplyBtn = document.getElementById('theme-apply-btn');
   const themeCancelBtn = document.getElementById('theme-cancel-btn');
-  const themeOptions = document.querySelectorAll('.theme-option');
+  const themeCards = document.querySelectorAll('.modern-theme-card');
+  const themeModeButtons = document.querySelectorAll('.theme-mode-btn');
   
   if (!themeSelector || !themeModal) return;
   
@@ -3505,7 +4165,7 @@ function initThemeSelector() {
   const savedTheme = JSON.parse(localStorage.getItem('selectedTheme') || '{"name":"default","mode":"light"}');
   currentTheme = savedTheme;
   applyTheme(currentTheme.name, currentTheme.mode);
-  updateActiveThemeOption();
+  updateActiveThemeCard();
   
   let selectedTheme = { ...currentTheme };
   
@@ -3514,7 +4174,7 @@ function initThemeSelector() {
     e.stopPropagation();
     themeModal.style.display = 'flex';
     selectedTheme = { ...currentTheme };
-    updateActiveThemeOption();
+    updateActiveThemeCard();
   });
   
   // Close modal and revert theme
@@ -3523,7 +4183,7 @@ function initThemeSelector() {
     selectedTheme = { ...currentTheme };
     // Visszaállítjuk az eredeti témát
     applyTheme(currentTheme.name, currentTheme.mode);
-    updateActiveThemeOption();
+    updateActiveThemeCard();
   };
   
   if (themeModalClose) themeModalClose.addEventListener('click', closeModal);
@@ -3536,18 +4196,37 @@ function initThemeSelector() {
     }
   });
   
-  // Theme option selection with live preview
-  themeOptions.forEach(option => {
-    option.addEventListener('click', () => {
-      const themeName = option.dataset.theme;
-      const themeMode = option.dataset.mode;
+  // Theme card selection
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const themeName = card.dataset.theme;
       
-      selectedTheme = { name: themeName, mode: themeMode };
-      window.selectedTheme = selectedTheme; // Global hozzáférés biztosítása
+      // Update selected theme with current mode
+      selectedTheme.name = themeName;
+      window.selectedTheme = selectedTheme;
       
-      // Élő előnézet alkalmazása
-      applyTheme(themeName, themeMode);
-      updateActiveThemeOption();
+      // Apply theme with live preview
+      applyTheme(selectedTheme.name, selectedTheme.mode);
+      updateActiveThemeCard();
+    });
+  });
+  
+  // Theme mode button selection
+  themeModeButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      const mode = button.dataset.mode;
+      const card = button.closest('.modern-theme-card');
+      const themeName = card.dataset.theme;
+      
+      // Update selected theme
+      selectedTheme = { name: themeName, mode: mode };
+      window.selectedTheme = selectedTheme;
+      
+      // Apply theme with live preview
+      applyTheme(selectedTheme.name, selectedTheme.mode);
+      updateActiveThemeCard();
     });
   });
   
@@ -3568,7 +4247,7 @@ function selectTheme(themeName, themeMode) {
   
   // Apply theme
   applyTheme(themeName, themeMode);
-  updateActiveThemeOption();
+  updateActiveThemeCard();
   
   // Save to Firebase if user is logged in
   if (auth.currentUser) {
@@ -3616,8 +4295,9 @@ function loadThemeCSS(themeName) {
   }
 }
 
-function updateActiveThemeOption() {
-  const themeOptions = document.querySelectorAll('.theme-option');
+function updateActiveThemeCard() {
+  const themeCards = document.querySelectorAll('.modern-theme-card');
+  const themeModeButtons = document.querySelectorAll('.theme-mode-btn');
   const themeModal = document.getElementById('theme-modal');
   
   // Ha a modal nyitva van, használjuk a selectedTheme-t, különben a currentTheme-t
@@ -3626,22 +4306,37 @@ function updateActiveThemeOption() {
     targetTheme = window.selectedTheme;
   }
   
-  themeOptions.forEach(option => {
-    option.classList.remove('active');
-    
-    if (option.dataset.theme === targetTheme.name && option.dataset.mode === targetTheme.mode) {
-      option.classList.add('active');
+  // Reset all cards and buttons
+  themeCards.forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  themeModeButtons.forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Set active card and mode
+  themeCards.forEach(card => {
+    if (card.dataset.theme === targetTheme.name) {
+      card.classList.add('selected');
+      
+      // Set active mode button within this card
+      const modeButtons = card.querySelectorAll('.theme-mode-btn');
+      modeButtons.forEach(button => {
+        if (button.dataset.mode === targetTheme.mode) {
+          button.classList.add('active');
+        }
+      });
     }
   });
 }
 
 async function saveThemeToFirebase(themeSettings) {
+  if (!auth.currentUser) return;
+  
   try {
-    const userRef = doc(db, 'users', auth.currentUser.uid);
-    await updateDoc(userRef, {
-      themeSettings: themeSettings,
-      lastUpdated: new Date()
-    });
+    const userRef = ref(db, `users/${auth.currentUser.uid}/themeSettings`);
+    await set(userRef, themeSettings);
   } catch (error) {
     console.log('Theme save error:', error);
   }
@@ -3651,15 +4346,15 @@ async function loadThemeFromFirebase() {
   if (!auth.currentUser) return;
   
   try {
-    const userRef = doc(db, 'users', auth.currentUser.uid);
-    const userSnap = await getDoc(userRef);
+    const userRef = ref(db, `users/${auth.currentUser.uid}/themeSettings`);
+    const userSnap = await get(userRef);
     
-    if (userSnap.exists() && userSnap.data().themeSettings) {
-      const savedTheme = userSnap.data().themeSettings;
+    if (userSnap.exists()) {
+      const savedTheme = userSnap.val();
       currentTheme = savedTheme;
       localStorage.setItem('selectedTheme', JSON.stringify(currentTheme));
       applyTheme(currentTheme.name, currentTheme.mode);
-      updateActiveThemeOption();
+      updateActiveThemeCard();
     }
   } catch (error) {
     console.log('Theme load error:', error);
@@ -3671,6 +4366,7 @@ function initProfileMenu() {
   const profileBtn = document.getElementById('profile-btn');
   const profileDropdown = document.getElementById('profile-dropdown');
   const logoutBtn = document.getElementById('logout-btn');
+  const privacyBtn = document.getElementById('privacy-btn');
   
   if (!profileBtn || !profileDropdown || !logoutBtn) return;
   
@@ -3694,6 +4390,14 @@ function initProfileMenu() {
     }
   });
   
+  // Privacy gomb
+  if (privacyBtn) {
+    privacyBtn.addEventListener('click', () => {
+      openPrivacyModal();
+      profileDropdown.classList.remove('show');
+    });
+  }
+  
   // Logout gomb
   logoutBtn.addEventListener('click', () => {
     if (confirm(getText('auth.logout') + '?')) {
@@ -3707,9 +4411,181 @@ function initProfileMenu() {
   });
 }
 
+// Privacy modal functions
+function openPrivacyModal() {
+  const privacyModal = document.getElementById('privacy-modal');
+  if (privacyModal) {
+    // Frissítjük a modal szövegeit a jelenlegi nyelv szerint
+    updatePrivacyModalTexts();
+    privacyModal.style.display = 'flex';
+  }
+}
+
+function closePrivacyModal() {
+  const privacyModal = document.getElementById('privacy-modal');
+  if (privacyModal) {
+    privacyModal.style.display = 'none';
+  }
+}
+
+function updatePrivacyModalTexts() {
+  // Modal címe
+  const title = document.getElementById('privacy-modal-title');
+  if (title) title.textContent = getText('modals.privacy.title');
+
+  // Szekció címek és tartalmak
+  const sections = [
+    { titleId: 'privacy-intro-title', contentId: 'privacy-intro-content', key: 'intro' },
+    { titleId: 'privacy-controller-title', contentId: 'privacy-controller-content', key: 'controller' },
+    { titleId: 'privacy-data-title', key: 'data' },
+    { titleId: 'privacy-purpose-title', key: 'purpose' },
+    { titleId: 'privacy-legal-title', contentId: 'privacy-legal-content', key: 'legal' },
+    { titleId: 'privacy-storage-title', contentId: 'privacy-storage-content', key: 'storage' },
+    { titleId: 'privacy-retention-title', contentId: 'privacy-retention-content', key: 'retention' },
+    { titleId: 'privacy-rights-title', key: 'rights' },
+    { titleId: 'privacy-security-title', key: 'security' },
+    { titleId: 'privacy-contact-title', contentId: 'privacy-contact-content', key: 'contact' },
+    { titleId: 'privacy-changes-title', contentId: 'privacy-changes-content', key: 'changes' },
+    { titleId: 'privacy-effective-title', contentId: 'privacy-effective-content', key: 'effective' }
+  ];
+
+  sections.forEach(section => {
+    const titleElement = document.getElementById(section.titleId);
+    const contentElement = section.contentId ? document.getElementById(section.contentId) : null;
+    
+    if (titleElement) {
+      titleElement.textContent = getText(`modals.privacy.${section.key}_title`);
+    }
+    
+    if (contentElement) {
+      contentElement.textContent = getText(`modals.privacy.${section.key}_content`);
+    }
+  });
+
+  // Lista elemek frissítése
+  const dataItems = [
+    { id: 'privacy-data-email', key: 'data_email' },
+    { id: 'privacy-data-lists', key: 'data_lists' },
+    { id: 'privacy-data-notes', key: 'data_notes' },
+    { id: 'privacy-data-events', key: 'data_events' },
+    { id: 'privacy-data-settings', key: 'data_settings' },
+    { id: 'privacy-data-usage', key: 'data_usage' }
+  ];
+
+  dataItems.forEach(item => {
+    const element = document.getElementById(item.id);
+    if (element) {
+      element.textContent = getText(`modals.privacy.${item.key}`);
+    }
+  });
+
+  const purposeItems = [
+    { id: 'privacy-purpose-service', key: 'purpose_service' },
+    { id: 'privacy-purpose-sync', key: 'purpose_sync' },
+    { id: 'privacy-purpose-security', key: 'purpose_security' },
+    { id: 'privacy-purpose-features', key: 'purpose_features' }
+  ];
+
+  purposeItems.forEach(item => {
+    const element = document.getElementById(item.id);
+    if (element) {
+      element.textContent = getText(`modals.privacy.${item.key}`);
+    }
+  });
+
+  const rightsItems = [
+    { id: 'privacy-right-access', key: 'right_access' },
+    { id: 'privacy-right-rectification', key: 'right_rectification' },
+    { id: 'privacy-right-erasure', key: 'right_erasure' },
+    { id: 'privacy-right-portability', key: 'right_portability' },
+    { id: 'privacy-right-objection', key: 'right_objection' }
+  ];
+
+  rightsItems.forEach(item => {
+    const element = document.getElementById(item.id);
+    if (element) {
+      element.textContent = getText(`modals.privacy.${item.key}`);
+    }
+  });
+
+  const securityItems = [
+    { id: 'privacy-security-encryption', key: 'security_encryption' },
+    { id: 'privacy-security-firebase', key: 'security_firebase' },
+    { id: 'privacy-security-https', key: 'security_https' },
+    { id: 'privacy-security-access', key: 'security_access' }
+  ];
+
+  securityItems.forEach(item => {
+    const element = document.getElementById(item.id);
+    if (element) {
+      element.textContent = getText(`modals.privacy.${item.key}`);
+    }
+  });
+
+  // Gombok
+  const acceptBtn = document.getElementById('privacy-accept');
+  const closeBtn = document.getElementById('privacy-close');
+  
+  if (acceptBtn) acceptBtn.textContent = getText('modals.privacy.accept');
+  if (closeBtn) closeBtn.textContent = getText('modals.privacy.close');
+}
+
 // Globális függvény elérhetővé tétele
 window.openQuickTaskModal = openQuickTaskModal;
 window.submitQuickTask = submitQuickTask;
 window.closeQuickTaskModal = closeQuickTaskModal;
 window.togglePinUrgentTask = togglePinUrgentTask;
 window.markUrgentTaskDone = markUrgentTaskDone;
+window.destroySortableInstance = destroySortableInstance;
+
+// Privacy modal eseménykezelők inicializálása
+function initPrivacyModal() {
+  const privacyModalClose = document.getElementById('privacy-modal-close');
+  const privacyAccept = document.getElementById('privacy-accept');
+  const privacyClose = document.getElementById('privacy-close');
+  const privacyModal = document.getElementById('privacy-modal');
+
+  if (privacyModalClose) {
+    privacyModalClose.addEventListener('click', closePrivacyModal);
+  }
+
+  if (privacyAccept) {
+    privacyAccept.addEventListener('click', closePrivacyModal);
+  }
+
+  if (privacyClose) {
+    privacyClose.addEventListener('click', closePrivacyModal);
+  }
+
+  // Kívülre kattintás esetén bezárás
+  if (privacyModal) {
+    privacyModal.addEventListener('click', (e) => {
+      if (e.target === privacyModal) {
+        closePrivacyModal();
+      }
+    });
+  }
+
+  // ESC billentyű lenyomásakor bezárás
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (privacyModal && privacyModal.style.display === 'flex') {
+        closePrivacyModal();
+      }
+    }
+  });
+}
+
+// Sortable inicializálás késleltetése DOM betöltés után
+document.addEventListener('DOMContentLoaded', () => {
+  // Privacy modal inicializálása
+  initPrivacyModal();
+  
+  // Várjunk egy kicsit, hogy minden elem biztosan betöltödjön
+  setTimeout(() => {
+    if (listsContainer && toggleReorderBtn) {
+      // Inicializáljuk a sortable-t ha szükséges
+      initializeSortable();
+    }
+  }, 500);
+});
