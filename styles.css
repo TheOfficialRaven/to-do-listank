@@ -34,6 +34,9 @@
   
   .pwa-floating-install {
     z-index: 1000;
+    bottom: 120px !important;
+    left: 20px !important;
+    right: auto !important;
   }
 }
 
@@ -45,5 +48,11 @@
   .quick-add-fab {
     bottom: 70px;
     right: 15px;
+  }
+  
+  .pwa-floating-install {
+    bottom: 100px !important;
+    left: 15px !important;
+    right: auto !important;
   }
 } 

@@ -93,6 +93,13 @@ window.resetPWA = function() {
   localStorage.removeItem('pwa-user-dismissed');
   console.log('🧹 PWA localStorage flags cleared');
   console.log('🔄 Refresh the page to see install button again');
+  
+  // Force show the install button for testing
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'block';
+    console.log('📱 PWA install button forced visible for testing');
+  }
 };
 
 // Test hogy a függvények elérhetők-e
@@ -5224,6 +5231,31 @@ function initProfileMenu() {
       profileDropdown.classList.remove('show');
     });
   }
+
+  // PWA Reset gomb
+  const pwaResetBtn = document.getElementById('pwa-reset-btn');
+  if (pwaResetBtn) {
+    pwaResetBtn.addEventListener('click', () => {
+      profileDropdown.classList.remove('show');
+      if (confirm('Törölni szeretnéd a PWA telepítési állapotot? Ez újra megjeleníteni fogja a telepítési gombot.')) {
+        if (typeof window.clearPWAState === 'function') {
+          window.clearPWAState();
+        } else {
+          localStorage.removeItem('pwa-recently-installed');
+          localStorage.removeItem('pwa-user-dismissed');
+          
+          // Show the button immediately
+          const container = document.getElementById('pwa-floating-install');
+          if (container) {
+            container.style.display = 'block';
+          }
+          
+          showNotification('PWA állapot törölve. A telepítési gomb mostantól látható.');
+          console.log('🧹 PWA state cleared from profile menu');
+        }
+      }
+    });
+  }
   
   // Logout gomb
   logoutBtn.addEventListener('click', () => {
@@ -5430,23 +5462,40 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // PWA telepíthetőség és állapot ellenőrzése
     function canShowInstallButton() {
-      // Csak akkor jelenítjük meg, ha:
-      // 1. Van elérhető install prompt (deferredPrompt)
-      // 2. NEM standalone módban vagyunk (nem telepített PWA)
-      // 3. NEM a getDisplayMode() szerint standalone
-      // 4. localStorage nem jelzi, hogy nemrég volt telepítve
-      
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       const isInstalled = window.navigator.standalone === true; // iOS Safari
       const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
       const userDismissedRecently = localStorage.getItem('pwa-user-dismissed');
       
-      // Ha nemrég telepítették vagy elutasították, ne jelenjen meg
-      if (wasRecentlyInstalled || userDismissedRecently) {
+      // Ha ténylegesen telepítve van, ne jelenjen meg
+      if (isStandalone || isInstalled) {
         return false;
       }
       
-      return deferredPrompt && !isStandalone && !isInstalled;
+      // Ellenőrizzük az időzítéseket
+      if (wasRecentlyInstalled) {
+        const installedTime = parseInt(wasRecentlyInstalled);
+        // Ha 1 óránál régebben volt "telepítve", töröljük a jelölést
+        if (Date.now() - installedTime > (60 * 60 * 1000)) { // 1 óra
+          localStorage.removeItem('pwa-recently-installed');
+          console.log('🧹 PWA installed flag cleared after 1 hour');
+        } else {
+          return false;
+        }
+      }
+      
+      if (userDismissedRecently) {
+        const dismissTime = parseInt(userDismissedRecently);
+        if (Date.now() > dismissTime) {
+          localStorage.removeItem('pwa-user-dismissed');
+          console.log('🧹 PWA dismissed flag cleared after timeout');
+        } else {
+          return false;
+        }
+      }
+      
+      // A gomb megjelenhet, függetlenül attól, hogy van-e deferredPrompt
+      return true;
     }
     
     // Gomb megjelenítése
@@ -5454,6 +5503,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (canShowInstallButton()) {
         installContainer.style.display = 'block';
         console.log('📱 PWA floating install button shown');
+      } else {
+        console.log('📱 PWA install button not shown - conditions not met');
       }
     }
     
@@ -5466,6 +5517,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // PWA telepítés kezelése
     if (installBtn) {
       installBtn.addEventListener('click', () => {
+        console.log('📱 PWA install button clicked');
+        console.log('📱 deferredPrompt available:', !!deferredPrompt);
+        
         if (deferredPrompt) {
           deferredPrompt.prompt();
           deferredPrompt.userChoice.then((choiceResult) => {
@@ -5486,8 +5540,20 @@ document.addEventListener('DOMContentLoaded', () => {
             deferredPrompt = null;
           });
         } else {
-          console.log('PWA már telepítve vagy nem támogatott');
-          showNotification('📱 Az alkalmazás már telepítve van');
+          console.log('PWA telepítési prompt nem elérhető');
+          
+          // Ellenőrizzük a tényleges telepítési állapotot
+          const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+          const isInstalled = window.navigator.standalone === true;
+          
+          if (isStandalone || isInstalled) {
+            showNotification('📱 Az alkalmazás már telepítve van');
+          } else {
+            showNotification('📱 Telepítés nem elérhető. Próbáld újra később.');
+            // Próbáljuk visszaállítani a lehetőséget
+            localStorage.removeItem('pwa-recently-installed');
+            localStorage.removeItem('pwa-user-dismissed');
+          }
           hideInstallButton();
         }
       });
@@ -5566,24 +5632,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('  - current display:', installContainer ? installContainer.style.display : 'N/A');
     };
     
-    // Automatikus megjelenítés teszteléshez (csak ha engedélyezett)
-    console.log('🔧 No deferredPrompt available yet - use showPWAButton() to test UI');
+    // Automatikus megjelenítés teszteléshez
+    console.log('🔧 PWA install button setup complete');
     setTimeout(() => {
-      // Csak akkor jelenítjük meg automatikusan, ha minden feltétel teljesül
-      if (canShowInstallButton() || !deferredPrompt) {
+      if (canShowInstallButton()) {
+        installContainer.style.display = 'block';
+        console.log('🔧 AUTO-SHOWING PWA button');
+        console.log('📱 PWA button should now be visible in bottom-left corner (mobile)');
+      } else {
+        console.log('🔕 PWA button auto-show skipped - conditions not met');
+        // Debug info
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
         const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
         const userDismissed = localStorage.getItem('pwa-user-dismissed');
-        
-        if (!isStandalone && !wasRecentlyInstalled && !userDismissed) {
-          installContainer.style.display = 'block';
-          console.log('🔧 AUTO-SHOWING PWA button for testing purposes');
-          console.log('📱 PWA button should now be visible in bottom-left corner');
-        } else {
-          console.log('🔕 PWA button auto-show skipped - user preferences/status');
-        }
+        console.log('Debug: standalone:', isStandalone, 'recently installed:', !!wasRecentlyInstalled, 'dismissed:', !!userDismissed);
       }
-    }, 3000);
+    }, 2000);
     
     return { showInstallButton, hideInstallButton, checkInstallStatus };
   }
@@ -5591,7 +5655,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // PWA setup inicializálása
   const pwaInstall = setupPWAInstallButton();
   
-  // Globális függvény konzolból való használatra
+  // Globális függvények konzolból való használatra
   window.installPWA = function() {
     const installBtn = document.getElementById('pwa-install-btn');
     if (installBtn) {
@@ -5599,6 +5663,22 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       console.error('❌ PWA install button not found!');
     }
+  };
+  
+  // Globális reset PWA funkció
+  window.clearPWAState = function() {
+    localStorage.removeItem('pwa-recently-installed');
+    localStorage.removeItem('pwa-user-dismissed');
+    console.log('🧹 PWA state cleared');
+    
+    // Show the button immediately
+    const container = document.getElementById('pwa-floating-install');
+    if (container) {
+      container.style.display = 'block';
+      console.log('📱 PWA install button shown');
+    }
+    
+    showNotification('PWA állapot törölve. A telepítés gomb most megjelenik.');
   };
   
   // Backup globális függvények (ha a setupPWAInstallButton nem futott le)
