@@ -68,7 +68,7 @@
 
 .nav-language-menu,
 .nav-theme-menu {
-  display: none;
+  display: block;
 }
 
 .nav-tab {
