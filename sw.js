@@ -8,7 +8,6 @@ const OFFLINE_CACHE = 'todo-offline-v2.2.0';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
-  './',
   './index.html',
   './index.js',
   './styles.css',
@@ -41,10 +40,8 @@ const CACHE_RESOURCES = [
 
 // Essential resources for offline functionality
 const ESSENTIAL_RESOURCES = [
-  './',
   './index.html',
-  './index.js',
-  './index.css'
+  './index.js'
 ];
 
 // ===============================================
@@ -53,24 +50,8 @@ const ESSENTIAL_RESOURCES = [
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker installing...');
   
-  event.waitUntil(
-    Promise.all([
-      // Cache essential resources
-      caches.open(CACHE_NAME).then((cache) => {
-        console.log('📦 Caching app resources');
-        return cache.addAll(CACHE_RESOURCES);
-      }),
-      
-      // Cache offline fallbacks
-      caches.open(OFFLINE_CACHE).then((cache) => {
-        console.log('📦 Caching offline resources');
-        return cache.addAll(ESSENTIAL_RESOURCES);
-      }),
-      
-      // Skip waiting to activate immediately
-      self.skipWaiting()
-    ])
-  );
+  // Skip waiting to activate immediately
+  event.waitUntil(self.skipWaiting());
 });
 
 // ===============================================
@@ -108,42 +89,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // During development, always fetch from network
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        // Return cached version if available
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        // Try network request
-        return fetch(event.request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Clone response for caching
-            const responseToCache = response.clone();
-            
-            // Cache successful responses
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-            
-            return response;
-          })
-          .catch(() => {
-            // Network failed, try to serve offline fallback
-            if (event.request.destination === 'document') {
-              return caches.match('./index.html');
-            }
-            
-            // For other resources, return from offline cache
-            return caches.match(event.request, { cacheName: OFFLINE_CACHE });
-          });
+    fetch(event.request)
+      .catch(() => {
+        // Only fall back to cache if network fails
+        return caches.match(event.request);
       })
   );
 });
