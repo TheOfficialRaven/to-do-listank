@@ -29,7 +29,6 @@
   
   <!-- Saját stíluslapok -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
@@ -954,7 +953,23 @@
     </button>
   </div>
 
-  <!-- JavaScript fájlok -->
-  <script type="module" src="index.js"></script>
+  <!-- JavaScript modulok betöltése megfelelő sorrendben -->
+  
+  <!-- 1. Alapvető modulok -->
+  <script type="module" src="js/firebase-config.js"></script>
+  
+  
+  <!-- 2. Segédmodulok -->
+  <script type="module" src="js/language-manager.js"></script>
+  <script type="module" src="js/audio-manager.js"></script>
+  <script type="module" src="js/pwa-manager.js"></script>
+  
+  
+  
+  <script type="module" src="/index.js"></script>
+  <script type="module" src="js/quick-fixes.js"></script>
+  
+  <!-- 5. Főfájl - utoljára -->
+  
 </body>
 </html>

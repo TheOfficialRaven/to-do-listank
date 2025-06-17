@@ -3762,9 +3762,9 @@ function closeEventNotificationModal() {
   
   // EXTRA SAFETY: Set a short delay to ensure no audio triggers
   setTimeout(() => {
-    if (notificationInterval) {
-      clearInterval(notificationInterval);
-      notificationInterval = null;
+    if (window.notificationInterval) {
+      clearInterval(window.notificationInterval);
+      window.notificationInterval = null;
       console.log('🛑 SAFETY: Extra interval clearance');
     }
   }, 100);
@@ -3772,12 +3772,14 @@ function closeEventNotificationModal() {
   console.log('✅ Event notification modal closed completely - NO SOUNDS');
 }
 
-// Audio context a hang engedélyezéséhez
+// Audio context a hang engedélyezéséhez - GLOBÁLIS VÁLTOZÓK
 let audioContext = null;
 let audioEnabled = false;
 let audioFullyActivated = false; // Track if user has interacted and audio is fully ready
-let notificationInterval = null;
-let isNotificationPlaying = false;
+
+// GLOBÁLIS audio track változók (az audio-manager számára is elérhetők)
+window.notificationInterval = null;
+window.isNotificationPlaying = false;
 
 // Audio engedélyezése user interaction után
 function enableAudio() {
@@ -3860,21 +3862,43 @@ function enableAudioOnImportantElements() {
   return;
 }
 
-// 🔊 EGYSZERŰ NOTIFICATION HANG RENDSZER
+// 🔊 DELEGÁLJUK AZ AUDIO-MANAGER-HEZ
 function playNotificationSound() {
-  console.log('🔊 ========== STARTING NOTIFICATION SOUND (SIMPLE LOOP) ==========');
+  console.log('🔊 ========== DELEGATING TO AUDIO-MANAGER ==========');
+  
+  // Állítsuk be a flag-et a globális track-eléshez
+  window.isNotificationPlaying = true;
+  console.log('✅ window.isNotificationPlaying = TRUE (global tracking)');
+  
+  // KRITIKUS: Az audio-manager-ből származó globális függvény hívása
+  if (window.playNotificationSound && typeof window.playNotificationSound === 'function') {
+    try {
+      // Ideiglenes változó a nevütközés elkerülésére
+      const audioManagerPlay = window.playNotificationSound;
+      audioManagerPlay();
+      console.log('✅ Audio-manager playNotificationSound called successfully');
+    } catch (error) {
+      console.error('❌ Error calling audio-manager playNotificationSound:', error);
+      
+      // Fallback: eredeti rendszer
+      console.log('🔧 Falling back to local audio system...');
+      startLocalAudioFallback();
+    }
+  } else {
+    console.warn('⚠️ Audio-manager playNotificationSound not available, using local fallback');
+    startLocalAudioFallback();
+  }
+}
+
+// Fallback audio rendszer (eredeti kód)
+function startLocalAudioFallback() {
+  console.log('🔊 Starting local audio fallback...');
   
   // AUDIO ACTIVATION CHECK - CRITICAL SAFETY!
   if (!audioFullyActivated) {
     console.log('⚠️ Audio not activated yet! Need user interaction first.');
     console.log('💡 Audio will be enabled on first click/touch/key press');
     return;
-  }
-  
-  // Ha már szól egy értesítés, állítsuk le előbb
-  if (isNotificationPlaying) {
-    console.log('⚠️ Notification already playing - stopping previous first');
-    stopNotificationSound();
   }
   
   // BIZTOSÍTSUK, HOGY AZ AUDIO CONTEXT LÉTEZIK ÉS AKTÍV
@@ -3906,10 +3930,6 @@ function playNotificationSound() {
   function startSimpleLoop() {
     console.log('🔊 Starting simple notification loop...');
     
-    // ÁLLÍTSUK BE A FLAG-ET
-    isNotificationPlaying = true;
-    console.log('✅ isNotificationPlaying = TRUE');
-    
     // ELSŐ HANG AZONNAL
     playSingleBeep();
     
@@ -3929,27 +3949,27 @@ function startContinuousLoop() {
   console.log('🔄 ========== STARTING CONTINUOUS LOOP ==========');
   
   // ELLENŐRIZZÜK, hogy nincs-e már futó interval
-  if (notificationInterval) {
+  if (window.notificationInterval) {
     console.log('⚠️ Clearing existing interval first');
-    clearInterval(notificationInterval);
-    notificationInterval = null;
+    clearInterval(window.notificationInterval);
+    window.notificationInterval = null;
   }
   
   // Loop: minden 3 másodpercben ismétlés
-  notificationInterval = setInterval(() => {
-    console.log('🔄 Loop tick - isNotificationPlaying:', isNotificationPlaying);
-    if (isNotificationPlaying) {
+  window.notificationInterval = setInterval(() => {
+    console.log('🔄 Loop tick - window.isNotificationPlaying:', window.isNotificationPlaying);
+    if (window.isNotificationPlaying) {
       console.log('🔊 Playing loop beep...');
       playSingleBeep();
     } else {
       console.log('🛑 Loop stopped - clearing interval');
-      clearInterval(notificationInterval);
-      notificationInterval = null;
+      clearInterval(window.notificationInterval);
+      window.notificationInterval = null;
     }
   }, 3000); // 3 másodpercenként
   
   console.log('✅ Continuous loop started - playing every 3 seconds');
-  console.log('📊 isNotificationPlaying flag:', isNotificationPlaying);
+  console.log('📊 window.isNotificationPlaying flag:', window.isNotificationPlaying);
 }
 
 // 🔊 EGYSZERŰ BEEP HANG - TISZTA ÉS EGYEDÜLÁLLÓ
@@ -3989,24 +4009,24 @@ function playSingleBeep() {
 // - playNotificationSound() -> startContinuousLoop() -> playSingleBeep()
 console.log('✅ Deprecated audio functions cleaned up for simpler system');
 
-// 🛑 EGYSZERŰ HANG LEÁLLÍTÁS
+// 🛑 EGYSZERŰSÍTETT HANG LEÁLLÍTÁS - most már a globális változókkal
 function stopNotificationSound() {
-  console.log('🛑 ========== STOPPING NOTIFICATION SOUND ==========');
+  console.log('🛑 ========== STOPPING NOTIFICATION SOUND (LOCAL) ==========');
   
-  // ELSŐ LÉPÉS: isNotificationPlaying = false (ez megállítja a loop-okat)
-  isNotificationPlaying = false;
-  console.log('✅ isNotificationPlaying = FALSE');
+  // ELSŐ LÉPÉS: window.isNotificationPlaying = false (ez megállítja a loop-okat)
+  window.isNotificationPlaying = false;
+  console.log('✅ window.isNotificationPlaying = FALSE');
   
   // Folyamatos lejátszás leállítása (Web Audio interval)
-  if (notificationInterval) {
-    clearInterval(notificationInterval);
-    notificationInterval = null;
-    console.log('✅ Notification interval cleared');
+  if (window.notificationInterval) {
+    clearInterval(window.notificationInterval);
+    window.notificationInterval = null;
+    console.log('✅ Global notification interval cleared');
   } else {
-    console.log('ℹ️ No notification interval to clear');
+    console.log('ℹ️ No global notification interval to clear');
   }
   
-  console.log('✅ All notification sounds stopped completely');
+  console.log('✅ Local notification sounds stopped');
 }
 
 // 5 perces elhalasztás (teszteléshez 1 perc)
@@ -4091,10 +4111,10 @@ window.testContinuousSound = function() {
   console.log('📋 Audio status: ready');
   
   // RESET minden audio flag
-  isNotificationPlaying = false;
-  if (notificationInterval) {
-    clearInterval(notificationInterval);
-    notificationInterval = null;
+  window.isNotificationPlaying = false;
+  if (window.notificationInterval) {
+    clearInterval(window.notificationInterval);
+    window.notificationInterval = null;
   }
   
   console.log('🔧 Audio system reset complete');
@@ -4114,7 +4134,7 @@ window.testNotificationSystem = function() {
   console.log('  - audioContext:', !!audioContext);
   console.log('  - audioEnabled:', audioEnabled);
   console.log('  - audioFullyActivated:', audioFullyActivated);
-  console.log('  - isNotificationPlaying:', isNotificationPlaying);
+  console.log('  - window.isNotificationPlaying:', window.isNotificationPlaying);
   
   // SAFETY CHECK - NO AUTOMATIC AUDIO ACTIVATION!
   if (!audioFullyActivated) {
@@ -5149,7 +5169,7 @@ function loadThemeCSS(themeName) {
     const link = document.createElement('link');
     link.id = 'theme-css';
     link.rel = 'stylesheet';
-    link.href = 'modern-themes.css';
+    link.href = 'css/modern-themes.css';
     document.head.appendChild(link);
   }
 }

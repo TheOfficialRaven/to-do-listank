@@ -3,8 +3,8 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.1.1';
-const OFFLINE_CACHE = 'todo-offline-v2.1.0';
+const CACHE_NAME = 'todo-app-v2.2.0';
+const OFFLINE_CACHE = 'todo-offline-v2.2.0';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
@@ -12,11 +12,22 @@ const CACHE_RESOURCES = [
   './index.html',
   './index.js',
   './styles.css',
-  './index.css',
-  './modern-themes.css',
-  './css/variables.css',
+  './css/modern-themes.css',
   './css/base.css',
   './css/navigation.css',
+  './css/animations.css',
+  './css/auth.css',
+  './css/components.css',
+  './css/dashboard.css',
+  './css/lists.css',
+  './css/media.css',
+  './css/modals.css',
+  './css/themes.css',
+  './css/unmatched.css',
+  './js/firebase-config.js',
+  './js/audio-manager.js',
+  './js/language-manager.js',
+  './js/pwa-manager.js',
   './manifest.json',
   './favicon-16x16.png',
   './favicon-32x32.png',
@@ -70,19 +81,7 @@ self.addEventListener('activate', (event) => {
   
   event.waitUntil(
     Promise.all([
-      // Clean up old caches
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName !== CACHE_NAME && cacheName !== OFFLINE_CACHE)
-            .map((cacheName) => {
-              console.log('🗑️ Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-        );
-      }),
-      
-      // Take control of all clients immediately
+      clearAllCaches(),
       self.clients.claim()
     ])
   );
@@ -178,7 +177,7 @@ self.addEventListener('push', (event) => {
       }
     ],
     requireInteraction: true,
-    vibrate: [200, 100, 200, 100, 200],
+    vibrate: [200, 100, 200],
     sound: 'default'
   };
   
@@ -508,13 +507,17 @@ function scheduleNotificationFromData(data) {
   console.log('📅 Scheduling notification:', data);
 }
 
-// Clear all caches
+// Add cache clearing function
 async function clearAllCaches() {
+  console.log('🧹 Clearing all caches...');
   const cacheNames = await caches.keys();
   await Promise.all(
-    cacheNames.map(cacheName => caches.delete(cacheName))
+    cacheNames.map(cacheName => {
+      console.log('🗑️ Deleting cache:', cacheName);
+      return caches.delete(cacheName);
+    })
   );
-  console.log('🗑️ All caches cleared');
+  console.log('✅ All caches cleared');
 }
 
 console.log('✅ Service Worker fully loaded and ready'); 

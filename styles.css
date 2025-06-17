@@ -1,12 +1,20 @@
 /* Combined Styles - Import all CSS modules */
 
 /* Core styles */
-@import url('./css/variables.css');
+@import url('./css/animations.css');
 @import url('./css/base.css');
+@import url('./css/auth.css');
+@import url('./css/components.css');
+@import url('./css/dashboard.css');
+@import url('./css/lists.css');
+@import url('./css/media.css');
+@import url('./css/modals.css');
 @import url('./css/navigation.css');
+@import url('./css/themes.css');
+@import url('./css/unmatched.css');
 
 /* Import existing theme styles */
-@import url('./modern-themes.css');
+@import url('./css/modern-themes.css');
 
 /* Quick fixes for language keys display */
 .note-content-overlay h4,
