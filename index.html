@@ -32,8 +32,8 @@
   <!-- Google Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-  <!-- SortableJS könyvtár (globális változóként elérhető) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <!-- SortableJS könyvtár -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" defer></script>
   
   <!-- Saját stíluslapok -->
   <link rel="stylesheet" href="/styles.css">
@@ -42,15 +42,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  
-  <!-- Saját JavaScript modulok -->
-  <script type="module" src="/js/firebase-config.js"></script>
-  <script type="module" src="/js/audio-manager.js"></script>
-  <script type="module" src="/js/language-manager.js"></script>
-  <script type="module" src="/js/pwa-manager.js"></script>
-  
-  <!-- Fő JavaScript fájl -->
-  <script type="module" src="/index.js"></script>
 </head>
 <body>
 
@@ -973,23 +964,14 @@
     </button>
   </div>
 
-  <!-- JavaScript modulok betöltése megfelelő sorrendben -->
+  <!-- Saját JavaScript modulok -->
+  <script type="module" src="/js/firebase-config.js"></script>
+  <script type="module" src="/js/audio-manager.js"></script>
+  <script type="module" src="/js/language-manager.js"></script>
+  <script type="module" src="/js/pwa-manager.js"></script>
   
-  <!-- 1. Alapvető modulok -->
-  <script type="module" src="js/firebase-config.js"></script>
-  
-  
-  <!-- 2. Segédmodulok -->
-  <script type="module" src="js/language-manager.js"></script>
-  <script type="module" src="js/audio-manager.js"></script>
-  <script type="module" src="js/pwa-manager.js"></script>
-  
-  
-  
+  <!-- Fő JavaScript fájl -->
   <script type="module" src="/index.js"></script>
   <script type="module" src="js/quick-fixes.js"></script>
-  
-  <!-- 5. Főfájl - utoljára -->
-  
 </body>
 </html>
