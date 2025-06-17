@@ -89,12 +89,34 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // During development, always fetch from network
+  // Cache First strategy
   event.respondWith(
-    fetch(event.request)
-      .catch(() => {
-        // Only fall back to cache if network fails
-        return caches.match(event.request);
+    caches.match(event.request)
+      .then((response) => {
+        // Return cached response if found
+        if (response) {
+          return response;
+        }
+        
+        // If not in cache, fetch from network
+        return fetch(event.request)
+          .then((networkResponse) => {
+            // Cache the new response
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+            
+            return networkResponse;
+          })
+          .catch(() => {
+            // If network fails and not in cache, return offline page
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+            return new Response('Offline content not available');
+          });
       })
   );
 });
