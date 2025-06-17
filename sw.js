@@ -44,7 +44,11 @@ const ESSENTIAL_RESOURCES = [
   '/',
   '/index.html',
   '/index.js',
-  '/styles.css'
+  '/styles.css',
+  '/js/firebase-config.js',
+  '/js/audio-manager.js',
+  '/js/language-manager.js',
+  '/js/pwa-manager.js'
 ];
 
 // ===============================================
@@ -102,12 +106,15 @@ self.addEventListener('fetch', (event) => {
   // Skip Firebase and external API requests (let them go through)
   if (event.request.url.includes('firebase') || 
       event.request.url.includes('googleapis') ||
-      event.request.url.startsWith('https://apis.')) {
+      event.request.url.startsWith('https://apis.') ||
+      event.request.url.startsWith('https://www.gstatic.com/')) {
     return;
   }
   
-  // Network First strategy for HTML requests
-  if (event.request.mode === 'navigate') {
+  // Network First strategy for HTML and JavaScript requests
+  if (event.request.mode === 'navigate' || 
+      event.request.url.endsWith('.js') || 
+      event.request.url.includes('/js/')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -124,7 +131,10 @@ self.addEventListener('fetch', (event) => {
               if (response) {
                 return response;
               }
-              return caches.match('/index.html');
+              if (event.request.mode === 'navigate') {
+                return caches.match('/index.html');
+              }
+              return new Response('Offline content not available');
             });
         })
     );
