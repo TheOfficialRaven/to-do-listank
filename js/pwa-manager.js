@@ -92,24 +92,24 @@ let deferredPrompt = null;
 let serviceWorkerRegistration = null;
 
 // Service Worker regisztráció az index.js-ben történik
-// if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.register('./sw.js')
-//     .then(registration => {
-//       console.log('ServiceWorker regisztrálva:', registration.scope);
-//       serviceWorkerRegistration = registration;
-//       
-//       // Új service worker telepítése esetén
-//       registration.addEventListener('updatefound', () => {
-//         const newWorker = registration.installing;
-//         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-//           console.log('Új verzió elérhető!');
-//         }
-//       });
-//     })
-//     .catch(err => {
-//       console.error('ServiceWorker regisztrációs hiba:', err);
-//     });
-// }
+ if ('serviceWorker' in navigator) {
+   navigator.serviceWorker.register('./sw.js')
+     .then(registration => {
+       console.log('ServiceWorker regisztrálva:', registration.scope);
+       serviceWorkerRegistration = registration;
+       
+       // Új service worker telepítése esetén
+       registration.addEventListener('updatefound', () => {
+         const newWorker = registration.installing;
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+           console.log('Új verzió elérhető!');
+         }
+       });
+     })
+     .catch(err => {
+       console.error('ServiceWorker regisztrációs hiba:', err);
+     });
+ }
 
 // PWA Install Event
 window.addEventListener('beforeinstallprompt', (e) => {
