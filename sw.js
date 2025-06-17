@@ -8,40 +8,43 @@ const OFFLINE_CACHE = 'todo-offline-v2.2.0';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
-  './index.html',
-  './index.js',
-  './styles.css',
-  './css/modern-themes.css',
-  './css/base.css',
-  './css/navigation.css',
-  './css/animations.css',
-  './css/auth.css',
-  './css/components.css',
-  './css/dashboard.css',
-  './css/lists.css',
-  './css/media.css',
-  './css/modals.css',
-  './css/themes.css',
-  './css/unmatched.css',
-  './js/firebase-config.js',
-  './js/audio-manager.js',
-  './js/language-manager.js',
-  './js/pwa-manager.js',
-  './manifest.json',
-  './favicon-16x16.png',
-  './favicon-32x32.png',
-  './android-chrome-192x192.png',
-  './android-chrome-512x512.png',
-  './apple-touch-icon.png',
-  './languages/hu.json',
-  './languages/en.json',
-  './languages/de.json'
+  '/',
+  '/index.html',
+  '/index.js',
+  '/styles.css',
+  '/css/modern-themes.css',
+  '/css/base.css',
+  '/css/navigation.css',
+  '/css/animations.css',
+  '/css/auth.css',
+  '/css/components.css',
+  '/css/dashboard.css',
+  '/css/lists.css',
+  '/css/media.css',
+  '/css/modals.css',
+  '/css/themes.css',
+  '/css/unmatched.css',
+  '/js/firebase-config.js',
+  '/js/audio-manager.js',
+  '/js/language-manager.js',
+  '/js/pwa-manager.js',
+  '/manifest.json',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  '/apple-touch-icon.png',
+  '/languages/hu.json',
+  '/languages/en.json',
+  '/languages/de.json'
 ];
 
 // Essential resources for offline functionality
 const ESSENTIAL_RESOURCES = [
-  './index.html',
-  './index.js'
+  '/',
+  '/index.html',
+  '/index.js',
+  '/styles.css'
 ];
 
 // ===============================================
@@ -50,8 +53,22 @@ const ESSENTIAL_RESOURCES = [
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker installing...');
   
-  // Skip waiting to activate immediately
-  event.waitUntil(self.skipWaiting());
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('📦 Caching essential resources');
+        return cache.addAll(ESSENTIAL_RESOURCES);
+      })
+      .then(() => {
+        console.log('📦 Caching additional resources');
+        return caches.open(CACHE_NAME)
+          .then((cache) => cache.addAll(CACHE_RESOURCES));
+      })
+      .then(() => {
+        console.log('✅ Service Worker installed successfully');
+        return self.skipWaiting();
+      })
+  );
 });
 
 // ===============================================
@@ -89,31 +106,51 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Cache First strategy
+  // Network First strategy for HTML requests
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request)
+            .then((response) => {
+              if (response) {
+                return response;
+              }
+              return caches.match('/index.html');
+            });
+        })
+    );
+    return;
+  }
+  
+  // Cache First strategy for other requests
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached response if found
         if (response) {
           return response;
         }
         
-        // If not in cache, fetch from network
         return fetch(event.request)
           .then((networkResponse) => {
-            // Cache the new response
             const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-            
             return networkResponse;
           })
           .catch(() => {
-            // If network fails and not in cache, return offline page
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
+            if (event.request.destination === 'image') {
+              return caches.match('/android-chrome-192x192.png');
             }
             return new Response('Offline content not available');
           });

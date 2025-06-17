@@ -2,8 +2,21 @@
 <html lang="hu" id="html-root">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Privát Teendőlista & Bevásárlólista</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#10B981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TodoApp">
+  <meta name="description" content="Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support.">
+  
+  <!-- PWA Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
   
   <!-- IMMEDIATE JAVASCRIPT TEST -->
   <script>
@@ -16,19 +29,14 @@
     console.log('🔴 testFunction defined in HTML');
   </script>
   
-  <!-- Link a manifest fájlhoz (PWA támogatás) -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  
   <!-- Google Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
   <!-- SortableJS könyvtár (globális változóként elérhető) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   
   <!-- Saját stíluslapok -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
@@ -643,8 +651,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Firebase modulokat importáló script - ÁTHELYEZVE A FÁJL VÉGÉRE -->
 
   <!-- Lebegő gyors hozzáadás gomb -->
   <div id="quick-add-fab" class="quick-add-fab" style="display: none;">
