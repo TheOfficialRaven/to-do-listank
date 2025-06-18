@@ -13,6 +13,37 @@ import {
 
 console.log('📦 Firebase imports loaded successfully');
 
+// Ellenőrizzük, hogy minden Firebase függvény elérhető
+console.log('🔍 Firebase functions check:');
+console.log('  - initializeApp:', typeof initializeApp);
+console.log('  - getDatabase:', typeof getDatabase);
+console.log('  - getAuth:', typeof getAuth);
+
+if (typeof initializeApp === 'undefined') {
+  console.error('❌ CRITICAL: initializeApp is undefined! Firebase modules failed to load.');
+  
+  // Fallback error message for user
+  setTimeout(() => {
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; 
+      background: #ff4444; color: white; padding: 15px; 
+      text-align: center; z-index: 9999; font-family: Arial;
+      font-size: 16px;
+    `;
+    errorDiv.innerHTML = `
+      ❌ Firebase betöltési hiba! Ellenőrizd az internetkapcsolatot és frissítsd az oldalt.
+      <button onclick="location.reload()" style="margin-left: 10px; padding: 8px 15px; background: white; color: #ff4444; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        🔄 Frissítés
+      </button>
+    `;
+    document.body.insertBefore(errorDiv, document.body.firstChild);
+  }, 2000);
+  
+  // Stop execution
+  throw new Error('Firebase modules failed to load');
+}
+
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
   apiKey: "AIzaSyBLrDOTSC_bA1mxQpaIfyAz-Eyan26TVT0",

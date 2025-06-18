@@ -989,6 +989,50 @@
     console.log('🔴 DOM ready state:', document.readyState);
     console.log('🔴 Module support:', 'noModule' in HTMLScriptElement.prototype);
     
+    // Simple test to verify page responsiveness
+    window.simpleTest = function() {
+      console.log('🧪 SIMPLE PAGE TEST');
+      console.log('==================');
+      
+      // Check auth section
+      const authSection = document.getElementById('auth-section');
+      const loginBtn = document.getElementById('login-btn');
+      const registerBtn = document.getElementById('register-btn');
+      
+      console.log('Auth elements found:');
+      console.log('  - authSection:', !!authSection);
+      console.log('  - loginBtn:', !!loginBtn);
+      console.log('  - registerBtn:', !!registerBtn);
+      
+      if (authSection) {
+        console.log('  - authSection display:', getComputedStyle(authSection).display);
+        console.log('  - authSection visibility:', getComputedStyle(authSection).visibility);
+      }
+      
+      // Test basic interaction
+      if (loginBtn) {
+        console.log('✅ Login button found - testing click');
+        loginBtn.style.border = '3px solid red';
+        loginBtn.onclick = () => {
+          alert('Login button works! The page is responsive.');
+          loginBtn.style.border = '';
+        };
+        console.log('👆 Click the login button to test responsiveness');
+      }
+      
+      return {
+        authExists: !!authSection,
+        buttonsExist: !!(loginBtn && registerBtn),
+        pageResponsive: true
+      };
+    };
+    
+    // Auto-run test after 2 seconds
+    setTimeout(() => {
+      console.log('🔄 Auto-running simple test...');
+      window.simpleTest();
+    }, 2000);
+    
     window.addEventListener('load', () => {
       console.log('🟢 Window loaded');
     });
@@ -1003,6 +1047,11 @@
       console.error('🔴 Unhandled promise rejection:', e.reason);
     });
   </script>
+
+  <!-- Firebase SDK (script tags as fallback) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <!-- Saját JavaScript modulok -->
   <script type="module" src="/js/firebase-config.js"></script>
