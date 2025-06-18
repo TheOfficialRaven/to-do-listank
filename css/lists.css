@@ -1,69 +1,96 @@
-/* Modern Professional To-Do List - List Styles */
-
-/* Lists Container */
-#lists-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+/* lists.css */
+#new-list-section input {
   padding: 1rem;
-  transition: all 0.3s ease;
+  margin: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  font-size: clamp(14px, 1.5vw, 18px);
+  color: var(--text-primary);
+  box-sizing: border-box;
 }
 
-#lists-container.reorder-enabled {
-  position: relative;
+#new-list-section button {
+  padding: 1rem 2rem;
+  margin: 0.5rem;
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: clamp(14px, 1.5vw, 18px);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#new-list-section button:hover {
+  opacity: 0.9;
+}
+
+#new-list-section select {
+  padding: 0.75rem;
+  margin: 0.5rem;
+  font-size: 1.2rem;
 }
 
 #lists-container.reorder-enabled::before {
-  content: '';
+  content: "📝 Átrendezési mód aktív - Húzd a listákat új pozícióba!";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(16, 185, 129, 0.1);
-  border: 2px dashed var(--accent-primary);
-  border-radius: 12px;
-  pointer-events: none;
-  animation: pulse-glow 2s infinite;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
+  padding: 5px 15px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 768px) {
+  #lists-container.reorder-enabled::before {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    display: block;
+    text-align: center;
+    margin-bottom: 1rem;
+    white-space: normal;
+    font-size: 0.8rem;
+  }
 }
 
 #lists-container.reorder-enabled .list-box {
-  cursor: move;
-  transform: scale(0.98);
-  transition: all 0.2s ease;
+  cursor: grab;
+  transition: all 0.3s ease;
+  border: 2px solid #10B981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 #lists-container.reorder-enabled .list-box::after {
-  content: '⋮⋮';
+  content: "↕️";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  color: var(--accent-primary);
-  opacity: 0.5;
-  pointer-events: none;
+  top: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+  opacity: 0.7;
 }
 
 #lists-container.reorder-enabled .list-box:hover {
-  transform: scale(1);
-  z-index: 1;
+  transform: scale(1.03) rotate(1deg);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  border-color: #059669;
 }
 
 #lists-container.reorder-enabled .list-box:active {
-  transform: scale(0.95);
-  z-index: 2;
-}
-
-/* List Box */
-.list-box {
-  background: var(--bg-secondary);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: var(--box-shadow-primary);
-  position: relative;
-  transition: all 0.3s ease;
-  overflow: hidden;
+  cursor: grabbing;
+  transform: scale(1.05) rotate(-1deg);
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.6);
 }
 
 .list-box::before {
@@ -74,95 +101,43 @@
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 .list-box:hover::before {
-  opacity: 1;
+  transform: scaleX(1);
 }
 
 .list-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 48px var(--box-shadow-primary, rgba(16,185,129,0.22));
-}
-
-/* List Header */
-.header-icons {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.list-box h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.list-title {
-  flex: 1;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15);
 }
 
 .inline-edit-input {
+  padding: 0.55rem;
+  margin: 0.5rem 0;
   width: 100%;
-  padding: 0.5rem;
-  border: 2px solid var(--accent-primary);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.title-icons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.title-icons button {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.title-icons button:hover {
-  color: var(--accent-primary);
-}
-
-/* List Items */
-.list-box .item-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  transition: all 0.2s ease;
+  border: 1px solid #10B981;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #1F2937;
+  color: #F8FAFC;
 }
 
 .list-box .item-add-btn {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent-primary);
+  padding: 0.75rem 1.5rem;
+  background-color: var(--accent-primary);
   color: var(--bg-primary);
-  font-weight: 600;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 .list-box .item-add-btn:hover {
-  background: var(--accent-secondary);
+  opacity: 0.9;
 }
 
 .list-box ul {
@@ -174,17 +149,19 @@
 .list-box li {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  background-color: var(--bg-tertiary);
   padding: 0.75rem;
-  border-radius: 8px;
-  background: var(--bg-tertiary);
   margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .list-box li.done span.item-text {
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .list-box .icons {
@@ -193,231 +170,55 @@
 }
 
 .list-box .material-icons {
-  font-size: 1.2rem;
-  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  color: var(--accent-primary);
+  font-size: 1.5rem;
 }
 
 .list-box .material-icons:hover {
-  color: var(--accent-primary);
-}
-
-.list-box .delete-list-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0.5rem;
-  border-radius: 50%;
+  color: var(--accent-secondary);
 }
 
 .list-box .edit-title-btn {
-  background: none;
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: transparent;
   border: none;
-  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0.5rem;
-  border-radius: 50%;
-}
-
-/* Sortable Ghost */
-.sortable-ghost {
-  opacity: 0.5;
-  background: var(--bg-tertiary);
-  border: 2px dashed var(--accent-primary);
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  #lists-container {
-    grid-template-columns: 1fr;
-  }
-
-  .list-box {
-    padding: 1rem;
-  }
-
-  .list-box h2 {
-    font-size: 1.2rem;
-  }
-
-  .list-box .item-input,
-  .list-box .item-add-btn {
-    padding: 0.5rem;
-  }
-
-  .list-box li {
-    padding: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  #lists-container {
-    padding: 0.5rem;
-  }
-
-  .list-box {
-    padding: 0.75rem;
-  }
-
-  .list-box h2 {
-    font-size: 1.1rem;
-  }
-
-  .list-box .icons {
-    gap: 0.25rem;
-  }
-
-  .list-box .material-icons {
-    font-size: 1rem;
-  }
-}
-
-/* New List Section */
-#new-list-section {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--box-shadow-primary);
-}
-
-#new-list-section input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--bg-tertiary);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-#filter-category {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--bg-tertiary);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-#new-list-section button {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: var(--bg-primary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-#new-list-section button:hover {
-  transform: translateY(-2px);
-}
-
-#new-list-section select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--bg-tertiary);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-/* Reorder Button */
-.reorder-btn {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-}
-
-.reorder-btn::before {
-  content: '⋮⋮';
   font-size: 1.2rem;
-  letter-spacing: -2px;
+  color: var(--accent-primary);
 }
 
-.reorder-btn:hover {
-  background: var(--accent-primary);
+.quick-add-fab .material-icons {
   color: var(--bg-primary);
+  font-size: 28px;
 }
 
-.reorder-btn.active {
-  background: var(--accent-primary);
-  color: var(--bg-primary);
-  font-weight: 600;
-  box-shadow: var(--box-shadow-primary);
+.nav-control-btn .material-icons {
+  font-size: 18px;
 }
 
-.reorder-btn.active::before {
-  content: '✓';
-  letter-spacing: 0;
+.pwa-floating-btn .material-icons {
+  color: white;
+  font-size: 28px;
 }
 
-.reorder-btn.active:hover {
-  background: var(--accent-secondary);
-}
-
-/* Custom New List Button */
-#custom-new-list-btn {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: var(--bg-primary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: var(--box-shadow-primary);
-}
-
-#custom-new-list-btn:hover {
-  transform: translateY(-2px);
-}
-
-#custom-new-list-btn:active {
-  transform: translateY(0);
+.unlock-prompt .material-icons {
+  font-size: 2.5rem;
+  color: var(--accent-primary);
+  margin-bottom: 0.5rem;
 }
 
 #custom-new-list-btn .material-icons {
+  font-size: 20px;
+}
+
+.event-notification-icon .material-icons {
+  font-size: 3rem;
+  color: white;
+}
+
+.event-notification-time .material-icons {
   font-size: 1.2rem;
-}
-
-/* Lists Control Panel */
-.lists-control-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-}
-
-@media (max-width: 768px) {
-  .lists-control-panel {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }

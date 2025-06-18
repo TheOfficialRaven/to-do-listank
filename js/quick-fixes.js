@@ -1,12 +1,12 @@
 // Quick Fixes Module for Language Keys and UI Issues
-console.log('🔧 Quick Fixes module loading...');
+
 
 // Import language manager
 import { getText, updateUITexts } from './language-manager.js';
 
 // Fix language key display by replacing common keys with actual text
 function fixLanguageKeys() {
-  console.log('🔧 Fixing language key displays...');
+  
   
   // Replace common language keys with actual text
   const replacements = {
@@ -63,7 +63,7 @@ function fixLanguageKeys() {
     }
   });
   
-  console.log('✅ Language keys fixed');
+  
 }
 
 // Fix calendar display specifically
@@ -146,12 +146,12 @@ function observeAndFix() {
     characterData: true
   });
   
-  console.log('🔧 DOM observer started for language fixes');
+  
 }
 
 // Initialize fixes
 function initQuickFixes() {
-  console.log('🔧 Initializing quick fixes...');
+  
   
   // Run immediate fixes
   setTimeout(() => {
@@ -181,7 +181,7 @@ function initQuickFixes() {
     fixLanguageKeys();
   }, 5000);
   
-  console.log('✅ Quick fixes initialized');
+  
 }
 
 // Auto-initialize when DOM is ready
@@ -197,7 +197,7 @@ window.fixCalendarDisplay = fixCalendarDisplay;
 window.fixNotesDisplay = fixNotesDisplay;
 window.fixOverviewDisplay = fixOverviewDisplay;
 
-console.log('✅ Quick Fixes module loaded successfully');
+
 
 export { 
   fixLanguageKeys, 

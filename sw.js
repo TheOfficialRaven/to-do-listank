@@ -3,37 +3,53 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.1.1';
-const OFFLINE_CACHE = 'todo-offline-v2.1.0';
+const CACHE_NAME = 'todo-app-v2.3.0';
+const OFFLINE_CACHE = 'todo-offline-v2.3.0';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
-  './',
-  './index.html',
-  './index.js',
-  './styles.css',
-  './index.css',
-  './modern-themes.css',
-  './css/variables.css',
-  './css/base.css',
-  './css/navigation.css',
-  './manifest.json',
-  './favicon-16x16.png',
-  './favicon-32x32.png',
-  './android-chrome-192x192.png',
-  './android-chrome-512x512.png',
-  './apple-touch-icon.png',
-  './languages/hu.json',
-  './languages/en.json',
-  './languages/de.json'
+  '/?v=2.3.0',
+  '/index.html?v=2.3.0',
+  '/index.js?v=2.3.0',
+  '/styles.css?v=2.3.0',
+  '/css/modern-themes.css?v=2.3.0',
+  '/css/base.css?v=2.3.0',
+  '/css/navigation.css?v=2.3.0',
+  '/css/animations.css?v=2.3.0',
+  '/css/auth.css?v=2.3.0',
+  '/css/components.css?v=2.3.0',
+  '/css/dashboard.css?v=2.3.0',
+  '/css/lists.css?v=2.3.0',
+  '/css/media.css?v=2.3.0',
+  '/css/modals.css?v=2.3.0',
+  '/css/themes.css?v=2.3.0',
+  '/css/unmatched.css?v=2.3.0',
+  '/js/firebase-config.js?v=2.3.0',
+  '/js/audio-manager.js?v=2.3.0',
+  '/js/language-manager.js?v=2.3.0',
+  '/js/pwa-manager.js?v=2.3.0',
+  '/manifest.json?v=2.3.0',
+  '/site.webmanifest?v=2.3.0',
+  '/favicon-16x16.png?v=2.3.0',
+  '/favicon-32x32.png?v=2.3.0',
+  '/android-chrome-192x192.png?v=2.3.0',
+  '/android-chrome-512x512.png?v=2.3.0',
+  '/apple-touch-icon.png?v=2.3.0',
+  '/languages/hu.json?v=2.3.0',
+  '/languages/en.json?v=2.3.0',
+  '/languages/de.json?v=2.3.0'
 ];
 
 // Essential resources for offline functionality
 const ESSENTIAL_RESOURCES = [
-  './',
-  './index.html',
-  './index.js',
-  './index.css'
+  '/?v=2.3.0',
+  '/index.html?v=2.3.0',
+  '/index.js?v=2.3.0',
+  '/styles.css?v=2.3.0',
+  '/js/firebase-config.js?v=2.3.0',
+  '/js/audio-manager.js?v=2.3.0',
+  '/js/language-manager.js?v=2.3.0',
+  '/js/pwa-manager.js?v=2.3.0'
 ];
 
 // ===============================================
@@ -43,22 +59,20 @@ self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker installing...');
   
   event.waitUntil(
-    Promise.all([
-      // Cache essential resources
-      caches.open(CACHE_NAME).then((cache) => {
-        console.log('📦 Caching app resources');
-        return cache.addAll(CACHE_RESOURCES);
-      }),
-      
-      // Cache offline fallbacks
-      caches.open(OFFLINE_CACHE).then((cache) => {
-        console.log('📦 Caching offline resources');
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('📦 Caching essential resources');
         return cache.addAll(ESSENTIAL_RESOURCES);
-      }),
-      
-      // Skip waiting to activate immediately
-      self.skipWaiting()
-    ])
+      })
+      .then(() => {
+        console.log('📦 Caching additional resources');
+        return caches.open(CACHE_NAME)
+          .then((cache) => cache.addAll(CACHE_RESOURCES));
+      })
+      .then(() => {
+        console.log('✅ Service Worker installed successfully');
+        return self.skipWaiting();
+      })
   );
 });
 
@@ -70,19 +84,7 @@ self.addEventListener('activate', (event) => {
   
   event.waitUntil(
     Promise.all([
-      // Clean up old caches
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName !== CACHE_NAME && cacheName !== OFFLINE_CACHE)
-            .map((cacheName) => {
-              console.log('🗑️ Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-        );
-      }),
-      
-      // Take control of all clients immediately
+      clearOldCaches(),
       self.clients.claim()
     ])
   );
@@ -105,45 +107,71 @@ self.addEventListener('fetch', (event) => {
   // Skip Firebase and external API requests (let them go through)
   if (event.request.url.includes('firebase') || 
       event.request.url.includes('googleapis') ||
-      event.request.url.startsWith('https://apis.')) {
+      event.request.url.startsWith('https://apis.') ||
+      event.request.url.startsWith('https://www.gstatic.com/')) {
     return;
   }
   
+  // Network First strategy for HTML and JavaScript requests
+  if (event.request.mode === 'navigate' || 
+      event.request.url.endsWith('.js') || 
+      event.request.url.includes('/js/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request)
+            .then((response) => {
+              if (response) {
+                return response;
+              }
+              if (event.request.mode === 'navigate') {
+                return caches.match('/index.html?v=2.3.0');
+              }
+              return new Response('Offline content not available');
+            });
+        })
+    );
+    return;
+  }
+  
+  // Cache First strategy for other requests
   event.respondWith(
     caches.match(event.request)
-      .then((cachedResponse) => {
-        // Return cached version if available
-        if (cachedResponse) {
-          return cachedResponse;
+      .then((response) => {
+        if (response) {
+          return response;
         }
         
-        // Try network request
         return fetch(event.request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+          .then((networkResponse) => {
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+              return networkResponse;
             }
             
-            // Clone response for caching
-            const responseToCache = response.clone();
-            
-            // Cache successful responses
+            const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-            
-            return response;
+            return networkResponse;
           })
           .catch(() => {
-            // Network failed, try to serve offline fallback
-            if (event.request.destination === 'document') {
-              return caches.match('./index.html');
+            if (event.request.destination === 'image') {
+              return caches.match('/android-chrome-192x192.png?v=2.3.0');
             }
-            
-            // For other resources, return from offline cache
-            return caches.match(event.request, { cacheName: OFFLINE_CACHE });
+            return new Response('Offline content not available');
           });
       })
   );
@@ -158,8 +186,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: '📅 Event Reminder',
     body: 'You have an upcoming event',
-    icon: './android-chrome-192x192.png',
-    badge: './favicon-32x32.png',
+    icon: './android-chrome-192x192.png?v=2.3.0',
+    badge: './favicon-32x32.png?v=2.3.0',
     tag: 'event-reminder',
     data: {
       url: './',
@@ -169,16 +197,16 @@ self.addEventListener('push', (event) => {
       {
         action: 'view',
         title: '👀 View',
-        icon: './favicon-16x16.png'
+        icon: './favicon-16x16.png?v=2.3.0'
       },
       {
         action: 'snooze',
         title: '⏰ Snooze 5min',
-        icon: './favicon-16x16.png'
+        icon: './favicon-16x16.png?v=2.3.0'
       }
     ],
     requireInteraction: true,
-    vibrate: [200, 100, 200, 100, 200],
+    vibrate: [200, 100, 200],
     sound: 'default'
   };
   
@@ -231,8 +259,8 @@ self.addEventListener('notificationclick', (event) => {
             `⏰ Snoozed: ${snoozeData.originalTitle}`,
             {
               body: snoozeData.originalBody,
-              icon: './android-chrome-192x192.png',
-              badge: './favicon-32x32.png',
+              icon: './android-chrome-192x192.png?v=2.3.0',
+              badge: './favicon-32x32.png?v=2.3.0',
               tag: `snooze-${Date.now()}`,
               requireInteraction: true,
               vibrate: [200, 100, 200],
@@ -241,12 +269,12 @@ self.addEventListener('notificationclick', (event) => {
                 {
                   action: 'snooze',
                   title: '⏰ Snooze again',
-                  icon: './favicon-16x16.png'
+                  icon: './favicon-16x16.png?v=2.3.0'
                 },
                 {
                   action: 'dismiss',
                   title: '✅ Dismiss',
-                  icon: './favicon-16x16.png'
+                  icon: './favicon-16x16.png?v=2.3.0'
                 }
               ]
             }
@@ -313,8 +341,8 @@ function scheduleSnoozeNotification(data) {
     setTimeout(() => {
       self.registration.showNotification('⏰ Snoozed Reminder', {
         body: 'Your snoozed event is now due',
-        icon: './android-chrome-192x192.png',
-        badge: './favicon-32x32.png',
+        icon: './android-chrome-192x192.png?v=2.3.0',
+        badge: './favicon-32x32.png?v=2.3.0',
         tag: 'snoozed-reminder',
         data: data,
         requireInteraction: true,
@@ -382,8 +410,8 @@ async function checkScheduledNotifications() {
         // Show notification
         await self.registration.showNotification(event.title, {
           body: event.body,
-          icon: './android-chrome-192x192.png',
-          badge: './favicon-32x32.png',
+          icon: './android-chrome-192x192.png?v=2.3.0',
+          badge: './favicon-32x32.png?v=2.3.0',
           tag: `event-${event.id}`,
           data: event.data,
           requireInteraction: true,
@@ -508,13 +536,38 @@ function scheduleNotificationFromData(data) {
   console.log('📅 Scheduling notification:', data);
 }
 
-// Clear all caches
+// Add cache clearing function - only clear old caches
+async function clearOldCaches() {
+  console.log('🧹 Clearing old caches...');
+  const cacheNames = await caches.keys();
+  const currentCaches = [CACHE_NAME, OFFLINE_CACHE];
+  
+  await Promise.all(
+    cacheNames.map(cacheName => {
+      // Only delete caches that are not current
+      if (!currentCaches.includes(cacheName)) {
+        console.log('🗑️ Deleting old cache:', cacheName);
+        return caches.delete(cacheName);
+      } else {
+        console.log('✅ Keeping current cache:', cacheName);
+        return Promise.resolve();
+      }
+    })
+  );
+  console.log('✅ Old caches cleared');
+}
+
+// Keep the original clearAllCaches for manual use
 async function clearAllCaches() {
+  console.log('🧹 Clearing ALL caches...');
   const cacheNames = await caches.keys();
   await Promise.all(
-    cacheNames.map(cacheName => caches.delete(cacheName))
+    cacheNames.map(cacheName => {
+      console.log('🗑️ Deleting cache:', cacheName);
+      return caches.delete(cacheName);
+    })
   );
-  console.log('🗑️ All caches cleared');
+  console.log('✅ All caches cleared');
 }
 
 console.log('✅ Service Worker fully loaded and ready'); 
