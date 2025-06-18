@@ -121,7 +121,7 @@ window.clearPWAState = function() {
 // Test hogy a függvények elérhetők-e
 console.log('✅ IMMEDIATE PWA functions defined successfully!');
 console.log('🔧 Test immediately: debugPWA()');
-console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA()');
+console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA(), testApp()');
 
 // Immediate test
 setTimeout(() => {
@@ -130,6 +130,22 @@ setTimeout(() => {
     console.log('✅ debugPWA function is accessible');
   } else {
     console.error('❌ debugPWA function is NOT accessible');
+  }
+  
+  // Auth elemek ellenőrzése
+  const authSection = document.getElementById('auth-section');
+  const loginBtn = document.getElementById('login-btn');
+  
+  console.log('🔍 Quick Auth Check:');
+  console.log('  - authSection exists:', !!authSection);
+  console.log('  - authSection visible:', authSection ? getComputedStyle(authSection).display !== 'none' : 'N/A');
+  console.log('  - loginBtn exists:', !!loginBtn);
+  console.log('  - Firebase auth loaded:', typeof auth !== 'undefined');
+  
+  if (!authSection || !loginBtn) {
+    console.error('❌ CRITICAL: Auth elements missing from DOM!');
+  } else {
+    console.log('✅ Auth elements found in DOM');
   }
 }, 1000);
 
@@ -3180,55 +3196,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('  hidePWAButton() - Hide install button');
   console.log('  debugPWA() - Show PWA debug info');
   console.log('  installPWA() - Trigger install dialog');
-
-// ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
-// Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
-window.showPWAButton = function() {
-  const container = document.getElementById('pwa-floating-install');
-  if (container) {
-    container.style.display = 'block';
-    console.log('🔧 IMMEDIATE: PWA button shown');
-  } else {
-    console.error('❌ PWA container not found! DOM might not be ready yet.');
-    console.log('💡 Try calling this function after page load');
-  }
-};
-
-window.hidePWAButton = function() {
-  const container = document.getElementById('pwa-floating-install');
-  if (container) {
-    container.style.display = 'none';
-    console.log('🔧 IMMEDIATE: PWA button hidden');
-  } else {
-    console.error('❌ PWA container not found! DOM might not be ready yet.');
-  }
-};
-
-window.debugPWA = function() {
-  const container = document.getElementById('pwa-floating-install');
-  const btn = document.getElementById('pwa-install-btn');
-  console.log('🔧 IMMEDIATE PWA DEBUG:');
-  console.log('  - container found:', !!container);
-  console.log('  - button found:', !!btn);
-  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
-  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
-  console.log('  - container display:', container ? container.style.display : 'N/A');
-  console.log('  - DOM ready:', document.readyState);
-};
-
-window.installPWA = function() {
-  const installBtn = document.getElementById('pwa-install-btn');
-  if (installBtn) {
-    installBtn.click();
-    console.log('🔧 IMMEDIATE: PWA install triggered');
-  } else {
-    console.error('❌ PWA install button not found! DOM might not be ready yet.');
-  }
-};
-
-// Test hogy a függvények elérhetők-e
-console.log('✅ Immediate PWA functions defined');
-console.log('🔧 Test now: debugPWA()');
   
   // ⚠️ AUDIO STATUS TESZTELŐ ELTÁVOLÍTVA
   console.log('🧹 Audio status checker removed for production');
@@ -5954,4 +5921,53 @@ function stopSnoozeMonitoring() {
     console.log('Snooze monitoring stopped');
   }
 }
+
+// Test funkció az alkalmazás működésének ellenőrzéséhez
+window.testApp = function() {
+  console.log('🧪 APP FUNCTIONALITY TEST');
+  console.log('========================');
+  
+  // DOM elemek tesztelése
+  const authSection = document.getElementById('auth-section');
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('auth-password-input');
+  
+  console.log('🔍 AUTH ELEMENTS CHECK:');
+  console.log('  - authSection:', !!authSection, authSection ? `(display: ${getComputedStyle(authSection).display})` : '');
+  console.log('  - loginBtn:', !!loginBtn);
+  console.log('  - registerBtn:', !!registerBtn);
+  console.log('  - emailInput:', !!emailInput);
+  console.log('  - passwordInput:', !!passwordInput);
+  
+  // Firebase tesztelése
+  console.log('🔥 FIREBASE CHECK:');
+  console.log('  - auth available:', typeof auth !== 'undefined');
+  console.log('  - db available:', typeof db !== 'undefined');
+  console.log('  - current user:', auth ? auth.currentUser : 'N/A');
+  
+  // Eseménykezelők tesztelése
+  console.log('🎯 EVENT HANDLERS CHECK:');
+  if (loginBtn) {
+    const hasClickHandler = loginBtn.onclick !== null || loginBtn.hasAttribute('data-has-listener');
+    console.log('  - Login button has handler:', hasClickHandler);
+  }
+  
+  // Modul betöltés tesztelése
+  console.log('📦 MODULE FUNCTIONS CHECK:');
+  console.log('  - showPWAButton:', typeof window.showPWAButton);
+  console.log('  - debugPWA:', typeof window.debugPWA);
+  console.log('  - testApp:', typeof window.testApp);
+  
+  console.log('========================');
+  console.log('✅ Test completed. Check the results above.');
+  
+  return {
+    authSection: !!authSection,
+    loginBtn: !!loginBtn,
+    firebaseAuth: typeof auth !== 'undefined',
+    functionsLoaded: typeof window.showPWAButton !== 'undefined'
+  };
+};
 
