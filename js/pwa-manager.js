@@ -93,7 +93,10 @@ let serviceWorkerRegistration = null;
 
 // Service Worker regisztráció az index.js-ben történik
  if ('serviceWorker' in navigator) {
-   navigator.serviceWorker.register('./sw.js')
+   // Add cache-busting parameter for Netlify
+   const swUrl = './sw.js?v=' + Date.now();
+   
+   navigator.serviceWorker.register(swUrl)
      .then(registration => {
        console.log('ServiceWorker regisztrálva:', registration.scope);
        serviceWorkerRegistration = registration;

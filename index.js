@@ -144,7 +144,10 @@ let serviceWorkerRegistration = null;
 // Service Worker regisztrálása
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    // Add cache-busting parameter for Netlify
+    const swUrl = './sw.js?v=' + Date.now();
+    
+    navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.log('✅ Service Worker registered successfully:', registration.scope);
         serviceWorkerRegistration = registration;
@@ -2548,7 +2551,10 @@ hamburgerIcon.addEventListener("click", () => {
 // Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    // Add cache-busting parameter for Netlify
+    const swUrl = './sw.js?v=' + Date.now();
+    
+    navigator.serviceWorker.register(swUrl)
       .then(registration => {
         console.log('ServiceWorker regisztrálva:', registration.scope);
       })

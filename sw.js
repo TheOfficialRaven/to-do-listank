@@ -3,52 +3,53 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.2.0';
-const OFFLINE_CACHE = 'todo-offline-v2.2.0';
+const CACHE_NAME = 'todo-app-v2.3.0';
+const OFFLINE_CACHE = 'todo-offline-v2.3.0';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
-  '/',
-  '/index.html',
-  '/index.js',
-  '/styles.css',
-  '/css/modern-themes.css',
-  '/css/base.css',
-  '/css/navigation.css',
-  '/css/animations.css',
-  '/css/auth.css',
-  '/css/components.css',
-  '/css/dashboard.css',
-  '/css/lists.css',
-  '/css/media.css',
-  '/css/modals.css',
-  '/css/themes.css',
-  '/css/unmatched.css',
-  '/js/firebase-config.js',
-  '/js/audio-manager.js',
-  '/js/language-manager.js',
-  '/js/pwa-manager.js',
-  '/manifest.json',
-  '/favicon-16x16.png',
-  '/favicon-32x32.png',
-  '/android-chrome-192x192.png',
-  '/android-chrome-512x512.png',
-  '/apple-touch-icon.png',
-  '/languages/hu.json',
-  '/languages/en.json',
-  '/languages/de.json'
+  '/?v=2.3.0',
+  '/index.html?v=2.3.0',
+  '/index.js?v=2.3.0',
+  '/styles.css?v=2.3.0',
+  '/css/modern-themes.css?v=2.3.0',
+  '/css/base.css?v=2.3.0',
+  '/css/navigation.css?v=2.3.0',
+  '/css/animations.css?v=2.3.0',
+  '/css/auth.css?v=2.3.0',
+  '/css/components.css?v=2.3.0',
+  '/css/dashboard.css?v=2.3.0',
+  '/css/lists.css?v=2.3.0',
+  '/css/media.css?v=2.3.0',
+  '/css/modals.css?v=2.3.0',
+  '/css/themes.css?v=2.3.0',
+  '/css/unmatched.css?v=2.3.0',
+  '/js/firebase-config.js?v=2.3.0',
+  '/js/audio-manager.js?v=2.3.0',
+  '/js/language-manager.js?v=2.3.0',
+  '/js/pwa-manager.js?v=2.3.0',
+  '/manifest.json?v=2.3.0',
+  '/site.webmanifest?v=2.3.0',
+  '/favicon-16x16.png?v=2.3.0',
+  '/favicon-32x32.png?v=2.3.0',
+  '/android-chrome-192x192.png?v=2.3.0',
+  '/android-chrome-512x512.png?v=2.3.0',
+  '/apple-touch-icon.png?v=2.3.0',
+  '/languages/hu.json?v=2.3.0',
+  '/languages/en.json?v=2.3.0',
+  '/languages/de.json?v=2.3.0'
 ];
 
 // Essential resources for offline functionality
 const ESSENTIAL_RESOURCES = [
-  '/',
-  '/index.html',
-  '/index.js',
-  '/styles.css',
-  '/js/firebase-config.js',
-  '/js/audio-manager.js',
-  '/js/language-manager.js',
-  '/js/pwa-manager.js'
+  '/?v=2.3.0',
+  '/index.html?v=2.3.0',
+  '/index.js?v=2.3.0',
+  '/styles.css?v=2.3.0',
+  '/js/firebase-config.js?v=2.3.0',
+  '/js/audio-manager.js?v=2.3.0',
+  '/js/language-manager.js?v=2.3.0',
+  '/js/pwa-manager.js?v=2.3.0'
 ];
 
 // ===============================================
@@ -83,7 +84,7 @@ self.addEventListener('activate', (event) => {
   
   event.waitUntil(
     Promise.all([
-      clearAllCaches(),
+      clearOldCaches(),
       self.clients.claim()
     ])
   );
@@ -136,7 +137,7 @@ self.addEventListener('fetch', (event) => {
                 return response;
               }
               if (event.request.mode === 'navigate') {
-                return caches.match('/index.html');
+                return caches.match('/index.html?v=2.3.0');
               }
               return new Response('Offline content not available');
             });
@@ -168,7 +169,7 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(() => {
             if (event.request.destination === 'image') {
-              return caches.match('/android-chrome-192x192.png');
+              return caches.match('/android-chrome-192x192.png?v=2.3.0');
             }
             return new Response('Offline content not available');
           });
@@ -185,8 +186,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: '📅 Event Reminder',
     body: 'You have an upcoming event',
-    icon: './android-chrome-192x192.png',
-    badge: './favicon-32x32.png',
+    icon: './android-chrome-192x192.png?v=2.3.0',
+    badge: './favicon-32x32.png?v=2.3.0',
     tag: 'event-reminder',
     data: {
       url: './',
@@ -196,12 +197,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'view',
         title: '👀 View',
-        icon: './favicon-16x16.png'
+        icon: './favicon-16x16.png?v=2.3.0'
       },
       {
         action: 'snooze',
         title: '⏰ Snooze 5min',
-        icon: './favicon-16x16.png'
+        icon: './favicon-16x16.png?v=2.3.0'
       }
     ],
     requireInteraction: true,
@@ -258,8 +259,8 @@ self.addEventListener('notificationclick', (event) => {
             `⏰ Snoozed: ${snoozeData.originalTitle}`,
             {
               body: snoozeData.originalBody,
-              icon: './android-chrome-192x192.png',
-              badge: './favicon-32x32.png',
+              icon: './android-chrome-192x192.png?v=2.3.0',
+              badge: './favicon-32x32.png?v=2.3.0',
               tag: `snooze-${Date.now()}`,
               requireInteraction: true,
               vibrate: [200, 100, 200],
@@ -268,12 +269,12 @@ self.addEventListener('notificationclick', (event) => {
                 {
                   action: 'snooze',
                   title: '⏰ Snooze again',
-                  icon: './favicon-16x16.png'
+                  icon: './favicon-16x16.png?v=2.3.0'
                 },
                 {
                   action: 'dismiss',
                   title: '✅ Dismiss',
-                  icon: './favicon-16x16.png'
+                  icon: './favicon-16x16.png?v=2.3.0'
                 }
               ]
             }
@@ -340,8 +341,8 @@ function scheduleSnoozeNotification(data) {
     setTimeout(() => {
       self.registration.showNotification('⏰ Snoozed Reminder', {
         body: 'Your snoozed event is now due',
-        icon: './android-chrome-192x192.png',
-        badge: './favicon-32x32.png',
+        icon: './android-chrome-192x192.png?v=2.3.0',
+        badge: './favicon-32x32.png?v=2.3.0',
         tag: 'snoozed-reminder',
         data: data,
         requireInteraction: true,
@@ -409,8 +410,8 @@ async function checkScheduledNotifications() {
         // Show notification
         await self.registration.showNotification(event.title, {
           body: event.body,
-          icon: './android-chrome-192x192.png',
-          badge: './favicon-32x32.png',
+          icon: './android-chrome-192x192.png?v=2.3.0',
+          badge: './favicon-32x32.png?v=2.3.0',
           tag: `event-${event.id}`,
           data: event.data,
           requireInteraction: true,
@@ -535,9 +536,30 @@ function scheduleNotificationFromData(data) {
   console.log('📅 Scheduling notification:', data);
 }
 
-// Add cache clearing function
+// Add cache clearing function - only clear old caches
+async function clearOldCaches() {
+  console.log('🧹 Clearing old caches...');
+  const cacheNames = await caches.keys();
+  const currentCaches = [CACHE_NAME, OFFLINE_CACHE];
+  
+  await Promise.all(
+    cacheNames.map(cacheName => {
+      // Only delete caches that are not current
+      if (!currentCaches.includes(cacheName)) {
+        console.log('🗑️ Deleting old cache:', cacheName);
+        return caches.delete(cacheName);
+      } else {
+        console.log('✅ Keeping current cache:', cacheName);
+        return Promise.resolve();
+      }
+    })
+  );
+  console.log('✅ Old caches cleared');
+}
+
+// Keep the original clearAllCaches for manual use
 async function clearAllCaches() {
-  console.log('🧹 Clearing all caches...');
+  console.log('🧹 Clearing ALL caches...');
   const cacheNames = await caches.keys();
   await Promise.all(
     cacheNames.map(cacheName => {
