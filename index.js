@@ -3,13 +3,13 @@ console.log('🟢 EXTERNAL JS FILE LOADING - index.js started');
 console.log('🟢 Script execution beginning at:', new Date().toLocaleTimeString());
 console.log('🟢 If you see this, the JS file is loading properly');
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
   getDatabase, ref, push, onValue, remove, set, get, query, orderByChild, update
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 console.log('📦 Firebase imports loaded successfully');
 
@@ -5220,14 +5220,17 @@ function updateManifestColors(themeName, themeMode) {
 }
 
 function updateDynamicManifest(backgroundColor, themeColor) {
+  // Get the current origin and path for absolute URLs
+  const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+  
   // Create dynamic manifest object
   const dynamicManifest = {
     "name": "Todo & Shopping List - Personal Organizer",
     "short_name": "TodoApp",
     "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
-    "version": "2.0.0",
-    "start_url": "./",
-    "scope": "./",
+    "version": "2.3.0",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "orientation": "any",
     "background_color": backgroundColor,
@@ -5237,31 +5240,31 @@ function updateDynamicManifest(backgroundColor, themeColor) {
     "dir": "ltr",
     "icons": [
       {
-        "src": "favicon-16x16.png",
+        "src": "/favicon-16x16.png",
         "sizes": "16x16",
         "type": "image/png",
         "purpose": "favicon"
       },
       {
-        "src": "favicon-32x32.png",
+        "src": "/favicon-32x32.png",
         "sizes": "32x32",
         "type": "image/png",
         "purpose": "favicon"
       },
       {
-        "src": "android-chrome-192x192.png",
+        "src": "/android-chrome-192x192.png",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "android-chrome-512x512.png",
+        "src": "/android-chrome-512x512.png",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "apple-touch-icon.png",
+        "src": "/apple-touch-icon.png",
         "sizes": "180x180",
         "type": "image/png",
         "purpose": "apple touch icon"
@@ -5272,22 +5275,22 @@ function updateDynamicManifest(backgroundColor, themeColor) {
         "name": "Quick Task",
         "short_name": "Add Task",
         "description": "Quickly add a new task to your lists",
-        "url": "./?action=quick-task",
-        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "/?action=quick-task",
+        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "New Note",
         "short_name": "Add Note",
         "description": "Create a new note",
-        "url": "./?action=quick-note",
-        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "/?action=quick-note",
+        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "Calendar",
         "short_name": "Events",
         "description": "View and add calendar events",
-        "url": "./?tab=calendar",
-        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "/?tab=calendar",
+        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
       }
     ],
     "related_applications": [],
