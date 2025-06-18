@@ -55,6 +55,11 @@
     "activity_streak": "Legjobb sorozat",
     "activity_avg": "Átlag/nap",
     "achievements": "🏅 Elért eredmények",
+    "achievements_details": {
+      "explorer": "Felfedező",
+      "explorer_desc": "Próbáld ki az összes funkciót",
+      "available": "Elérhető!"
+    },
     "productivity": "🔍 Produktivitási betekintés",
     "productivity_insights": {
       "completion": "Teljesítés: {rate}% ({completed}/{total} feladat)",

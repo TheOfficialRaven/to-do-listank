@@ -1,3 +1,14 @@
+/* 
+===============================================
+TISZTÍTOTT CSS STRUKTÚRA
+===============================================
+Navigációs stílusok: css/navigation.css
+Alap stílusok: css/base.css  
+Változók: css/variables.css
+Betöltés: styles.css (import-ok)
+===============================================
+*/
+
 /* Alap stílusok, sötét háttér, zöld akcentus */
 :root {
   /* Sötét téma (alapértelmezett) */
@@ -268,78 +279,6 @@ body {
 .theme-preview.royal-purple-light { background: linear-gradient(45deg, #7b1fa2, #f8f5ff); }
 .theme-preview.royal-purple-dark { background: linear-gradient(45deg, #ba68c8, #1a0f1a); }
 
-/* Navigációban lévő nyelv dropdown stílusai */
-.language-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
-  border-radius: 15px;
-  box-shadow: var(--box-shadow-hover);
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  overflow: hidden;
-  min-width: 140px;
-}
-
-.language-dropdown.show {
-  display: block;
-  animation: slideInDown 0.3s ease-out;
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.language-dropdown ul {
-  list-style: none;
-  margin: 0;
-  padding: 8px;
-}
-
-.language-dropdown li {
-  margin: 0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.language-dropdown a {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  font-weight: 500;
-  font-size: 16px;
-}
-
-.language-dropdown a:hover {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: var(--bg-primary);
-  transform: translateX(5px);
-}
-
-.language-dropdown a.current {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--accent-primary);
-  font-weight: 700;
-}
-
-.language-dropdown a.current::before {
-  content: "✓ ";
-  margin-right: 8px;
-}
 
 
 h1, h2 {
@@ -1512,56 +1451,7 @@ h1, h2 {
   gap: 1rem;
 }
 
-.nav-tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  flex: 1;
-}
 
-.nav-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-.nav-control-btn {
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  padding: 8px 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--text-color);
-  font-size: 13px;
-  font-weight: 500;
-  min-height: 44px;
-}
-
-.nav-control-btn:hover {
-  border-color: var(--accent-primary);
-  background: var(--bg-secondary);
-  transform: translateY(-1px);
-}
-
-.nav-control-btn .material-icons {
-  font-size: 18px;
-}
-
-.nav-control-btn .language-text,
-.nav-control-btn .theme-text {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.nav-language-menu,
-.nav-theme-selector {
-  position: relative;
-}
 
 /* PWA Floating Install Button - Bal alsó sarok, nem zavaró */
 .pwa-floating-install {
@@ -1681,95 +1571,7 @@ h1, h2 {
   }
 }
 
-.nav-tab {
-  padding: 1rem 1.5rem;
-  background: var(--bg-tertiary);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: clamp(14px, 2vw, 16px);
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
 
-.nav-tab::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
-  transition: left 0.5s;
-}
-
-.nav-tab:hover::before {
-  left: 100%;
-}
-
-.nav-tab:hover {
-  color: var(--accent-primary);
-  border-color: var(--accent-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
-}
-
-.nav-tab.active {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: var(--bg-primary);
-  border-color: var(--accent-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
-}
-
-/* Profile menu styles */
-.profile-menu {
-  position: relative;
-}
-
-.profile-btn {
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--accent-primary);
-  flex-shrink: 0;
-}
-
-.profile-btn:hover {
-  border-color: var(--accent-primary);
-  background: var(--bg-secondary);
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: 60px;
-  right: 0;
-  background: var(--bg-secondary);
-  border: 2px solid var(--accent-primary);
-  border-radius: 12px;
-  min-width: 200px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  z-index: 1000;
-  display: none;
-  backdrop-filter: blur(10px);
-}
-
-.profile-dropdown.show {
-  display: block;
-  animation: slideInDown 0.3s ease-out;
-}
 
 .privacy-menu-btn,
 .logout-menu-btn {
@@ -2563,16 +2365,7 @@ h1, h2 {
 }
 
 /* Nyelv dropdown aktív elem jelölése */
-.language-dropdown a.current {
-  background: var(--accent-primary);
-  color: var(--bg-primary);
-  font-weight: 600;
-}
 
-.language-dropdown a.current::before {
-  content: "✓ ";
-  font-weight: bold;
-}
 
 /* Hover effektusok javítása */
 .action-btn:active {
@@ -4240,65 +4033,7 @@ h1, h2 {
     gap: 1rem;
   }
   
-  .nav-container {
-    padding: 0.6rem 0.8rem;
-    flex-direction: column;
-    gap: 0.8rem;
-    align-items: stretch;
-  }
-  
-  .nav-tabs {
-    order: 2;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  
-  .nav-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .nav-tab {
-    padding: 0.7rem 1rem;
-    font-size: 13px;
-    white-space: nowrap;
-    min-width: max-content;
-  }
-  
-  .nav-controls {
-    order: 1;
-    justify-content: flex-end;
-    width: 100%;
-    gap: 0.4rem;
-  }
-  
-  .nav-control-btn {
-    padding: 6px 10px;
-    min-height: 38px;
-    font-size: 12px;
-  }
-  
-  .nav-control-btn .material-icons {
-    font-size: 16px;
-  }
-  
-  .nav-control-btn .language-text,
-  .nav-control-btn .theme-text {
-    font-size: 11px;
-  }
-  
-  .profile-btn {
-    width: 38px;
-    height: 38px;
-  }
-  
-  .profile-dropdown {
-    top: 45px;
-    min-width: 160px;
-    right: 0;
-  }
+
 }
 
 /* Modern Téma Modal Stílusok */

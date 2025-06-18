@@ -55,6 +55,11 @@
     "activity_streak": "Beste Serie",
     "activity_avg": "Durchschnitt/Tag",
     "achievements": "🏅 Errungenschaften",
+    "achievements_details": {
+      "explorer": "Entdecker",
+      "explorer_desc": "Probiere alle Funktionen aus",
+      "available": "Verfügbar!"
+    },
     "productivity": "🔍 Produktivitäts-Einblicke",
     "productivity_insights": {
       "completion": "Abschluss: {rate}% ({completed}/{total} Aufgaben)",

@@ -2,7 +2,7 @@
   "name": "Todo & Shopping List - Personal Organizer",
   "short_name": "TodoApp",
   "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
-  "version": "2.0.0",
+  "version": "2.1.4",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

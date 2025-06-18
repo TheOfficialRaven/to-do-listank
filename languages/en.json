@@ -55,6 +55,11 @@
     "activity_streak": "Best streak",
     "activity_avg": "Average/day",
     "achievements": "🏅 Achievements",
+    "achievements_details": {
+      "explorer": "Explorer",
+      "explorer_desc": "Try all features",
+      "available": "Available!"
+    },
     "productivity": "🔍 Productivity Insights",
     "productivity_insights": {
       "completion": "Completion: {rate}% ({completed}/{total} tasks)",

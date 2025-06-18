@@ -47,14 +47,6 @@ const defaultTranslations = {
   
   // Overview
   'overview.title': 'Áttekintés',
-  'overview.achievements.explorer': 'Felfedező',
-  'overview.achievements.explorer_desc': 'Próbáld ki az összes funkciót',
-  'overview.achievements.available': 'Elérhető!',
-  'overview.productivity_insights': 'Produktivitási betekintés',
-  'overview.productivity_insights.completion': 'Befejezési ráta elemzése',
-  'overview.productivity_insights.managing_lists': 'Listák kezelésének optimalizálása',
-  'overview.productivity_insights.streak_active': 'Aktív sorozat fenntartása',
-  'overview.productivity_insights.level_progress': 'Szint előrehaladás nyomon követése',
   
   // Common
   'common.save': 'Mentés',
@@ -88,11 +80,11 @@ async function loadLanguage(languageCode) {
   currentLanguage = languageCode;
   
   try {
-    // Try to load from languages folder
-    const response = await fetch(`./languages/${languageCode}.json`);
+    // Force fresh fetch with cache busting
+    const response = await fetch(`./languages/${languageCode}.json?t=${Date.now()}`);
     if (response.ok) {
       languageData = await response.json();
-      console.log(`✅ Loaded language data for ${languageCode}`);
+      console.log(`✅ Loaded fresh language data for ${languageCode}`);
     } else {
       throw new Error('Language file not found');
     }
@@ -191,10 +183,10 @@ function updateOverviewTexts() {
     const descElement = badge.querySelector('.badge-description');
     
     if (titleElement && titleElement.textContent.includes('explorer')) {
-      titleElement.textContent = getText('overview.achievements.explorer');
+      titleElement.textContent = getText('overview.achievements_details.explorer');
     }
     if (descElement && descElement.textContent.includes('Próbáld')) {
-      descElement.textContent = getText('overview.achievements.explorer_desc');
+      descElement.textContent = getText('overview.achievements_details.explorer_desc');
     }
   });
   

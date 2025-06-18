@@ -155,7 +155,9 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               console.log('🔄 New Service Worker available');
-              showNotification('🔄 Új verzió elérhető! Frissítsd az oldalt.');
+              // Auto clear cache and refresh for immediate updates
+              clearCacheAndRefresh();
+              showNotification('🔄 Új verzió elérhető! Az oldal frissül...');
             }
           });
         });
@@ -207,6 +209,73 @@ window.addEventListener('appinstalled', (evt) => {
     pwaInstall.hideInstallButton();
   }
 });
+
+// Cache clearing and refresh function
+async function clearCacheAndRefresh() {
+  try {
+    console.log('🗑️ Clearing all caches...');
+    
+    // Send message to service worker to clear caches
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CLEAR_CACHE'
+      });
+    }
+    
+    // Also clear caches directly if possible
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      console.log('✅ All caches cleared');
+    }
+    
+    // Force refresh after a short delay
+    setTimeout(() => {
+      console.log('🔄 Refreshing page...');
+      window.location.reload(true);
+    }, 1000);
+    
+  } catch (error) {
+    console.error('❌ Error clearing cache:', error);
+    // Fallback: just refresh the page
+    window.location.reload(true);
+  }
+}
+
+// Function to force cache refresh for language files
+async function refreshLanguageCache() {
+  try {
+    console.log('🌐 Refreshing language cache...');
+    
+    if ('caches' in window) {
+      const cache = await caches.open('todo-app-v2.1.2');
+      const languageFiles = [
+        './languages/hu.json',
+        './languages/en.json', 
+        './languages/de.json'
+      ];
+      
+      // Delete old language files from cache
+      for (const file of languageFiles) {
+        await cache.delete(file);
+        console.log(`🗑️ Cleared cache for ${file}`);
+      }
+      
+      // Fetch fresh versions
+      for (const file of languageFiles) {
+        const response = await fetch(file + '?t=' + Date.now());
+        if (response.ok) {
+          await cache.put(file, response.clone());
+          console.log(`✅ Cached fresh version of ${file}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error refreshing language cache:', error);
+  }
+}
 
 // DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section");
@@ -3083,6 +3152,10 @@ setInterval(updateCurrentTime, 1000);
 
 // Alkalmazás inicializálása
 document.addEventListener('DOMContentLoaded', async () => {
+  // Cache refresh on startup for immediate updates
+  console.log('🔄 Checking for fresh content...');
+  await refreshLanguageCache();
+  
   // Nyelv rendszer inicializálása
   await initLanguageSystem();
   
@@ -4165,14 +4238,20 @@ async function initLanguageSystem() {
 // Nyelvi fájl betöltése
 async function loadLanguage(languageCode) {
   try {
-    const response = await fetch(`languages/${languageCode}.json`);
+    // Force fresh fetch with cache busting
+    const response = await fetch(`languages/${languageCode}.json?t=${Date.now()}`);
     if (response.ok) {
       translations = await response.json();
       currentLanguage = languageCode;
       localStorage.setItem('language', languageCode);
       
+      // Refresh language cache for this specific file
+      await refreshLanguageCache();
+      
       // UI frissítése
       updateUITexts();
+      
+      console.log(`✅ Language loaded and cached: ${languageCode}`);
     } else {
       console.error(`Language file ${languageCode}.json not found, falling back to Hungarian`);
       if (languageCode !== 'hu') {
@@ -5945,3 +6024,72 @@ function stopSnoozeMonitoring() {
     console.log('Snooze monitoring stopped');
   }
 }
+
+// =================================
+// CACHE MANAGEMENT SYSTEM
+// =================================
+
+// Global cache management functions for development and debugging
+window.refreshCache = async function() {
+  console.log('🔄 Manual cache refresh triggered...');
+  await refreshLanguageCache();
+  console.log('✅ Cache refreshed successfully');
+};
+
+window.clearAllCaches = async function() {
+  console.log('🗑️ Manual cache clear triggered...');
+  await clearCacheAndRefresh();
+};
+
+window.forceReload = function() {
+  console.log('🔄 Force reloading with cache bust...');
+  window.location.reload(true);
+};
+
+// Cache status checker
+window.checkCacheStatus = async function() {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    console.log('📦 Current caches:', cacheNames);
+    
+    for (const cacheName of cacheNames) {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      console.log(`📋 Cache "${cacheName}" contains ${keys.length} items:`, keys.map(req => req.url));
+    }
+  } else {
+    console.log('❌ Cache API not supported');
+  }
+};
+
+// Force update language cache immediately 
+window.updateLanguageCache = async function() {
+  console.log('🌐 Updating language cache immediately...');
+  
+  // Clear old language caches
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    for (const cacheName of cacheNames) {
+      if (cacheName.includes('todo-app')) {
+        const cache = await caches.open(cacheName);
+        await cache.delete('./languages/hu.json');
+        await cache.delete('./languages/en.json');
+        await cache.delete('./languages/de.json');
+        console.log(`🗑️ Cleared language files from ${cacheName}`);
+      }
+    }
+  }
+  
+  // Force reload language files
+  const currentLang = localStorage.getItem('language') || 'hu';
+  await loadLanguage(currentLang);
+  
+  console.log('✅ Language cache updated and reloaded');
+};
+
+console.log('✅ Cache management functions loaded:');
+console.log('  - refreshCache() - Refresh language cache');
+console.log('  - clearAllCaches() - Clear all caches and reload');
+console.log('  - forceReload() - Force reload with cache bust');
+console.log('  - checkCacheStatus() - Show current cache contents');
+console.log('  - updateLanguageCache() - Force update language cache');
