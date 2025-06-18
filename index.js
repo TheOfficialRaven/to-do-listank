@@ -5155,7 +5155,7 @@ function loadThemeCSS(themeName) {
     const link = document.createElement('link');
     link.id = 'theme-css';
     link.rel = 'stylesheet';
-    link.href = 'modern-themes.css';
+    link.href = '/css/modern-themes.css';
     document.head.appendChild(link);
   }
 }
