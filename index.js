@@ -3,46 +3,15 @@ console.log('🟢 EXTERNAL JS FILE LOADING - index.js started');
 console.log('🟢 Script execution beginning at:', new Date().toLocaleTimeString());
 console.log('🟢 If you see this, the JS file is loading properly');
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getDatabase, ref, push, onValue, remove, set, get, query, orderByChild, update
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 console.log('📦 Firebase imports loaded successfully');
-
-// Ellenőrizzük, hogy minden Firebase függvény elérhető
-console.log('🔍 Firebase functions check:');
-console.log('  - initializeApp:', typeof initializeApp);
-console.log('  - getDatabase:', typeof getDatabase);
-console.log('  - getAuth:', typeof getAuth);
-
-if (typeof initializeApp === 'undefined') {
-  console.error('❌ CRITICAL: initializeApp is undefined! Firebase modules failed to load.');
-  
-  // Fallback error message for user
-  setTimeout(() => {
-    const errorDiv = document.createElement('div');
-    errorDiv.style.cssText = `
-      position: fixed; top: 0; left: 0; right: 0; 
-      background: #ff4444; color: white; padding: 15px; 
-      text-align: center; z-index: 9999; font-family: Arial;
-      font-size: 16px;
-    `;
-    errorDiv.innerHTML = `
-      ❌ Firebase betöltési hiba! Ellenőrizd az internetkapcsolatot és frissítsd az oldalt.
-      <button onclick="location.reload()" style="margin-left: 10px; padding: 8px 15px; background: white; color: #ff4444; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-        🔄 Frissítés
-      </button>
-    `;
-    document.body.insertBefore(errorDiv, document.body.firstChild);
-  }, 2000);
-  
-  // Stop execution
-  throw new Error('Firebase modules failed to load');
-}
 
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
@@ -152,7 +121,7 @@ window.clearPWAState = function() {
 // Test hogy a függvények elérhetők-e
 console.log('✅ IMMEDIATE PWA functions defined successfully!');
 console.log('🔧 Test immediately: debugPWA()');
-console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA(), testApp()');
+console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA()');
 
 // Immediate test
 setTimeout(() => {
@@ -161,22 +130,6 @@ setTimeout(() => {
     console.log('✅ debugPWA function is accessible');
   } else {
     console.error('❌ debugPWA function is NOT accessible');
-  }
-  
-  // Auth elemek ellenőrzése
-  const authSection = document.getElementById('auth-section');
-  const loginBtn = document.getElementById('login-btn');
-  
-  console.log('🔍 Quick Auth Check:');
-  console.log('  - authSection exists:', !!authSection);
-  console.log('  - authSection visible:', authSection ? getComputedStyle(authSection).display !== 'none' : 'N/A');
-  console.log('  - loginBtn exists:', !!loginBtn);
-  console.log('  - Firebase auth loaded:', typeof auth !== 'undefined');
-  
-  if (!authSection || !loginBtn) {
-    console.error('❌ CRITICAL: Auth elements missing from DOM!');
-  } else {
-    console.log('✅ Auth elements found in DOM');
   }
 }, 1000);
 
@@ -191,10 +144,7 @@ let serviceWorkerRegistration = null;
 // Service Worker regisztrálása
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Add cache-busting parameter for Netlify
-    const swUrl = './sw.js?v=' + Date.now();
-    
-    navigator.serviceWorker.register(swUrl)
+    navigator.serviceWorker.register('./sw.js')
       .then((registration) => {
         console.log('✅ Service Worker registered successfully:', registration.scope);
         serviceWorkerRegistration = registration;
@@ -205,7 +155,9 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               console.log('🔄 New Service Worker available');
-              showNotification('🔄 Új verzió elérhető! Frissítsd az oldalt.');
+              // Auto clear cache and refresh for immediate updates
+              clearCacheAndRefresh();
+              showNotification('🔄 Új verzió elérhető! Az oldal frissül...');
             }
           });
         });
@@ -257,6 +209,73 @@ window.addEventListener('appinstalled', (evt) => {
     pwaInstall.hideInstallButton();
   }
 });
+
+// Cache clearing and refresh function
+async function clearCacheAndRefresh() {
+  try {
+    console.log('🗑️ Clearing all caches...');
+    
+    // Send message to service worker to clear caches
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CLEAR_CACHE'
+      });
+    }
+    
+    // Also clear caches directly if possible
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      console.log('✅ All caches cleared');
+    }
+    
+    // Force refresh after a short delay
+    setTimeout(() => {
+      console.log('🔄 Refreshing page...');
+      window.location.reload(true);
+    }, 1000);
+    
+  } catch (error) {
+    console.error('❌ Error clearing cache:', error);
+    // Fallback: just refresh the page
+    window.location.reload(true);
+  }
+}
+
+// Function to force cache refresh for language files
+async function refreshLanguageCache() {
+  try {
+    console.log('🌐 Refreshing language cache...');
+    
+    if ('caches' in window) {
+      const cache = await caches.open('todo-app-v2.1.2');
+      const languageFiles = [
+        './languages/hu.json',
+        './languages/en.json', 
+        './languages/de.json'
+      ];
+      
+      // Delete old language files from cache
+      for (const file of languageFiles) {
+        await cache.delete(file);
+        console.log(`🗑️ Cleared cache for ${file}`);
+      }
+      
+      // Fetch fresh versions
+      for (const file of languageFiles) {
+        const response = await fetch(file + '?t=' + Date.now());
+        if (response.ok) {
+          await cache.put(file, response.clone());
+          console.log(`✅ Cached fresh version of ${file}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error refreshing language cache:', error);
+  }
+}
 
 // DOM elemek – Autentikáció
 const authSection = document.getElementById("auth-section");
@@ -410,8 +429,6 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     authSection.style.display = "none";
     
-    // Globális nyelv választó mindig látható marad
-    
     // Modern UI megjelenítése
     const mainNav = document.getElementById("main-navigation");
     if (mainNav) mainNav.style.display = "block";
@@ -463,8 +480,6 @@ onAuthStateChanged(auth, (user) => {
     }, 500); // Csak 0.5 másodperc a listák betöltéséhez
   } else {
     authSection.style.display = "block";
-    
-    // Globális nyelv választó mindig látható
     
     // Modern UI elrejtése
     const mainNav = document.getElementById("main-navigation");
@@ -2602,10 +2617,7 @@ hamburgerIcon.addEventListener("click", () => {
 // Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Add cache-busting parameter for Netlify
-    const swUrl = './sw.js?v=' + Date.now();
-    
-    navigator.serviceWorker.register(swUrl)
+    navigator.serviceWorker.register('./sw.js')
       .then(registration => {
         console.log('ServiceWorker regisztrálva:', registration.scope);
       })
@@ -3140,11 +3152,12 @@ setInterval(updateCurrentTime, 1000);
 
 // Alkalmazás inicializálása
 document.addEventListener('DOMContentLoaded', async () => {
+  // Cache refresh on startup for immediate updates
+  console.log('🔄 Checking for fresh content...');
+  await refreshLanguageCache();
+  
   // Nyelv rendszer inicializálása
   await initLanguageSystem();
-  
-  // Globális nyelv választó inicializálása
-  initLanguageDropdown();
   
   // Navigáció inicializálása
   initNavigation();
@@ -3234,6 +3247,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('  hidePWAButton() - Hide install button');
   console.log('  debugPWA() - Show PWA debug info');
   console.log('  installPWA() - Trigger install dialog');
+
+// ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
+// Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
+window.showPWAButton = function() {
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'block';
+    console.log('🔧 IMMEDIATE: PWA button shown');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+    console.log('💡 Try calling this function after page load');
+  }
+};
+
+window.hidePWAButton = function() {
+  const container = document.getElementById('pwa-floating-install');
+  if (container) {
+    container.style.display = 'none';
+    console.log('🔧 IMMEDIATE: PWA button hidden');
+  } else {
+    console.error('❌ PWA container not found! DOM might not be ready yet.');
+  }
+};
+
+window.debugPWA = function() {
+  const container = document.getElementById('pwa-floating-install');
+  const btn = document.getElementById('pwa-install-btn');
+  console.log('🔧 IMMEDIATE PWA DEBUG:');
+  console.log('  - container found:', !!container);
+  console.log('  - button found:', !!btn);
+  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
+  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+  console.log('  - container display:', container ? container.style.display : 'N/A');
+  console.log('  - DOM ready:', document.readyState);
+};
+
+window.installPWA = function() {
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.click();
+    console.log('🔧 IMMEDIATE: PWA install triggered');
+  } else {
+    console.error('❌ PWA install button not found! DOM might not be ready yet.');
+  }
+};
+
+// Test hogy a függvények elérhetők-e
+console.log('✅ Immediate PWA functions defined');
+console.log('🔧 Test now: debugPWA()');
   
   // ⚠️ AUDIO STATUS TESZTELŐ ELTÁVOLÍTVA
   console.log('🧹 Audio status checker removed for production');
@@ -4176,14 +4238,20 @@ async function initLanguageSystem() {
 // Nyelvi fájl betöltése
 async function loadLanguage(languageCode) {
   try {
-    const response = await fetch(`languages/${languageCode}.json`);
+    // Force fresh fetch with cache busting
+    const response = await fetch(`languages/${languageCode}.json?t=${Date.now()}`);
     if (response.ok) {
       translations = await response.json();
       currentLanguage = languageCode;
       localStorage.setItem('language', languageCode);
       
+      // Refresh language cache for this specific file
+      await refreshLanguageCache();
+      
       // UI frissítése
       updateUITexts();
+      
+      console.log(`✅ Language loaded and cached: ${languageCode}`);
     } else {
       console.error(`Language file ${languageCode}.json not found, falling back to Hungarian`);
       if (languageCode !== 'hu') {
@@ -4689,94 +4757,75 @@ function updateModalSelectOptions() {
 
 // Nyelv dropdown inicializálása
 function initLanguageDropdown() {
-  // Fő navigáció nyelv választó
   const hamburgerIcon = document.getElementById('hamburger-icon');
   const languageDropdown = document.getElementById('language-dropdown');
   
-  // Auth nyelv választó
-  const authLanguageBtn = document.getElementById('auth-language-btn');
-  const authLanguageDropdown = document.getElementById('auth-language-dropdown');
-  
-  // Fő navigáció nyelv választó kezelés
   if (hamburgerIcon && languageDropdown) {
-    setupLanguageDropdown(hamburgerIcon, languageDropdown);
-  }
-  
-  // Auth/Global nyelv választó kezelés
-  if (authLanguageBtn && authLanguageDropdown) {
-    setupLanguageDropdown(authLanguageBtn, authLanguageDropdown);
-    console.log('🌐 Global language dropdown initialized');
-  }
-  
-  // Aktuális nyelv jelzése mindkét választón
-  markCurrentLanguage();
-}
-
-// Nyelv választó beállítása - univerzális függvény
-function setupLanguageDropdown(toggleBtn, dropdown) {
-  toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdown.classList.toggle('show');
+    // Aktuális nyelv jelzése
+    markCurrentLanguage();
     
-    // Ha megnyitjuk, távolítsuk el az inline style-t
-    if (dropdown.classList.contains('show')) {
-      dropdown.style.display = '';
-    } else {
-      dropdown.style.display = 'none';
-    }
-  });
-  
-  // Kívülre kattintás esetén bezárás
-  document.addEventListener('click', (e) => {
-    if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('show');
-      dropdown.style.display = 'none';
-    }
-  });
-  
-  // ESC billentyű lenyomásakor bezárás
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && dropdown.classList.contains('show')) {
-      dropdown.classList.remove('show');
-      dropdown.style.display = 'none';
-    }
-  });
-  
-  // Nyelv linkekre kattintás - JSON alapú váltás
-  const languageLinks = dropdown.querySelectorAll('a');
-  languageLinks.forEach(link => {
-    link.addEventListener('click', async (e) => {
-      e.preventDefault();
+    hamburgerIcon.addEventListener('click', (e) => {
       e.stopPropagation();
+      languageDropdown.classList.toggle('show');
       
-      const languageCode = link.getAttribute('data-lang') || 'hu';
-      
-      // Dropdown azonnal bezárása a nyelv váltás előtt
-      dropdown.classList.remove('show');
-      dropdown.style.display = 'none'; // Erős override
-      
-      try {
-        await loadLanguage(languageCode);
-        markCurrentLanguage();
-        
-        // Biztonságos bezárás a nyelv váltás után is
-        setTimeout(() => {
-          dropdown.classList.remove('show');
-          dropdown.style.display = 'none';
-        }, 100);
-      } catch (error) {
-        console.error('Hiba a nyelv betöltése során:', error);
+      // Ha megnyitjuk, távolítsuk el az inline style-t
+      if (languageDropdown.classList.contains('show')) {
+        languageDropdown.style.display = '';
+      } else {
+        languageDropdown.style.display = 'none';
       }
     });
-  });
+    
+    // Kívülre kattintás esetén bezárás
+    document.addEventListener('click', (e) => {
+      if (!hamburgerIcon.contains(e.target) && !languageDropdown.contains(e.target)) {
+        languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none';
+      }
+    });
+    
+    // ESC billentyű lenyomásakor bezárás
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && languageDropdown.classList.contains('show')) {
+        languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none';
+      }
+    });
+    
+    // Nyelv linkekre kattintás - JSON alapú váltás
+    const languageLinks = languageDropdown.querySelectorAll('a');
+    languageLinks.forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const languageCode = link.getAttribute('data-lang') || 'hu';
+        
+        // Dropdown azonnal bezárása a nyelv váltás előtt
+        languageDropdown.classList.remove('show');
+        languageDropdown.style.display = 'none'; // Erős override
+        
+        try {
+          await loadLanguage(languageCode);
+          markCurrentLanguage();
+          
+          // Biztonságos bezárás a nyelv váltás után is
+          setTimeout(() => {
+            languageDropdown.classList.remove('show');
+            languageDropdown.style.display = 'none';
+          }, 100);
+        } catch (error) {
+          console.error('Hiba a nyelv betöltése során:', error);
+        }
+      });
+    });
+  }
 }
 
 // Aktuális nyelv jelölése
 function markCurrentLanguage() {
-  // Fő navigáció és auth nyelv linkek
-  const languageLinks = document.querySelectorAll('.language-dropdown a, .auth-language-dropdown a');
+  const languageLinks = document.querySelectorAll('.language-dropdown a');
   const languageText = document.querySelector('.language-text');
-  const authLanguageText = document.querySelector('.auth-language-text');
   
   languageLinks.forEach(link => {
     link.classList.remove('current');
@@ -4785,26 +4834,24 @@ function markCurrentLanguage() {
     const linkLang = link.getAttribute('data-lang');
     if (linkLang === currentLanguage) {
       link.classList.add('current');
+      
+      // Frissítjük a hamburger menü szövegét
+      if (languageText) {
+        switch(currentLanguage) {
+          case 'en':
+            languageText.textContent = 'EN';
+            break;
+          case 'de':
+            languageText.textContent = 'DE';
+            break;
+          case 'hu':
+          default:
+            languageText.textContent = 'HU';
+            break;
+        }
+      }
     }
   });
-  
-  // Frissítjük mindkét nyelv választó szövegét
-  const displayText = (() => {
-    switch(currentLanguage) {
-      case 'en': return 'EN';
-      case 'de': return 'DE';
-      case 'hu':
-      default: return 'HU';
-    }
-  })();
-  
-  if (languageText) {
-    languageText.textContent = displayText;
-  }
-  
-  if (authLanguageText) {
-    authLanguageText.textContent = displayText;
-  }
 }
 
 // Globális függvények elérhetővé tétele
@@ -5177,16 +5224,12 @@ function loadThemeCSS(themeName) {
     return;
   }
   
-  // Only create the link if it doesn't exist
   if (!existingLink) {
     const link = document.createElement('link');
     link.id = 'theme-css';
     link.rel = 'stylesheet';
-    link.href = '/css/modern-themes.css';
+    link.href = 'modern-themes.css';
     document.head.appendChild(link);
-    console.log('📎 Theme CSS link created for:', themeName);
-  } else {
-    console.log('📎 Theme CSS link already exists for:', themeName);
   }
 }
 
@@ -5250,17 +5293,14 @@ function updateManifestColors(themeName, themeMode) {
 }
 
 function updateDynamicManifest(backgroundColor, themeColor) {
-  // Get the current origin and path for absolute URLs
-  const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
-  
   // Create dynamic manifest object
   const dynamicManifest = {
     "name": "Todo & Shopping List - Personal Organizer",
     "short_name": "TodoApp",
     "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
-    "version": "2.3.0",
-    "start_url": "/",
-    "scope": "/",
+    "version": "2.0.0",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
     "orientation": "any",
     "background_color": backgroundColor,
@@ -5270,31 +5310,31 @@ function updateDynamicManifest(backgroundColor, themeColor) {
     "dir": "ltr",
     "icons": [
       {
-        "src": "/favicon-16x16.png",
+        "src": "favicon-16x16.png",
         "sizes": "16x16",
         "type": "image/png",
         "purpose": "favicon"
       },
       {
-        "src": "/favicon-32x32.png",
+        "src": "favicon-32x32.png",
         "sizes": "32x32",
         "type": "image/png",
         "purpose": "favicon"
       },
       {
-        "src": "/android-chrome-192x192.png",
+        "src": "android-chrome-192x192.png",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "/android-chrome-512x512.png",
+        "src": "android-chrome-512x512.png",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "/apple-touch-icon.png",
+        "src": "apple-touch-icon.png",
         "sizes": "180x180",
         "type": "image/png",
         "purpose": "apple touch icon"
@@ -5305,22 +5345,22 @@ function updateDynamicManifest(backgroundColor, themeColor) {
         "name": "Quick Task",
         "short_name": "Add Task",
         "description": "Quickly add a new task to your lists",
-        "url": "/?action=quick-task",
-        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "./?action=quick-task",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "New Note",
         "short_name": "Add Note",
         "description": "Create a new note",
-        "url": "/?action=quick-note",
-        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "./?action=quick-note",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "Calendar",
         "short_name": "Events",
         "description": "View and add calendar events",
-        "url": "/?tab=calendar",
-        "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        "url": "./?tab=calendar",
+        "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       }
     ],
     "related_applications": [],
@@ -5985,52 +6025,71 @@ function stopSnoozeMonitoring() {
   }
 }
 
-// Test funkció az alkalmazás működésének ellenőrzéséhez
-window.testApp = function() {
-  console.log('🧪 APP FUNCTIONALITY TEST');
-  console.log('========================');
-  
-  // DOM elemek tesztelése
-  const authSection = document.getElementById('auth-section');
-  const loginBtn = document.getElementById('login-btn');
-  const registerBtn = document.getElementById('register-btn');
-  const emailInput = document.getElementById('email-input');
-  const passwordInput = document.getElementById('auth-password-input');
-  
-  console.log('🔍 AUTH ELEMENTS CHECK:');
-  console.log('  - authSection:', !!authSection, authSection ? `(display: ${getComputedStyle(authSection).display})` : '');
-  console.log('  - loginBtn:', !!loginBtn);
-  console.log('  - registerBtn:', !!registerBtn);
-  console.log('  - emailInput:', !!emailInput);
-  console.log('  - passwordInput:', !!passwordInput);
-  
-  // Firebase tesztelése
-  console.log('🔥 FIREBASE CHECK:');
-  console.log('  - auth available:', typeof auth !== 'undefined');
-  console.log('  - db available:', typeof db !== 'undefined');
-  console.log('  - current user:', auth ? auth.currentUser : 'N/A');
-  
-  // Eseménykezelők tesztelése
-  console.log('🎯 EVENT HANDLERS CHECK:');
-  if (loginBtn) {
-    const hasClickHandler = loginBtn.onclick !== null || loginBtn.hasAttribute('data-has-listener');
-    console.log('  - Login button has handler:', hasClickHandler);
-  }
-  
-  // Modul betöltés tesztelése
-  console.log('📦 MODULE FUNCTIONS CHECK:');
-  console.log('  - showPWAButton:', typeof window.showPWAButton);
-  console.log('  - debugPWA:', typeof window.debugPWA);
-  console.log('  - testApp:', typeof window.testApp);
-  
-  console.log('========================');
-  console.log('✅ Test completed. Check the results above.');
-  
-  return {
-    authSection: !!authSection,
-    loginBtn: !!loginBtn,
-    firebaseAuth: typeof auth !== 'undefined',
-    functionsLoaded: typeof window.showPWAButton !== 'undefined'
-  };
+// =================================
+// CACHE MANAGEMENT SYSTEM
+// =================================
+
+// Global cache management functions for development and debugging
+window.refreshCache = async function() {
+  console.log('🔄 Manual cache refresh triggered...');
+  await refreshLanguageCache();
+  console.log('✅ Cache refreshed successfully');
 };
 
+window.clearAllCaches = async function() {
+  console.log('🗑️ Manual cache clear triggered...');
+  await clearCacheAndRefresh();
+};
+
+window.forceReload = function() {
+  console.log('🔄 Force reloading with cache bust...');
+  window.location.reload(true);
+};
+
+// Cache status checker
+window.checkCacheStatus = async function() {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    console.log('📦 Current caches:', cacheNames);
+    
+    for (const cacheName of cacheNames) {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      console.log(`📋 Cache "${cacheName}" contains ${keys.length} items:`, keys.map(req => req.url));
+    }
+  } else {
+    console.log('❌ Cache API not supported');
+  }
+};
+
+// Force update language cache immediately 
+window.updateLanguageCache = async function() {
+  console.log('🌐 Updating language cache immediately...');
+  
+  // Clear old language caches
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    for (const cacheName of cacheNames) {
+      if (cacheName.includes('todo-app')) {
+        const cache = await caches.open(cacheName);
+        await cache.delete('./languages/hu.json');
+        await cache.delete('./languages/en.json');
+        await cache.delete('./languages/de.json');
+        console.log(`🗑️ Cleared language files from ${cacheName}`);
+      }
+    }
+  }
+  
+  // Force reload language files
+  const currentLang = localStorage.getItem('language') || 'hu';
+  await loadLanguage(currentLang);
+  
+  console.log('✅ Language cache updated and reloaded');
+};
+
+console.log('✅ Cache management functions loaded:');
+console.log('  - refreshCache() - Refresh language cache');
+console.log('  - clearAllCaches() - Clear all caches and reload');
+console.log('  - forceReload() - Force reload with cache bust');
+console.log('  - checkCacheStatus() - Show current cache contents');
+console.log('  - updateLanguageCache() - Force update language cache');
