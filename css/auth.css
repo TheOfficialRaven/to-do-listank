@@ -1,0 +1,88 @@
+#auth-section input {
+    padding: 1.2rem 1.5rem;
+    margin: 0.8rem 0;
+    width: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1.1rem;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+  
+  #auth-section input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .auth-buttons {
+    margin: 2rem 0;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+  }
+  
+  #auth-section button {
+    padding: 1.2rem 2rem;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  #auth-section button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  #auth-section button:hover::before {
+    left: 100%;
+  }
+  
+  #auth-section button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+  
+  #auth-section button:active {
+    transform: translateY(0);
+  }
+  
+  .auth-message {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--accent-primary);
+    background: rgba(16, 185, 129, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
+  #logout-section button {
+    padding: 1rem 2rem;
+    background-color: #10B981;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+  
+  #logout-section button:hover {
+    opacity: 0.9;
+  }
