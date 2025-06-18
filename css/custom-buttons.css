@@ -1,0 +1,110 @@
+/* Custom Button Styles */
+#custom-new-list-btn {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--box-shadow-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+#custom-new-list-btn:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+}
+
+#custom-new-list-btn:active {
+  transform: translateY(0);
+}
+
+#custom-new-list-btn .material-icons {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+#custom-new-list-btn:hover .material-icons {
+  transform: rotate(90deg);
+}
+
+.delete-event-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.delete-event-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.delete-event-btn:active {
+  transform: translateY(0);
+}
+
+.delete-event-btn .material-icons {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.delete-event-btn:hover .material-icons {
+  transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #custom-new-list-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  #custom-new-list-btn .material-icons {
+    font-size: 18px;
+  }
+
+  .delete-event-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .delete-event-btn .material-icons {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  #custom-new-list-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  #custom-new-list-btn .material-icons {
+    font-size: 16px;
+  }
+
+  .delete-event-btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .delete-event-btn .material-icons {
+    font-size: 14px;
+  }
+} 

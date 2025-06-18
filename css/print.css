@@ -1,0 +1,304 @@
+/* Print Styles */
+@media print {
+  /* Reset Background Colors */
+  * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Hide Unnecessary Elements */
+  .no-print,
+  .modal,
+  .notification,
+  .theme-selector,
+  .search-input,
+  .btn {
+    display: none !important;
+  }
+
+  /* Page Setup */
+  @page {
+    margin: 2cm;
+  }
+
+  /* Typography */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 24pt;
+  }
+
+  h2 {
+    font-size: 20pt;
+  }
+
+  h3 {
+    font-size: 16pt;
+  }
+
+  h4, h5, h6 {
+    font-size: 14pt;
+  }
+
+  /* Links */
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin-left: 1.5cm;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 0.5cm;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Page Breaks */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  p, blockquote, ul, ol, dl, table {
+    page-break-inside: avoid;
+  }
+
+  /* Container */
+  .container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* List Box */
+  .list-box {
+    border: 1px solid #000;
+    margin-bottom: 1cm;
+    page-break-inside: avoid;
+  }
+
+  .list-box-header {
+    border-bottom: 1px solid #000;
+    margin-bottom: 0.5cm;
+  }
+
+  .list-box-title {
+    font-size: 16pt;
+    font-weight: bold;
+  }
+
+  .list-box-content {
+    font-size: 12pt;
+  }
+
+  /* General Print Styles */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Hide Elements */
+  .no-print,
+  .modal,
+  .notification,
+  .search-container,
+  .drag-drop-container,
+  button,
+  .controls-container {
+    display: none !important;
+  }
+
+  /* Container Styles */
+  .container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* List Styles */
+  .list-box {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    margin-bottom: 1cm;
+    padding: 0.5cm;
+    box-shadow: none;
+    background: white;
+  }
+
+  .list-box h2 {
+    color: black;
+    font-size: 14pt;
+    margin-bottom: 0.5cm;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.25cm;
+  }
+
+  .list-box ul {
+    list-style-type: disc;
+    padding-left: 1cm;
+  }
+
+  .list-box li {
+    margin-bottom: 0.25cm;
+    color: black;
+    background: none;
+    padding: 0;
+  }
+
+  .list-box li.done {
+    text-decoration: line-through;
+    color: #666;
+  }
+
+  /* Overview Section */
+  #overview-section {
+    break-after: page;
+    page-break-after: always;
+    margin-bottom: 1cm;
+  }
+
+  .stat-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    background: white;
+    box-shadow: none;
+  }
+
+  .stat-card h3 {
+    color: black;
+    font-size: 12pt;
+  }
+
+  .stat-card .stat-value {
+    color: black;
+    font-size: 16pt;
+  }
+
+  /* Links */
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #666;
+  }
+
+  /* Page Breaks */
+  .page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* Headers and Footers */
+  @page :first {
+    margin-top: 3cm;
+  }
+
+  /* Print Header */
+  .print-header {
+    text-align: center;
+    margin-bottom: 1cm;
+  }
+
+  .print-header h1 {
+    font-size: 18pt;
+    margin-bottom: 0.5cm;
+  }
+
+  .print-header p {
+    font-size: 10pt;
+    color: #666;
+  }
+
+  /* Print Footer */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10pt;
+    color: #666;
+    padding: 0.5cm;
+    border-top: 1px solid #ddd;
+  }
+
+  /* Print Date */
+  .print-date {
+    text-align: right;
+    font-size: 10pt;
+    color: #666;
+    margin-bottom: 0.5cm;
+  }
+
+  /* Print Summary */
+  .print-summary {
+    margin: 1cm 0;
+    padding: 0.5cm;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+  }
+
+  .print-summary h2 {
+    font-size: 14pt;
+    margin-bottom: 0.5cm;
+  }
+
+  .print-summary p {
+    margin-bottom: 0.25cm;
+  }
+
+  /* Print Notes */
+  .print-notes {
+    margin-top: 1cm;
+    font-size: 10pt;
+    color: #666;
+  }
+
+  /* Print QR Code */
+  .print-qr {
+    position: fixed;
+    bottom: 1cm;
+    right: 1cm;
+    width: 2cm;
+    height: 2cm;
+  }
+} 

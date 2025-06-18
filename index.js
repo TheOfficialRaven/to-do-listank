@@ -360,6 +360,8 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     authSection.style.display = "none";
     
+    // Globális nyelv választó mindig látható marad
+    
     // Modern UI megjelenítése
     const mainNav = document.getElementById("main-navigation");
     if (mainNav) mainNav.style.display = "block";
@@ -411,6 +413,8 @@ onAuthStateChanged(auth, (user) => {
     }, 500); // Csak 0.5 másodperc a listák betöltéséhez
   } else {
     authSection.style.display = "block";
+    
+    // Globális nyelv választó mindig látható
     
     // Modern UI elrejtése
     const mainNav = document.getElementById("main-navigation");
@@ -3086,6 +3090,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Nyelv rendszer inicializálása
   await initLanguageSystem();
   
+  // Globális nyelv választó inicializálása
+  initLanguageDropdown();
+  
   // Navigáció inicializálása
   initNavigation();
   
@@ -4678,75 +4685,94 @@ function updateModalSelectOptions() {
 
 // Nyelv dropdown inicializálása
 function initLanguageDropdown() {
+  // Fő navigáció nyelv választó
   const hamburgerIcon = document.getElementById('hamburger-icon');
   const languageDropdown = document.getElementById('language-dropdown');
   
+  // Auth nyelv választó
+  const authLanguageBtn = document.getElementById('auth-language-btn');
+  const authLanguageDropdown = document.getElementById('auth-language-dropdown');
+  
+  // Fő navigáció nyelv választó kezelés
   if (hamburgerIcon && languageDropdown) {
-    // Aktuális nyelv jelzése
-    markCurrentLanguage();
-    
-    hamburgerIcon.addEventListener('click', (e) => {
-      e.stopPropagation();
-      languageDropdown.classList.toggle('show');
-      
-      // Ha megnyitjuk, távolítsuk el az inline style-t
-      if (languageDropdown.classList.contains('show')) {
-        languageDropdown.style.display = '';
-      } else {
-        languageDropdown.style.display = 'none';
-      }
-    });
-    
-    // Kívülre kattintás esetén bezárás
-    document.addEventListener('click', (e) => {
-      if (!hamburgerIcon.contains(e.target) && !languageDropdown.contains(e.target)) {
-        languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none';
-      }
-    });
-    
-    // ESC billentyű lenyomásakor bezárás
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && languageDropdown.classList.contains('show')) {
-        languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none';
-      }
-    });
-    
-    // Nyelv linkekre kattintás - JSON alapú váltás
-    const languageLinks = languageDropdown.querySelectorAll('a');
-    languageLinks.forEach(link => {
-      link.addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const languageCode = link.getAttribute('data-lang') || 'hu';
-        
-        // Dropdown azonnal bezárása a nyelv váltás előtt
-        languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none'; // Erős override
-        
-        try {
-          await loadLanguage(languageCode);
-          markCurrentLanguage();
-          
-          // Biztonságos bezárás a nyelv váltás után is
-          setTimeout(() => {
-            languageDropdown.classList.remove('show');
-            languageDropdown.style.display = 'none';
-          }, 100);
-        } catch (error) {
-          console.error('Hiba a nyelv betöltése során:', error);
-        }
-      });
-    });
+    setupLanguageDropdown(hamburgerIcon, languageDropdown);
   }
+  
+  // Auth/Global nyelv választó kezelés
+  if (authLanguageBtn && authLanguageDropdown) {
+    setupLanguageDropdown(authLanguageBtn, authLanguageDropdown);
+    console.log('🌐 Global language dropdown initialized');
+  }
+  
+  // Aktuális nyelv jelzése mindkét választón
+  markCurrentLanguage();
+}
+
+// Nyelv választó beállítása - univerzális függvény
+function setupLanguageDropdown(toggleBtn, dropdown) {
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+    
+    // Ha megnyitjuk, távolítsuk el az inline style-t
+    if (dropdown.classList.contains('show')) {
+      dropdown.style.display = '';
+    } else {
+      dropdown.style.display = 'none';
+    }
+  });
+  
+  // Kívülre kattintás esetén bezárás
+  document.addEventListener('click', (e) => {
+    if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('show');
+      dropdown.style.display = 'none';
+    }
+  });
+  
+  // ESC billentyű lenyomásakor bezárás
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropdown.classList.contains('show')) {
+      dropdown.classList.remove('show');
+      dropdown.style.display = 'none';
+    }
+  });
+  
+  // Nyelv linkekre kattintás - JSON alapú váltás
+  const languageLinks = dropdown.querySelectorAll('a');
+  languageLinks.forEach(link => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const languageCode = link.getAttribute('data-lang') || 'hu';
+      
+      // Dropdown azonnal bezárása a nyelv váltás előtt
+      dropdown.classList.remove('show');
+      dropdown.style.display = 'none'; // Erős override
+      
+      try {
+        await loadLanguage(languageCode);
+        markCurrentLanguage();
+        
+        // Biztonságos bezárás a nyelv váltás után is
+        setTimeout(() => {
+          dropdown.classList.remove('show');
+          dropdown.style.display = 'none';
+        }, 100);
+      } catch (error) {
+        console.error('Hiba a nyelv betöltése során:', error);
+      }
+    });
+  });
 }
 
 // Aktuális nyelv jelölése
 function markCurrentLanguage() {
-  const languageLinks = document.querySelectorAll('.language-dropdown a');
+  // Fő navigáció és auth nyelv linkek
+  const languageLinks = document.querySelectorAll('.language-dropdown a, .auth-language-dropdown a');
   const languageText = document.querySelector('.language-text');
+  const authLanguageText = document.querySelector('.auth-language-text');
   
   languageLinks.forEach(link => {
     link.classList.remove('current');
@@ -4755,24 +4781,26 @@ function markCurrentLanguage() {
     const linkLang = link.getAttribute('data-lang');
     if (linkLang === currentLanguage) {
       link.classList.add('current');
-      
-      // Frissítjük a hamburger menü szövegét
-      if (languageText) {
-        switch(currentLanguage) {
-          case 'en':
-            languageText.textContent = 'EN';
-            break;
-          case 'de':
-            languageText.textContent = 'DE';
-            break;
-          case 'hu':
-          default:
-            languageText.textContent = 'HU';
-            break;
-        }
-      }
     }
   });
+  
+  // Frissítjük mindkét nyelv választó szövegét
+  const displayText = (() => {
+    switch(currentLanguage) {
+      case 'en': return 'EN';
+      case 'de': return 'DE';
+      case 'hu':
+      default: return 'HU';
+    }
+  })();
+  
+  if (languageText) {
+    languageText.textContent = displayText;
+  }
+  
+  if (authLanguageText) {
+    authLanguageText.textContent = displayText;
+  }
 }
 
 // Globális függvények elérhetővé tétele
@@ -5145,12 +5173,16 @@ function loadThemeCSS(themeName) {
     return;
   }
   
+  // Only create the link if it doesn't exist
   if (!existingLink) {
     const link = document.createElement('link');
     link.id = 'theme-css';
     link.rel = 'stylesheet';
     link.href = 'modern-themes.css';
     document.head.appendChild(link);
+    console.log('📎 Theme CSS link created for:', themeName);
+  } else {
+    console.log('📎 Theme CSS link already exists for:', themeName);
   }
 }
 

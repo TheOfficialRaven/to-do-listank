@@ -1,0 +1,277 @@
+/* Modern Professional To-Do List - Theme Styles */
+
+/* Theme Variables */
+:root {
+  /* Ocean Blue Theme */
+  --ocean-blue-text-primary: #F8FAFC;
+  --ocean-blue-text-secondary: #94A3B8;
+  --ocean-blue-bg-primary: #1E293B;
+  --ocean-blue-bg-secondary: #334155;
+  --ocean-blue-bg-tertiary: #475569;
+  --ocean-blue-accent-primary: #0EA5E9;
+  --ocean-blue-accent-secondary: #38BDF8;
+  --ocean-blue-border-color: #475569;
+  --ocean-blue-box-shadow: rgba(14, 165, 233, 0.22);
+
+  /* Sakura Pink Theme */
+  --sakura-pink-text-primary: #F8FAFC;
+  --sakura-pink-text-secondary: #94A3B8;
+  --sakura-pink-bg-primary: #1E293B;
+  --sakura-pink-bg-secondary: #334155;
+  --sakura-pink-bg-tertiary: #475569;
+  --sakura-pink-accent-primary: #EC4899;
+  --sakura-pink-accent-secondary: #F472B6;
+  --sakura-pink-border-color: #475569;
+  --sakura-pink-box-shadow: rgba(236, 72, 153, 0.22);
+
+  /* Forest Green Theme */
+  --forest-green-text-primary: #F8FAFC;
+  --forest-green-text-secondary: #94A3B8;
+  --forest-green-bg-primary: #1E293B;
+  --forest-green-bg-secondary: #334155;
+  --forest-green-bg-tertiary: #475569;
+  --forest-green-accent-primary: #10B981;
+  --forest-green-accent-secondary: #34D399;
+  --forest-green-border-color: #475569;
+  --forest-green-box-shadow: rgba(16, 185, 129, 0.22);
+
+  /* Minimal Mono Theme */
+  --minimal-mono-text-primary: #F8FAFC;
+  --minimal-mono-text-secondary: #94A3B8;
+  --minimal-mono-bg-primary: #1E293B;
+  --minimal-mono-bg-secondary: #334155;
+  --minimal-mono-bg-tertiary: #475569;
+  --minimal-mono-accent-primary: #64748B;
+  --minimal-mono-accent-secondary: #94A3B8;
+  --minimal-mono-border-color: #475569;
+  --minimal-mono-box-shadow: rgba(100, 116, 139, 0.22);
+
+  /* Sunset Orange Theme */
+  --sunset-orange-text-primary: #F8FAFC;
+  --sunset-orange-text-secondary: #94A3B8;
+  --sunset-orange-bg-primary: #1E293B;
+  --sunset-orange-bg-secondary: #334155;
+  --sunset-orange-bg-tertiary: #475569;
+  --sunset-orange-accent-primary: #F97316;
+  --sunset-orange-accent-secondary: #FB923C;
+  --sunset-orange-border-color: #475569;
+  --sunset-orange-box-shadow: rgba(249, 115, 22, 0.22);
+
+  /* Royal Purple Theme */
+  --royal-purple-text-primary: #F8FAFC;
+  --royal-purple-text-secondary: #94A3B8;
+  --royal-purple-bg-primary: #1E293B;
+  --royal-purple-bg-secondary: #334155;
+  --royal-purple-bg-tertiary: #475569;
+  --royal-purple-accent-primary: #8B5CF6;
+  --royal-purple-accent-secondary: #A78BFA;
+  --royal-purple-border-color: #475569;
+  --royal-purple-box-shadow: rgba(139, 92, 246, 0.22);
+}
+
+/* Theme Classes */
+.theme-ocean-blue {
+  --text-primary: var(--ocean-blue-text-primary);
+  --text-secondary: var(--ocean-blue-text-secondary);
+  --bg-primary: var(--ocean-blue-bg-primary);
+  --bg-secondary: var(--ocean-blue-bg-secondary);
+  --bg-tertiary: var(--ocean-blue-bg-tertiary);
+  --accent-primary: var(--ocean-blue-accent-primary);
+  --accent-secondary: var(--ocean-blue-accent-secondary);
+  --border-color: var(--ocean-blue-border-color);
+  --box-shadow-primary: var(--ocean-blue-box-shadow);
+}
+
+.theme-sakura-pink {
+  --text-primary: var(--sakura-pink-text-primary);
+  --text-secondary: var(--sakura-pink-text-secondary);
+  --bg-primary: var(--sakura-pink-bg-primary);
+  --bg-secondary: var(--sakura-pink-bg-secondary);
+  --bg-tertiary: var(--sakura-pink-bg-tertiary);
+  --accent-primary: var(--sakura-pink-accent-primary);
+  --accent-secondary: var(--sakura-pink-accent-secondary);
+  --border-color: var(--sakura-pink-border-color);
+  --box-shadow-primary: var(--sakura-pink-box-shadow);
+}
+
+.theme-forest-green {
+  --text-primary: var(--forest-green-text-primary);
+  --text-secondary: var(--forest-green-text-secondary);
+  --bg-primary: var(--forest-green-bg-primary);
+  --bg-secondary: var(--forest-green-bg-secondary);
+  --bg-tertiary: var(--forest-green-bg-tertiary);
+  --accent-primary: var(--forest-green-accent-primary);
+  --accent-secondary: var(--forest-green-accent-secondary);
+  --border-color: var(--forest-green-border-color);
+  --box-shadow-primary: var(--forest-green-box-shadow);
+}
+
+.theme-minimal-mono {
+  --text-primary: var(--minimal-mono-text-primary);
+  --text-secondary: var(--minimal-mono-text-secondary);
+  --bg-primary: var(--minimal-mono-bg-primary);
+  --bg-secondary: var(--minimal-mono-bg-secondary);
+  --bg-tertiary: var(--minimal-mono-bg-tertiary);
+  --accent-primary: var(--minimal-mono-accent-primary);
+  --accent-secondary: var(--minimal-mono-accent-secondary);
+  --border-color: var(--minimal-mono-border-color);
+  --box-shadow-primary: var(--minimal-mono-box-shadow);
+}
+
+.theme-sunset-orange {
+  --text-primary: var(--sunset-orange-text-primary);
+  --text-secondary: var(--sunset-orange-text-secondary);
+  --bg-primary: var(--sunset-orange-bg-primary);
+  --bg-secondary: var(--sunset-orange-bg-secondary);
+  --bg-tertiary: var(--sunset-orange-bg-tertiary);
+  --accent-primary: var(--sunset-orange-accent-primary);
+  --accent-secondary: var(--sunset-orange-accent-secondary);
+  --border-color: var(--sunset-orange-border-color);
+  --box-shadow-primary: var(--sunset-orange-box-shadow);
+}
+
+.theme-royal-purple {
+  --text-primary: var(--royal-purple-text-primary);
+  --text-secondary: var(--royal-purple-text-secondary);
+  --bg-primary: var(--royal-purple-bg-primary);
+  --bg-secondary: var(--royal-purple-bg-secondary);
+  --bg-tertiary: var(--royal-purple-bg-tertiary);
+  --accent-primary: var(--royal-purple-accent-primary);
+  --accent-secondary: var(--royal-purple-accent-secondary);
+  --border-color: var(--royal-purple-border-color);
+  --box-shadow-primary: var(--royal-purple-box-shadow);
+}
+
+/* Theme Selector */
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-width: 200px;
+  box-shadow: var(--box-shadow-primary);
+  z-index: 1000;
+  display: none;
+}
+
+.theme-selector:hover .theme-dropdown {
+  display: block;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.theme-option:hover {
+  background: var(--bg-tertiary);
+}
+
+.theme-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+}
+
+.theme-color.ocean-blue { background: var(--ocean-blue-accent-primary); }
+.theme-color.sakura-pink { background: var(--sakura-pink-accent-primary); }
+.theme-color.forest-green { background: var(--forest-green-accent-primary); }
+.theme-color.minimal-mono { background: var(--minimal-mono-accent-primary); }
+.theme-color.sunset-orange { background: var(--sunset-orange-accent-primary); }
+.theme-color.royal-purple { background: var(--royal-purple-accent-primary); }
+
+/* Theme Transitions */
+.theme-transition {
+  transition: all 0.3s ease;
+}
+
+/* Theme Animations */
+@keyframes themeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-dropdown {
+  animation: themeFadeIn 0.3s ease;
+}
+
+/* Theme Colors */
+.theme-ocean-blue {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+}
+
+.theme-sakura-pink {
+  background: linear-gradient(135deg, #ed64a6, #d53f8c);
+}
+
+.theme-forest-green {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+.theme-minimal-mono {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
+.theme-sunset-orange {
+  background: linear-gradient(135deg, #ed8936, #dd6b20);
+}
+
+.theme-royal-purple {
+  background: linear-gradient(135deg, #9f7aea, #805ad5);
+}
+
+/* Theme Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .theme-selector {
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .theme-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-selector-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .theme-option {
+    width: 36px;
+    height: 36px;
+  }
+} 

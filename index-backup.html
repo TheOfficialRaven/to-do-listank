@@ -5,17 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privát Teendőlista & Bevásárlólista</title>
   
-  <!-- IMMEDIATE JAVASCRIPT TEST -->
-  <script>
-    console.log('🔴 IMMEDIATE HTML SCRIPT TEST - This should appear first');
-    console.log('🔴 Current time:', new Date().toLocaleTimeString());
-    window.testFunction = function() {
-      console.log('✅ testFunction works!');
-      return 'HTML script is working';
-    };
-    console.log('🔴 testFunction defined in HTML');
-  </script>
-  
   <!-- Link a manifest fájlhoz (PWA támogatás) -->
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,47 +13,18 @@
   <!-- Google Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-  <!-- 🎨 Egyszerű téma betöltő -->
-  <script>
-    try {
-      const savedTheme = JSON.parse(localStorage.getItem('selectedTheme') || '{"name":"default","mode":"light"}');
-      document.documentElement.setAttribute('data-theme', savedTheme.mode);
-      if (savedTheme.name !== 'default') {
-        document.documentElement.classList.add(`theme-${savedTheme.name}`);
-      }
-      window.pendingThemeCSS = savedTheme.name;
-    } catch (error) {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  </script>
-
   <!-- SortableJS könyvtár (globális változóként elérhető) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   
-  <!-- Saját stíluslapok -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Stíluslapok - moduláris struktúra -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/navigation.css">
-  <link rel="stylesheet" href="index.css">
-  
-  <!-- Téma CSS betöltő script - CSS fájlok után -->
-  <script>
-    (function() {
-      // CSS betöltés a fő CSS fájlok után
-      if (window.pendingThemeCSS && window.pendingThemeCSS !== 'default') {
-        const existingLink = document.getElementById('theme-css');
-        if (!existingLink) {
-          const link = document.createElement('link');
-          link.id = 'theme-css';
-          link.rel = 'stylesheet';
-          link.href = 'modern-themes.css';
-          document.head.appendChild(link);
-          console.log('📎 Téma CSS betöltve:', window.pendingThemeCSS);
-        }
-      }
-    })();
-  </script>
+  <link rel="stylesheet" href="css/app-specific.css">
+  <link rel="stylesheet" href="modern-themes.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -94,11 +54,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-                  
                 </button>
               </div>
             </div>
@@ -118,11 +76,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-                  
                 </button>
               </div>
             </div>
@@ -142,11 +98,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-                  
                 </button>
               </div>
             </div>
@@ -166,11 +120,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-                  
                 </button>
               </div>
             </div>
@@ -190,11 +142,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-                  
                 </button>
               </div>
             </div>
@@ -214,11 +164,9 @@
               <div class="theme-mode-toggle">
                 <button class="theme-mode-btn" data-mode="light">
                   <span class="material-icons">light_mode</span>
-                  
                 </button>
                 <button class="theme-mode-btn" data-mode="dark">
                   <span class="material-icons">dark_mode</span>
-              
                 </button>
               </div>
             </div>
@@ -249,35 +197,14 @@
         </div>
       </div>
       <div class="modern-theme-footer">
-        <button id="theme-apply-btn" class="modern-apply-btn">
-          <span class="material-icons">check</span>
-          Alkalmaz
-        </button>
-        <button id="theme-cancel-btn" class="modern-cancel-btn">
-          <span class="material-icons">close</span>
-          Mégse
-        </button>
+        <button class="modern-apply-btn" id="theme-apply-btn">Alkalmaz</button>
+        <button class="modern-cancel-btn" id="theme-cancel-btn">Mégse</button>
       </div>
     </div>
   </div>
 
-  <!-- Nyelv választó - mindig látható (kívül az auth-section-ből) -->
-  <div class="global-language-menu">
-    <button id="auth-language-btn" class="auth-language-btn" title="Nyelv váltás / Language">
-      <span class="material-icons">language</span>
-      <span class="auth-language-text">HU</span>
-    </button>
-    <div id="auth-language-dropdown" class="auth-language-dropdown">
-      <ul>
-        <li><a href="#" data-lang="hu">🇭🇺 Magyar</a></li>
-        <li><a href="#" data-lang="en">🇺🇸 English</a></li>
-        <li><a href="#" data-lang="de">🇩🇪 Deutsch</a></li>
-      </ul>
-    </div>
-  </div>
-
   <!-- Autentikációs szekció -->
-  <section id="auth-section" style="display: none;">    
+  <section id="auth-section" style="display: none;">
     <h1>Regisztráció / Bejelentkezés</h1>
     <input type="email" id="email-input" placeholder="Email cím" required>
     <input type="password" id="auth-password-input" placeholder="Jelszó" required>
@@ -693,8 +620,6 @@
     </div>
   </div>
 
-  <!-- Firebase modulokat importáló script - ÁTHELYEZVE A FÁJL VÉGÉRE -->
-
   <!-- Lebegő gyors hozzáadás gomb -->
   <div id="quick-add-fab" class="quick-add-fab" style="display: none;">
     <span class="material-icons">add</span>
@@ -1002,7 +927,7 @@
     </button>
   </div>
 
-  <!-- JavaScript fájlok -->
-  <script type="module" src="index.js"></script>
+  <!-- JavaScript fájlok - Modular Structure -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
