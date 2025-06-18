@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Test</title>
+  
+  <!-- Tesztelés: CSS fájlok betöltése -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/app-specific.css">
+  <link rel="stylesheet" href="modern-themes.css">
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    .test-box {
+      background: red;
+      padding: 20px;
+      margin: 20px;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS Teszt</h1>
+  
+  <div class="test-box">
+    Ez piros háttérrel kell hogy megjelenjen (inline style)
+  </div>
+  
+  <div class="modern-card">
+    Ez egy modern-card osztály - ha látszik styling, akkor a CSS betöltődött
+  </div>
+  
+  <button class="primary-btn">
+    Elsődleges gomb
+  </button>
+  
+  <div class="stat-card">
+    <div class="stat-number">123</div>
+    <div class="stat-label">Statisztika</div>
+  </div>
+  
+  <script>
+    console.log('Test page loaded');
+    
+    // CSS betöltés ellenőrzése
+    const testStyleSheet = document.styleSheets[0];
+    console.log('Stylesheets count:', document.styleSheets.length);
+    
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      const sheet = document.styleSheets[i];
+      console.log(`Stylesheet ${i}:`, sheet.href);
+    }
+    
+    // CSS változók ellenőrzése
+    const bodyStyles = getComputedStyle(document.body);
+    console.log('--bg-primary:', bodyStyles.getPropertyValue('--bg-primary'));
+    console.log('--text-primary:', bodyStyles.getPropertyValue('--text-primary'));
+    console.log('Background color:', bodyStyles.backgroundColor);
+    console.log('Color:', bodyStyles.color);
+  </script>
+</body>
+</html> 

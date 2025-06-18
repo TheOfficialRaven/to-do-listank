@@ -91,30 +91,28 @@ console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA
 let deferredPrompt = null;
 let serviceWorkerRegistration = null;
 
-// Service Worker regisztrálása
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then((registration) => {
-        console.log('✅ Service Worker registered successfully:', registration.scope);
-        serviceWorkerRegistration = registration;
-        
-        // Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New Service Worker available');
-              showNotification('🔄 Új verzió elérhető! Frissítsd az oldalt.');
-            }
-          });
-        });
-      })
-      .catch((error) => {
-        console.log('❌ Service Worker registration failed:', error);
-      });
-  });
-}
+// Service Worker regisztráció az index.js-ben történik
+ if ('serviceWorker' in navigator) {
+   // Add cache-busting parameter for Netlify
+   const swUrl = './sw.js?v=' + Date.now();
+   
+   navigator.serviceWorker.register(swUrl)
+     .then(registration => {
+       console.log('ServiceWorker regisztrálva:', registration.scope);
+       serviceWorkerRegistration = registration;
+       
+       // Új service worker telepítése esetén
+       registration.addEventListener('updatefound', () => {
+         const newWorker = registration.installing;
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+           console.log('Új verzió elérhető!');
+         }
+       });
+     })
+     .catch(err => {
+       console.error('ServiceWorker regisztrációs hiba:', err);
+     });
+ }
 
 // PWA Install Event
 window.addEventListener('beforeinstallprompt', (e) => {
