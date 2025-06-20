@@ -1,0 +1,257 @@
+{
+  "templates": {
+    "student": {
+      "study_focus": {
+        "title": "Deep Focus Study Session",
+        "description": "Complete a 45-minute focused study session without distractions. Use the Pomodoro technique and take notes.",
+        "xp": 25,
+        "estimatedDuration": "45 min",
+        "tag": "study",
+        "tags": ["focus", "productivity", "monday", "tuesday", "wednesday", "thursday"],
+        "active": true
+      },
+      "review_notes": {
+        "title": "Review Yesterday's Notes",
+        "description": "Go through your notes from yesterday and create a summary of key points. Highlight important concepts.",
+        "xp": 15,
+        "estimatedDuration": "20 min",
+        "tag": "review",
+        "tags": ["morning", "tuesday", "wednesday", "thursday", "friday"],
+        "active": true
+      },
+      "organize_materials": {
+        "title": "Organize Study Materials",
+        "description": "Clean and organize your study space, digital files, and physical materials. Create folders for different subjects.",
+        "xp": 20,
+        "estimatedDuration": "30 min",
+        "tag": "organization",
+        "tags": ["weekend", "saturday", "sunday"],
+        "active": true
+      },
+      "practice_problems": {
+        "title": "Solve 3 Practice Problems",
+        "description": "Work through 3 challenging problems in your most difficult subject. Show all work and check answers.",
+        "xp": 30,
+        "estimatedDuration": "60 min",
+        "tag": "practice",
+        "tags": ["monday", "wednesday", "friday", "focus"],
+        "active": true
+      },
+      "read_chapter": {
+        "title": "Read One Chapter",
+        "description": "Read and take notes on one chapter from your current textbook. Create a mind map of key concepts.",
+        "xp": 20,
+        "estimatedDuration": "45 min",
+        "tag": "reading",
+        "tags": ["evening", "tuesday", "thursday", "weekend"],
+        "active": true
+      }
+    },
+    "youngProfessional": {
+      "skill_development": {
+        "title": "Learn Something New",
+        "description": "Spend 30 minutes learning a new skill related to your career through online courses, articles, or tutorials.",
+        "xp": 25,
+        "estimatedDuration": "30 min",
+        "tag": "learning",
+        "tags": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+        "active": true
+      },
+      "networking": {
+        "title": "Connect with One Professional",
+        "description": "Reach out to someone in your industry on LinkedIn or send a professional email. Build your network.",
+        "xp": 20,
+        "estimatedDuration": "15 min",
+        "tag": "networking",
+        "tags": ["tuesday", "wednesday", "thursday"],
+        "active": true
+      },
+      "organize_workspace": {
+        "title": "Optimize Your Workspace",
+        "description": "Clean and organize your physical and digital workspace. Update your task management system.",
+        "xp": 15,
+        "estimatedDuration": "25 min",
+        "tag": "productivity",
+        "tags": ["monday", "friday", "weekend"],
+        "active": true
+      },
+      "industry_news": {
+        "title": "Read Industry News",
+        "description": "Read 2-3 articles about trends and developments in your industry. Take notes on key insights.",
+        "xp": 15,
+        "estimatedDuration": "20 min",
+        "tag": "knowledge",
+        "tags": ["morning", "tuesday", "wednesday", "thursday"],
+        "active": true
+      },
+      "side_project": {
+        "title": "Work on Side Project",
+        "description": "Spend 45 minutes working on a personal project that showcases your skills or explores new technologies.",
+        "xp": 30,
+        "estimatedDuration": "45 min",
+        "tag": "project",
+        "tags": ["evening", "weekend", "saturday", "sunday"],
+        "active": true
+      }
+    },
+    "selfImprover": {
+      "meditation": {
+        "title": "Morning Meditation",
+        "description": "Practice mindfulness meditation for 10 minutes. Focus on your breathing and set intentions for [today].",
+        "xp": 15,
+        "estimatedDuration": "10 min",
+        "tag": "mindfulness",
+        "tags": ["morning", "monday", "tuesday", "wednesday", "thursday", "friday"],
+        "active": true
+      },
+      "gratitude_journal": {
+        "title": "Write 3 Things You're Grateful For",
+        "description": "Write down three things you're grateful for today and reflect on why they matter to you.",
+        "xp": 10,
+        "estimatedDuration": "5 min",
+        "tag": "gratitude",
+        "tags": ["evening", "daily"],
+        "active": true
+      },
+      "physical_exercise": {
+        "title": "20-Minute Exercise",
+        "description": "Do 20 minutes of physical exercise - walking, stretching, workout, or any movement that energizes you.",
+        "xp": 20,
+        "estimatedDuration": "20 min",
+        "tag": "fitness",
+        "tags": ["morning", "monday", "wednesday", "friday", "weekend"],
+        "active": true
+      },
+      "read_personal_dev": {
+        "title": "Read Personal Development",
+        "description": "Read 15 minutes from a personal development book or listen to an inspiring podcast episode.",
+        "xp": 15,
+        "estimatedDuration": "15 min",
+        "tag": "growth",
+        "tags": ["evening", "tuesday", "thursday", "weekend"],
+        "active": true
+      },
+      "declutter_space": {
+        "title": "Declutter One Area",
+        "description": "Choose one small area (desk, drawer, digital folder) and organize it completely. Donate or discard what you don't need.",
+        "xp": 20,
+        "estimatedDuration": "25 min",
+        "tag": "organization",
+        "tags": ["weekend", "saturday", "sunday"],
+        "active": true
+      },
+      "digital_detox": {
+        "title": "30-Minute Digital Detox",
+        "description": "Put away all devices for 30 minutes and do something analog - draw, write, walk, or have a real conversation.",
+        "xp": 25,
+        "estimatedDuration": "30 min",
+        "tag": "wellness",
+        "tags": ["evening", "weekend", "sunday"],
+        "active": true
+      }
+    },
+    "organizer": {
+      "plan_tomorrow": {
+        "title": "Plan Tomorrow's Tasks",
+        "description": "Review your calendar and create a prioritized task list for tomorrow. Set realistic goals and time blocks.",
+        "xp": 15,
+        "estimatedDuration": "15 min",
+        "tag": "planning",
+        "tags": ["evening", "monday", "tuesday", "wednesday", "thursday"],
+        "active": true
+      },
+      "review_goals": {
+        "title": "Weekly Goal Review",
+        "description": "Review your weekly goals and assess progress. Adjust plans if needed and celebrate completed milestones.",
+        "xp": 20,
+        "estimatedDuration": "20 min",
+        "tag": "goals",
+        "tags": ["friday", "sunday", "week-end"],
+        "active": true
+      },
+      "clean_emails": {
+        "title": "Inbox Zero Challenge",
+        "description": "Process all emails in your inbox. Reply, file, or delete each one. Unsubscribe from unnecessary lists.",
+        "xp": 25,
+        "estimatedDuration": "30 min",
+        "tag": "productivity",
+        "tags": ["monday", "wednesday", "friday"],
+        "active": true
+      },
+      "update_calendar": {
+        "title": "Calendar Maintenance",
+        "description": "Review and update your calendar for the next week. Add important deadlines and block time for focused work.",
+        "xp": 15,
+        "estimatedDuration": "15 min",
+        "tag": "scheduling",
+        "tags": ["friday", "sunday", "week-end"],
+        "active": true
+      },
+      "organize_files": {
+        "title": "Digital File Organization",
+        "description": "Organize files on your computer or cloud storage. Create logical folder structures and delete duplicates.",
+        "xp": 20,
+        "estimatedDuration": "25 min",
+        "tag": "organization",
+        "tags": ["weekend", "saturday"],
+        "active": true
+      },
+      "backup_important": {
+        "title": "Backup Important Data",
+        "description": "Backup important files, photos, and documents. Update your backup system and verify data integrity.",
+        "xp": 20,
+        "estimatedDuration": "20 min",
+        "tag": "maintenance",
+        "tags": ["sunday", "weekend"],
+        "active": true
+      }
+    },
+    "general": {
+      "hydration_reminder": {
+        "title": "Drink 3 Glasses of Water",
+        "description": "Stay hydrated by drinking at least 3 glasses of water throughout [today]. Your body will thank you!",
+        "xp": 10,
+        "estimatedDuration": "5 min",
+        "tag": "health",
+        "tags": ["daily", "morning", "afternoon"],
+        "active": true
+      },
+      "compliment_someone": {
+        "title": "Give Someone a Genuine Compliment",
+        "description": "Brighten someone's day by giving them a sincere compliment. It could be a friend, family member, or colleague.",
+        "xp": 15,
+        "estimatedDuration": "2 min",
+        "tag": "kindness",
+        "tags": ["daily", "social"],
+        "active": true
+      },
+      "tidy_space": {
+        "title": "5-Minute Tidy Up",
+        "description": "Spend 5 minutes tidying up your immediate surroundings. Put things back where they belong.",
+        "xp": 10,
+        "estimatedDuration": "5 min",
+        "tag": "organization",
+        "tags": ["daily", "quick"],
+        "active": true
+      },
+      "learn_fact": {
+        "title": "Learn One Interesting Fact",
+        "description": "Discover and remember one interesting fact about the world, science, history, or any topic that fascinates you.",
+        "xp": 10,
+        "estimatedDuration": "10 min",
+        "tag": "learning",
+        "tags": ["daily", "curiosity"],
+        "active": true
+      },
+      "call_loved_one": {
+        "title": "Call a Friend or Family Member",
+        "description": "Reach out to someone you care about and have a meaningful conversation. Strengthen your relationships.",
+        "xp": 20,
+        "estimatedDuration": "15 min",
+        "tag": "social",
+        "tags": ["evening", "weekend", "connection"],
+        "active": true
+      }
+    }
+  }
+} 

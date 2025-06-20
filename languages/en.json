@@ -1,10 +1,13 @@
 {
     "navigation": {
-    "dashboard": "🏠 Dashboard",
-    "overview": "📊 Overview",
-    "lists": "📝 Lists",
-    "notes": "📒 Notes",
-    "calendar": "🗓️ Calendar",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "lists": "Lists",
+    "daily-quests": "Quests",
+    "timetable": "Timetable",
+    "exam-calendar": "Exam Calendar",
+    "notes": "Notes",
+    "calendar": "Calendar",
     "privacy": "Privacy"
   },
   "common": {
@@ -362,6 +365,209 @@
     "explorer": {
       "title": "Explorer",
       "description": "Try all features"
+    }
+  },
+  "timetable": {
+    "title": "📅 Timetable",
+    "new_entry": "Add New Class",
+    "form_title": "✨ Add New Class",
+    "weekly_schedule": "📋 Weekly Schedule",
+    "table_view": "Table View",
+    "list_view": "List View",
+    "subject_label": "📚 Subject",
+    "subject_placeholder": "e.g. Mathematics, Physics...",
+    "day_label": "📅 Day",
+    "day_placeholder": "Select day",
+    "start_time_label": "🕐 Start Time",
+    "end_time_label": "🕑 End Time",
+    "teacher_label": "👨‍🏫 Teacher",
+    "teacher_placeholder": "e.g. John Smith",
+    "classroom_label": "🏫 Classroom/Location",
+    "classroom_placeholder": "e.g. Room 101, Online, Auditorium",
+    "online_link_label": "🔗 Online Link",
+    "online_link_placeholder": "https://...",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit_title": "✏️ Edit Class",
+    "update": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "empty_state": {
+      "title": "No classes in your timetable yet",
+      "subtitle": "Start adding classes with the \"Add New Class\" button!"
+    },
+    "no_classes": "No classes on this day",
+    "validation": {
+      "required_fields": "Please fill in the required fields!",
+      "invalid_time": "Invalid time setting!",
+      "time_conflict": "Conflict: there's already a class at this time!",
+      "delete_confirm": "Are you sure you want to delete this class?"
+    },
+    "notifications": {
+      "entry_added": "✅ Class successfully added!",
+      "entry_updated": "✅ Class successfully updated!",
+      "entry_deleted": "✅ Class successfully deleted!",
+      "save_error": "Error saving class",
+      "update_error": "Error updating class",
+      "delete_error": "Error deleting class"
+    }
+  },
+  "exam_calendar": {
+    "title": "📚 Exam Calendar",
+    "new_exam": "Add New Exam",
+    "form_title": "✨ Add New Exam",
+    "upcoming_exams": "📋 Upcoming Exams",
+    "filter_by": "Filter by:",
+    "all_exams": "All Exams",
+    "this_week": "This Week",
+    "this_month": "This Month",
+    "high_priority": "High Priority",
+    "medium_priority": "Medium Priority",
+    "low_priority": "Low Priority",
+    "subject_label": "📚 Subject",
+    "subject_placeholder": "e.g. Mathematics, Physics...",
+    "exam_type_label": "📝 Exam Type",
+    "exam_type_placeholder": "Select type",
+    "date_label": "📅 Date",
+    "time_label": "🕐 Time",
+    "time_placeholder": "e.g. 10:00",
+    "priority_label": "🔥 Priority",
+    "priority_placeholder": "Select priority",
+    "notes_label": "📝 Notes",
+    "notes_placeholder": "Additional information, study materials...",
+    "exam_types": {
+      "dolgozat": "Test",
+      "zh": "Quiz",
+      "feleles": "Oral Exam",
+      "erettsegi": "Final Exam",
+      "vizsga": "Exam",
+      "prezentacio": "Presentation",
+      "projekt": "Project Submission",
+      "teszt": "Quiz"
+    },
+    "priority_levels": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit_title": "✏️ Edit Exam",
+    "update": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "empty_state": {
+      "title": "No exams in your calendar yet",
+      "subtitle": "Start adding exams with the \"Add New Exam\" button!"
+    },
+    "days_until": "days left",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "overdue": "Overdue",
+    "validation": {
+      "required_fields": "Please fill in the required fields!",
+      "invalid_date": "Invalid date!",
+      "past_date": "Date cannot be in the past!",
+      "delete_confirm": "Are you sure you want to delete this exam?"
+    },
+    "notifications": {
+      "exam_added": "✅ Exam successfully added!",
+      "exam_updated": "✅ Exam successfully updated!",
+      "exam_deleted": "✅ Exam successfully deleted!",
+      "save_error": "Error saving exam",
+      "update_error": "Error updating exam",
+      "delete_error": "Error deleting exam"
+    }
+  },
+  "target_groups": {
+    "student": {
+      "navigation": {
+        "dashboard": "Study Center",
+        "overview": "Results",
+        "lists": "Tasks",
+        "daily-quests": "Daily Goals",
+        "timetable": "Timetable",
+        "exam-calendar": "Exam Calendar",
+        "notes": "Notebook",
+        "calendar": "Schedule"
+      },
+      "dashboard": {
+        "welcome": "📚 Welcome to your study center!",
+        "todayGoal": "Today's study goal",
+        "studyStreak": "Study streak",
+        "nextExam": "Next exam",
+        "studyTime": "Today's study time",
+        "completedTasks": "Completed tasks"
+      }
+    },
+    "youngProfessional": {
+      "navigation": {
+        "dashboard": "Career Hub",
+        "overview": "Performance",
+        "lists": "Projects",
+        "daily-quests": "Career Goals",
+        "timetable": "Work Schedule",
+        "exam-calendar": "Courses",
+        "notes": "Professional Notes",
+        "calendar": "Business Calendar"
+      },
+      "dashboard": {
+        "welcome": "💼 Welcome to your career center!",
+        "todayGoal": "Today's professional goal",
+        "networkGrowth": "Network growth",
+        "skillProgress": "Skill development",
+        "projectStatus": "Project status",
+        "achievements": "Achievements"
+      }
+    },
+    "selfImprover": {
+      "navigation": {
+        "dashboard": "Growth Center",
+        "overview": "Progress",
+        "lists": "Habits",
+        "daily-quests": "Daily Practices",
+        "timetable": "Routine",
+        "exam-calendar": "Learning",
+        "notes": "Mindfulness Journal",
+        "calendar": "Wellness Calendar"
+      },
+      "dashboard": {
+        "welcome": "🌱 Welcome to your growth center!",
+        "todayGoal": "Today's development goal",
+        "habitStreak": "Habit streak",
+        "mindfulMoments": "Mindful moments",
+        "wellnessScore": "Wellness score",
+        "growthAreas": "Growth areas"
+      }
+    },
+    "organizer": {
+      "navigation": {
+        "dashboard": "Organization Hub",
+        "overview": "Projects",
+        "lists": "Task Lists",
+        "daily-quests": "Organization Goals",
+        "timetable": "Schedule",
+        "exam-calendar": "Training",
+        "notes": "Planning Notes",
+        "calendar": "Event Calendar"
+      },
+      "dashboard": {
+        "welcome": "📋 Welcome to your organization center!",
+        "todayGoal": "Today's organization goal",
+        "activeProjects": "Active projects",
+        "upcomingDeadlines": "Upcoming deadlines",
+        "teamTasks": "Team tasks",
+        "efficiency": "Efficiency rating"
+      }
     }
   }
 } 

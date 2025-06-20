@@ -1,10 +1,13 @@
 {
     "navigation": {
-    "dashboard": "🏠 Dashboard",
-    "overview": "📊 Übersicht",
-    "lists": "📝 Listen",
-    "notes": "📒 Notizen",
-    "calendar": "🗓️ Kalender",
+    "dashboard": "Dashboard",
+    "overview": "Übersicht",
+    "lists": "Listen",
+    "daily-quests": "Quests",
+    "timetable": "Stundenplan",
+    "exam-calendar": "Prüfungskalender",
+    "notes": "Notizen",
+    "calendar": "Kalender",
     "privacy": "Datenschutz"
   },
   "common": {
@@ -362,6 +365,209 @@
     "explorer": {
       "title": "Entdecker",
       "description": "Probiere alle Funktionen aus"
+    }
+  },
+  "timetable": {
+    "title": "📅 Stundenplan",
+    "new_entry": "Neue Stunde hinzufügen",
+    "form_title": "✨ Neue Stunde hinzufügen",
+    "weekly_schedule": "📋 Wochenstundenplan",
+    "table_view": "Tabellenansicht",
+    "list_view": "Listenansicht",
+    "subject_label": "📚 Fach",
+    "subject_placeholder": "z.B. Mathematik, Physik...",
+    "day_label": "📅 Tag",
+    "day_placeholder": "Tag auswählen",
+    "start_time_label": "🕐 Startzeit",
+    "end_time_label": "🕑 Endzeit",
+    "teacher_label": "👨‍🏫 Lehrer",
+    "teacher_placeholder": "z.B. Herr Schmidt",
+    "classroom_label": "🏫 Klassenzimmer/Ort",
+    "classroom_placeholder": "z.B. Raum 101, Online, Aula",
+    "online_link_label": "🔗 Online Link",
+    "online_link_placeholder": "https://...",
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    },
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit_title": "✏️ Stunde bearbeiten",
+    "update": "Speichern",
+    "delete": "Löschen",
+    "close": "Schließen",
+    "empty_state": {
+      "title": "Noch keine Stunden in deinem Stundenplan",
+      "subtitle": "Beginne mit dem Hinzufügen von Stunden über den \"Neue Stunde hinzufügen\" Button!"
+    },
+    "no_classes": "Keine Stunden an diesem Tag",
+    "validation": {
+      "required_fields": "Bitte füllen Sie die erforderlichen Felder aus!",
+      "invalid_time": "Ungültige Zeiteinstellung!",
+      "time_conflict": "Konflikt: Es gibt bereits eine Stunde zu dieser Zeit!",
+      "delete_confirm": "Sind Sie sicher, dass Sie diese Stunde löschen möchten?"
+    },
+    "notifications": {
+      "entry_added": "✅ Stunde erfolgreich hinzugefügt!",
+      "entry_updated": "✅ Stunde erfolgreich aktualisiert!",
+      "entry_deleted": "✅ Stunde erfolgreich gelöscht!",
+      "save_error": "Fehler beim Speichern der Stunde",
+      "update_error": "Fehler beim Aktualisieren der Stunde",
+      "delete_error": "Fehler beim Löschen der Stunde"
+    }
+  },
+  "exam_calendar": {
+    "title": "📚 Prüfungskalender",
+    "new_exam": "Neue Prüfung hinzufügen",
+    "form_title": "✨ Neue Prüfung hinzufügen",
+    "upcoming_exams": "📋 Kommende Prüfungen",
+    "filter_by": "Filtern nach:",
+    "all_exams": "Alle Prüfungen",
+    "this_week": "Diese Woche",
+    "this_month": "Dieser Monat",
+    "high_priority": "Hohe Priorität",
+    "medium_priority": "Mittlere Priorität",
+    "low_priority": "Niedrige Priorität",
+    "subject_label": "📚 Fach",
+    "subject_placeholder": "z.B. Mathematik, Physik...",
+    "exam_type_label": "📝 Prüfungstyp",
+    "exam_type_placeholder": "Typ auswählen",
+    "date_label": "📅 Datum",
+    "time_label": "🕐 Zeit",
+    "time_placeholder": "z.B. 10:00",
+    "priority_label": "🔥 Priorität",
+    "priority_placeholder": "Priorität auswählen",
+    "notes_label": "📝 Notizen",
+    "notes_placeholder": "Zusätzliche Informationen, Lernmaterialien...",
+    "exam_types": {
+      "dolgozat": "Klassenarbeit",
+      "zh": "Test",
+      "feleles": "Mündliche Prüfung",
+      "erettsegi": "Abitur",
+      "vizsga": "Prüfung",
+      "prezentacio": "Präsentation",
+      "projekt": "Projektabgabe",
+      "teszt": "Quiz"
+    },
+    "priority_levels": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit_title": "✏️ Prüfung bearbeiten",
+    "update": "Speichern",
+    "delete": "Löschen",
+    "close": "Schließen",
+    "empty_state": {
+      "title": "Noch keine Prüfungen in deinem Kalender",
+      "subtitle": "Beginne mit dem Hinzufügen von Prüfungen über den \"Neue Prüfung hinzufügen\" Button!"
+    },
+    "days_until": "Tage übrig",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "overdue": "Überfällig",
+    "validation": {
+      "required_fields": "Bitte füllen Sie die erforderlichen Felder aus!",
+      "invalid_date": "Ungültiges Datum!",
+      "past_date": "Das Datum kann nicht in der Vergangenheit liegen!",
+      "delete_confirm": "Sind Sie sicher, dass Sie diese Prüfung löschen möchten?"
+    },
+    "notifications": {
+      "exam_added": "✅ Prüfung erfolgreich hinzugefügt!",
+      "exam_updated": "✅ Prüfung erfolgreich aktualisiert!",
+      "exam_deleted": "✅ Prüfung erfolgreich gelöscht!",
+      "save_error": "Fehler beim Speichern der Prüfung",
+      "update_error": "Fehler beim Aktualisieren der Prüfung",
+      "delete_error": "Fehler beim Löschen der Prüfung"
+    }
+  },
+  "target_groups": {
+    "student": {
+      "navigation": {
+        "dashboard": "Lernzentrum",
+        "overview": "Ergebnisse",
+        "lists": "Aufgaben",
+        "daily-quests": "Tägliche Ziele",
+        "timetable": "Stundenplan",
+        "exam-calendar": "Prüfungskalender",
+        "notes": "Notizbuch",
+        "calendar": "Schulplan"
+      },
+      "dashboard": {
+        "welcome": "📚 Willkommen in deinem Lernzentrum!",
+        "todayGoal": "Heutiges Lernziel",
+        "studyStreak": "Lern-Serie",
+        "nextExam": "Nächste Prüfung",
+        "studyTime": "Heutige Lernzeit",
+        "completedTasks": "Erledigte Aufgaben"
+      }
+    },
+    "youngProfessional": {
+      "navigation": {
+        "dashboard": "Karriere-Hub",
+        "overview": "Leistung",
+        "lists": "Projekte",
+        "daily-quests": "Karriere-Ziele",
+        "timetable": "Arbeitsplan",
+        "exam-calendar": "Kurse",
+        "notes": "Fachnotizen",
+        "calendar": "Business-Kalender"
+      },
+      "dashboard": {
+        "welcome": "💼 Willkommen in deinem Karrierezentrum!",
+        "todayGoal": "Heutiges berufliches Ziel",
+        "networkGrowth": "Netzwerk-Wachstum",
+        "skillProgress": "Kompetenzentwicklung",
+        "projectStatus": "Projekt-Status",
+        "achievements": "Errungenschaften"
+      }
+    },
+    "selfImprover": {
+      "navigation": {
+        "dashboard": "Wachstumszentrum",
+        "overview": "Fortschritt",
+        "lists": "Gewohnheiten",
+        "daily-quests": "Tägliche Übungen",
+        "timetable": "Routine",
+        "exam-calendar": "Lernen",
+        "notes": "Achtsamkeits-Tagebuch",
+        "calendar": "Wellness-Kalender"
+      },
+      "dashboard": {
+        "welcome": "🌱 Willkommen in deinem Wachstumszentrum!",
+        "todayGoal": "Heutiges Entwicklungsziel",
+        "habitStreak": "Gewohnheits-Serie",
+        "mindfulMoments": "Achtsame Momente",
+        "wellnessScore": "Wellness-Wert",
+        "growthAreas": "Wachstumsbereiche"
+      }
+    },
+    "organizer": {
+      "navigation": {
+        "dashboard": "Organisations-Hub",
+        "overview": "Projekte",
+        "lists": "Aufgabenlisten",
+        "daily-quests": "Organisations-Ziele",
+        "timetable": "Zeitplan",
+        "exam-calendar": "Schulungen",
+        "notes": "Planungsnotizen",
+        "calendar": "Event-Kalender"
+      },
+      "dashboard": {
+        "welcome": "📋 Willkommen in deinem Organisationszentrum!",
+        "todayGoal": "Heutiges Organisationsziel",
+        "activeProjects": "Aktive Projekte",
+        "upcomingDeadlines": "Anstehende Fristen",
+        "teamTasks": "Team-Aufgaben",
+        "efficiency": "Effizienz-Bewertung"
+      }
     }
   }
 } 

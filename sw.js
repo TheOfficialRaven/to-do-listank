@@ -3,8 +3,8 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.1.4';
-const OFFLINE_CACHE = 'todo-offline-v2.1.4';
+const CACHE_NAME = 'todo-app-v2.1.5';
+const OFFLINE_CACHE = 'todo-offline-v2.1.5';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
@@ -12,17 +12,29 @@ const CACHE_RESOURCES = [
   './index.html',
   './index.js',
   './styles.css',
-  './index.css',
-  './modern-themes.css',
-  './css/variables.css',
+  './css/modern-themes.css',
+  './css/profile-target-group.css',
+  './css/daily-quests.css',
+  './css/quest-system.css',
   './css/base.css',
   './css/navigation.css',
+  './css/components.css',
+  './css/themes.css',
+  './css/buttons.css',
+  './css/animations.css',
+  './css/modals.css',
+  './css/app-specific.css',
   './manifest.json',
   './favicon-16x16.png',
   './favicon-32x32.png',
   './android-chrome-192x192.png',
   './android-chrome-512x512.png',
   './apple-touch-icon.png',
+  './js/daily-quests-manager.js',
+  './js/target-group-advanced.js',
+  './js/quest-ui.js',
+  './js/goal-templates.js',
+  './target-group-simple.js',
   './languages/hu.json',
   './languages/en.json',
   './languages/de.json'

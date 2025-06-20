@@ -29,6 +29,11 @@
   
   <!-- Saját stíluslapok -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/profile-target-group.css">
+  <link rel="stylesheet" href="css/quest-system.css">
+  <link rel="stylesheet" href="css/daily-quests.css">
+  <link rel="stylesheet" href="css/timetable.css">
+  <link rel="stylesheet" href="css/exam-calendar.css">
 </head>
 <body>
 
@@ -242,28 +247,36 @@
   <!-- Főnavigáció -->
   <nav id="main-navigation">
     <div class="nav-container">
-      <!-- Bal oldali navigációs tabek -->
-      <div class="nav-tabs">
-        <button class="nav-tab active" data-tab="dashboard">🏠 Dashboard</button>
-        <button class="nav-tab" data-tab="overview">📊 Áttekintés</button>
-        <button class="nav-tab" data-tab="lists">📝 Listák</button>
-        <button class="nav-tab" data-tab="notes">📒 Jegyzetek</button>
-        <button class="nav-tab" data-tab="calendar">🗓️ Naptár</button>
+      <!-- Hamburger menu button (mobil) -->
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Navigációs menü">
+        <span class="material-icons">menu</span>
+      </button>
+      
+      <!-- Navigációs tabek -->
+      <div class="nav-tabs" id="nav-tabs">
+                    <button class="nav-tab active" data-tab="dashboard">🏠 <span data-lang="navigation.dashboard">Dashboard</span></button>
+            <button class="nav-tab" data-tab="overview">📊 <span data-lang="navigation.overview">Áttekintés</span></button>
+            <button class="nav-tab" data-tab="lists">📝 <span data-lang="navigation.lists">Listák</span></button>
+            <button class="nav-tab" data-tab="daily-quests">🎯 <span data-lang="navigation.daily-quests">Küldetések</span></button>
+            <button class="nav-tab student-only" data-tab="timetable">📅 <span data-lang="navigation.timetable">Órarend</span></button>
+            <button class="nav-tab student-only" data-tab="exam-calendar">📚 <span data-lang="navigation.exam-calendar">Vizsganaptár</span></button>
+            <button class="nav-tab" data-tab="notes">📒 <span data-lang="navigation.notes">Jegyzetek</span></button>
+            <button class="nav-tab" data-tab="calendar">🗓️ <span data-lang="navigation.calendar">Naptár</span></button>
       </div>
       
       <!-- Jobb oldali kontroll gombok -->
       <div class="nav-controls">
         <!-- Nyelv váltó -->
         <div class="nav-language-menu">
-          <button id="hamburger-icon" class="nav-control-btn" title="Nyelv váltás / Language">
+          <button id="language-selector-btn" class="nav-control-btn" title="Nyelv váltás / Language">
             <span class="material-icons">language</span>
             <span class="language-text">HU</span>
           </button>
           <div id="language-dropdown" class="language-dropdown">
             <ul>
-              <li><a href="#" data-lang="hu">🇭🇺 Magyar</a></li>
-              <li><a href="#" data-lang="en">🇺🇸 English</a></li>
-              <li><a href="#" data-lang="de">🇩🇪 Deutsch</a></li>
+              <li><a href="#" data-language="hu">🇭🇺 Magyar</a></li>
+              <li><a href="#" data-language="en">🇺🇸 English</a></li>
+              <li><a href="#" data-language="de">🇩🇪 Deutsch</a></li>
             </ul>
           </div>
         </div>
@@ -275,9 +288,6 @@
             <span class="theme-text" data-i18n="common.theme">Téma</span>
           </button>
         </div>
-        
-        <!-- PWA Telepítés gomb (nem használt, eltávolítjuk) -->
-        <!-- REMOVED: nav install button -->
         
         <!-- Profil dropdown -->
         <div class="profile-menu">
@@ -301,17 +311,20 @@
         </div>
       </div>
     </div>
+    
+    <!-- Mobile overlay -->
+    <div class="nav-mobile-overlay" id="nav-mobile-overlay"></div>
   </nav>
 
   <!-- Dashboard szekció -->
   <section id="dashboard-section" class="tab-content active">
     <div class="dashboard-grid">
       <div class="welcome-card">
-        <h2>👋 Üdvözlünk újra!</h2>
-        <p>Itt a mai áttekintésed</p>
+        <h2 data-lang="dashboard.welcome">👋 Üdvözlünk újra!</h2>
+        <p data-lang="dashboard.overview_text">Itt a mai áttekintésed</p>
         <div class="streak-info">
           <span class="streak-number" id="current-streak">0</span>
-          <span class="streak-label">napos sorozat</span>
+          <span class="streak-label" data-lang="dashboard.streak_label">napos sorozat</span>
         </div>
         <div class="current-time">
           <span id="current-date"></span>
@@ -320,43 +333,43 @@
       </div>
       
       <div class="quick-actions">
-        <h3>⚡ Gyors műveletek</h3>
+        <h3 data-lang="dashboard.quick_actions">⚡ Gyors műveletek</h3>
         <div class="action-buttons">
-          <button class="action-btn" data-action="quick-task">+ Gyors feladat</button>
-          <button class="action-btn" data-action="quick-note">+ Gyors jegyzet</button>
-          <button class="action-btn" data-action="quick-event">+ Esemény</button>
+          <button class="action-btn" data-action="quick-task" data-lang="dashboard.quick_task">+ Gyors feladat</button>
+          <button class="action-btn" data-action="quick-note" data-lang="dashboard.quick_note">+ Gyors jegyzet</button>
+          <button class="action-btn" data-action="quick-event" data-lang="dashboard.quick_event">+ Esemény</button>
         </div>
       </div>
       
       <div class="daily-quote">
-        <h3>💡 Mai inspiráció</h3>
+        <h3 data-lang="dashboard.daily_inspiration">💡 Mai inspiráció</h3>
         <p id="quote-text"></p>
         <small id="quote-author"></small>
       </div>
       
       <div class="today-events">
-        <h3>📅 Mai események</h3>
+        <h3 data-lang="dashboard.today_events">📅 Mai események</h3>
         <div id="today-events-list" class="events-preview">
-          <p class="no-events"></p>
+          <p class="no-events" data-lang="dashboard.no_events"></p>
         </div>
       </div>
       
       <div class="pinned-items">
-        <h3>📌 Kiemelt elemek</h3>
+        <h3 data-lang="dashboard.pinned_items">📌 Kiemelt elemek</h3>
         <div id="pinned-notes" class="pinned-section">
-          <h4>Jegyzetek</h4>
+          <h4 data-lang="dashboard.notes">Jegyzetek</h4>
           <div id="pinned-notes-list" class="pinned-list"></div>
         </div>
         <div id="pinned-tasks" class="pinned-section">
-          <h4>Feladatok</h4>
+          <h4 data-lang="dashboard.tasks">Feladatok</h4>
           <div id="pinned-tasks-list" class="pinned-list"></div>
         </div>
       </div>
       
       <div class="urgent-tasks">
-        <h3>⚠️ Sürgős feladatok</h3>
+        <h3 data-lang="dashboard.urgent_tasks">⚠️ Sürgős feladatok</h3>
         <div id="urgent-tasks-list" class="urgent-list">
-          <p class="no-urgent" data-tab="dashboard" ></p>
+          <p class="no-urgent" data-lang="dashboard.no_urgent"></p>
         </div>
       </div>
     </div>
@@ -365,17 +378,17 @@
   <!-- Áttekintés szekció - Statisztikák és eredmények -->
   <section id="overview-section" class="tab-content" style="display: none;">
     <div class="section-header">
-      <h2>📊 Áttekintés & Statisztikák</h2>
+      <h2 data-lang="overview.title">📊 Áttekintés & Statisztikák</h2>
     </div>
     
     <!-- Főstatisztikák panel - visszahozva az eredeti designt -->
     <section id="main-stats-panel">
-      <h3>📈 Statisztikák</h3>
+      <h3 data-lang="overview.statistics">📈 Statisztikák</h3>
       <div id="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">📝</div>
           <div class="stat-number" id="total-lists">0</div>
-          <div class="stat-label">Lista</div>
+          <div class="stat-label" data-lang="overview.lists">Lista</div>
           <div class="progress-bar">
             <div class="progress-fill" id="lists-progress"></div>
           </div>
@@ -383,7 +396,7 @@
         <div class="stat-card">
           <div class="stat-icon">📋</div>
           <div class="stat-number" id="total-items">0</div>
-          <div class="stat-label">Elem</div>
+          <div class="stat-label" data-lang="overview.items">Elem</div>
           <div class="progress-bar">
             <div class="progress-fill" id="items-progress"></div>
           </div>
@@ -391,7 +404,7 @@
         <div class="stat-card">
           <div class="stat-icon">✅</div>
           <div class="stat-number" id="completed-items">0</div>
-          <div class="stat-label">Kész</div>
+          <div class="stat-label" data-lang="overview.completed">Kész</div>
           <div class="progress-bar">
             <div class="progress-fill" id="completed-progress"></div>
           </div>
@@ -409,7 +422,7 @@
               <text x="18" y="20.35" class="percentage" id="completion-percentage">0%</text>
             </svg>
           </div>
-          <div class="stat-label">Teljesítés</div>
+          <div class="stat-label" data-lang="overview.completion">Teljesítés</div>
         </div>
       </div>
     </section>
@@ -418,7 +431,7 @@
     <div class="overview-bottom">
       <div class="overview-left">
         <div class="level-card">
-          <h3>🌟 Szinted</h3>
+          <h3 data-lang="overview.level">🌟 Szinted</h3>
           <div class="level-info">
             <span class="level-number" id="user-level">1</span>
             <div class="xp-bar">
@@ -429,7 +442,7 @@
         </div>
         
         <div class="activity-graph">
-          <h3>📊 Aktivitás grafikon</h3>
+          <h3 data-lang="overview.activity_graph">📊 Aktivitás grafikon</h3>
           <div class="activity-calendar" id="activity-calendar">
             <!-- Activity heatmap will be generated here -->
           </div>
@@ -473,7 +486,7 @@
         </div>
         
         <div class="productivity-insights">
-          <h3>🔍 Produktivitási betekintés</h3>
+          <h3 data-lang="overview.productivity">🔍 Produktivitási betekintés</h3>
           <div class="insights-list" id="insights-list">
             <div class="insight-item">
               <span class="insight-icon">📈</span>
@@ -561,6 +574,287 @@
     <section id="lists-container" class="draggable-container"></section>
   </section>
 
+  <!-- Daily Quests szekció -->
+  <section id="daily-quests-section" class="tab-content" style="display: none;">
+    <div class="section-header">
+      <h2>🎯 Napi Küldetések</h2>
+      <div class="quest-stats">
+        <span id="daily-quest-stats" class="quest-stats-text">Betöltés...</span>
+      </div>
+    </div>
+    
+    <!-- Daily quests will be dynamically loaded here -->
+    <div id="daily-quests-container" class="daily-quests-container">
+      <div class="quest-empty-state">
+        <div class="quest-empty-icon">🎯</div>
+        <h3>Napi küldetések betöltése...</h3>
+        <p>A napi küldetéseid hamarosan megjelennek itt.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timetable (Órarend) szekció - csak diákoknak -->
+  <section id="timetable-section" class="tab-content student-only" style="display: none;">
+    <div class="section-header">
+      <h2 data-lang="timetable.title">📅 Órarend</h2>
+      <button id="new-timetable-entry-btn" class="primary-btn">
+        <span class="material-icons">add</span>
+        <span data-lang="timetable.new_entry">Új óra hozzáadása</span>
+      </button>
+    </div>
+    
+    <!-- Órarend hozzáadás form -->
+    <div id="timetable-form" class="timetable-form modern-card" style="display: none;">
+      <div class="form-header">
+        <h3 data-lang="timetable.form_title">✨ Új óra hozzáadása</h3>
+        <button id="cancel-timetable-form" class="close-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="timetable-subject" data-lang="timetable.subject_label">📚 Tantárgy *</label>
+          <input type="text" id="timetable-subject" data-lang="timetable.subject_placeholder" placeholder="pl. Matematika, Fizika..." required>
+        </div>
+        
+        <div class="input-group">
+          <label for="timetable-day" data-lang="timetable.day_label">📅 Nap *</label>
+          <select id="timetable-day" required>
+            <option value="" data-lang="timetable.day_placeholder">Válassz napot</option>
+            <option value="monday" data-lang="timetable.days.monday">Hétfő</option>
+            <option value="tuesday" data-lang="timetable.days.tuesday">Kedd</option>
+            <option value="wednesday" data-lang="timetable.days.wednesday">Szerda</option>
+            <option value="thursday" data-lang="timetable.days.thursday">Csütörtök</option>
+            <option value="friday" data-lang="timetable.days.friday">Péntek</option>
+            <option value="saturday" data-lang="timetable.days.saturday">Szombat</option>
+            <option value="sunday" data-lang="timetable.days.sunday">Vasárnap</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="timetable-start-time" data-lang="timetable.start_time_label">🕐 Kezdés *</label>
+          <input type="time" id="timetable-start-time" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="timetable-end-time" data-lang="timetable.end_time_label">🕑 Befejezés *</label>
+          <input type="time" id="timetable-end-time" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="timetable-teacher" data-lang="timetable.teacher_label">👨‍🏫 Tanár</label>
+          <input type="text" id="timetable-teacher" data-lang="timetable.teacher_placeholder" placeholder="pl. Kovács Péter">
+        </div>
+        
+        <div class="input-group">
+          <label for="timetable-classroom" data-lang="timetable.classroom_label">🏫 Terem/Helyszín</label>
+          <input type="text" id="timetable-classroom" data-lang="timetable.classroom_placeholder" placeholder="pl. 1/A, Online, Aula">
+        </div>
+        
+        <div class="input-group full-width">
+          <label for="timetable-online-link" data-lang="timetable.online_link_label">🔗 Online link</label>
+          <input type="url" id="timetable-online-link" data-lang="timetable.online_link_placeholder" placeholder="https://...">
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button id="save-timetable-entry" class="primary-btn">
+          <span class="material-icons">save</span>
+          <span data-lang="timetable.save">Mentés</span>
+        </button>
+        <button id="cancel-timetable-entry" class="secondary-btn">
+          <span data-lang="timetable.cancel">Mégse</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Heti órarend megjelenítés -->
+    <div class="timetable-container">
+      <div class="timetable-header">
+        <h3 data-lang="timetable.weekly_schedule">📋 Heti órarend</h3>
+        <div class="timetable-controls">
+          <button id="timetable-view-toggle" class="view-toggle-btn" data-view="table">
+            <span class="material-icons">view_list</span>
+            <span data-lang="timetable.list_view">Lista nézet</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Táblázatos órarend nézet -->
+      <div id="timetable-table-view" class="timetable-view">
+        <div class="timetable-table-container">
+          <table class="timetable-table">
+            <thead>
+              <tr>
+                <th>Idő</th>
+                <th>Hétfő</th>
+                <th>Kedd</th>
+                <th>Szerda</th>
+                <th>Csütörtök</th>
+                <th>Péntek</th>
+                <th>Szombat</th>
+                <th>Vasárnap</th>
+              </tr>
+            </thead>
+            <tbody id="timetable-table-body">
+              <!-- A táblázat tartalma dinamikusan töltődik fel -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Lista nézet -->
+      <div id="timetable-list-view" class="timetable-view" style="display: none;">
+        <div class="timetable-days">
+          <div class="timetable-day" data-day="monday">
+            <h4>📅 <span data-lang="timetable.days.monday">Hétfő</span></h4>
+            <div class="day-classes" id="monday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="tuesday">
+            <h4>📅 <span data-lang="timetable.days.tuesday">Kedd</span></h4>
+            <div class="day-classes" id="tuesday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="wednesday">
+            <h4>📅 <span data-lang="timetable.days.wednesday">Szerda</span></h4>
+            <div class="day-classes" id="wednesday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="thursday">
+            <h4>📅 <span data-lang="timetable.days.thursday">Csütörtök</span></h4>
+            <div class="day-classes" id="thursday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="friday">
+            <h4>📅 <span data-lang="timetable.days.friday">Péntek</span></h4>
+            <div class="day-classes" id="friday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="saturday">
+            <h4>📅 <span data-lang="timetable.days.saturday">Szombat</span></h4>
+            <div class="day-classes" id="saturday-classes"></div>
+          </div>
+          <div class="timetable-day" data-day="sunday">
+            <h4>📅 <span data-lang="timetable.days.sunday">Vasárnap</span></h4>
+            <div class="day-classes" id="sunday-classes"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Üres állapot -->
+      <div id="timetable-empty-state" class="timetable-empty-state" style="display: none;">
+        <div class="empty-state-icon">📅</div>
+        <h3 data-lang="timetable.empty_state.title">Még nincs óráid az órarendben</h3>
+        <p data-lang="timetable.empty_state.subtitle">Kezdj el felvenni órákat a "Új óra hozzáadása" gombbal!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vizsganaptár szekció - csak diákoknak -->
+  <section id="exam-calendar-section" class="tab-content student-only" style="display: none;">
+    <div class="section-header">
+      <h2 data-lang="exam_calendar.title">📚 Vizsganaptár</h2>
+      <button id="new-exam-btn" class="primary-btn">
+        <span class="material-icons">add</span>
+        <span data-lang="exam_calendar.new_exam">Új vizsga hozzáadása</span>
+      </button>
+    </div>
+    
+    <!-- Vizsga hozzáadás form -->
+    <div id="exam-form" class="exam-form modern-card" style="display: none;">
+      <div class="form-header">
+        <h3>✨ Új vizsga hozzáadása</h3>
+        <button id="cancel-exam-form" class="close-btn">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="exam-subject">📚 Tantárgy *</label>
+          <input type="text" id="exam-subject" placeholder="pl. Matematika, Történelem..." required>
+        </div>
+        
+        <div class="input-group">
+          <label for="exam-type">📝 Vizsga típusa *</label>
+          <select id="exam-type" required>
+            <option value="">Válassz típust</option>
+            <option value="dolgozat">Dolgozat</option>
+            <option value="zh">ZH</option>
+            <option value="feleles">Felelés</option>
+            <option value="erettsegi">Érettségi</option>
+            <option value="vizsga">Vizsga</option>
+            <option value="prezentacio">Prezentáció</option>
+            <option value="projekt">Projekt beadás</option>
+            <option value="teszt">Teszt</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="exam-date">📅 Dátum *</label>
+          <input type="date" id="exam-date" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="exam-time">🕐 Időpont</label>
+          <input type="time" id="exam-time">
+        </div>
+        
+        <div class="input-group">
+          <label for="exam-priority">⚡ Prioritás</label>
+          <select id="exam-priority">
+            <option value="low">🟢 Alacsony</option>
+            <option value="medium" selected>🟡 Közepes</option>
+            <option value="high">🔴 Magas</option>
+          </select>
+        </div>
+        
+        <div class="input-group full-width">
+          <label for="exam-notes">📝 Jegyzetek</label>
+          <textarea id="exam-notes" placeholder="pl. Témakörök: integrálás, deriválás, függvények..." rows="3"></textarea>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button id="save-exam" class="primary-btn">
+          <span class="material-icons">save</span>
+          Mentés
+        </button>
+        <button id="cancel-exam" class="secondary-btn">
+          Mégse
+        </button>
+      </div>
+    </div>
+    
+    <!-- Vizsgák megjelenítése -->
+    <div class="exam-container">
+      <div class="exam-header">
+        <h3>📅 Közelgő vizsgák</h3>
+        <div class="exam-filter">
+          <select id="exam-filter-select">
+            <option value="all">Minden vizsga</option>
+            <option value="week">Következő hét</option>
+            <option value="month">Következő hónap</option>
+            <option value="high">Magas prioritás</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Hetek szerint csoportosított vizsgák -->
+      <div id="exam-timeline" class="exam-timeline">
+        <!-- Dinamikusan töltődik -->
+      </div>
+      
+      <!-- Üres állapot -->
+      <div id="exam-empty-state" class="exam-empty-state" style="display: none;">
+        <div class="empty-state-icon">📚</div>
+        <h3>Még nincsenek vizsgáid</h3>
+        <p>Kezdj el felvinni közelgő vizsgákat, hogy időben készülhess rájuk!</p>
+        <button id="add-first-exam" class="primary-btn">
+          <span class="material-icons">add</span>
+          Első vizsga hozzáadása
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- Jegyzetek szekció -->
   <section id="notes-section" class="tab-content" style="display: none;">
     <div class="section-header">
@@ -640,6 +934,146 @@
       <div class="modal-footer">
         <button id="confirm-delete-note" class="danger-btn">🗑️ Törlés</button>
         <button id="cancel-delete-note" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vizsga szerkesztő modal -->
+  <div id="exam-edit-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="exam-edit-modal-title">✏️ Vizsga szerkesztése</h3>
+        <button class="close-btn" id="exam-edit-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="edit-exam-subject">📚 Tantárgy *</label>
+            <input type="text" id="edit-exam-subject" placeholder="pl. Matematika, Történelem..." required>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-exam-type">📝 Vizsga típusa *</label>
+            <select id="edit-exam-type" required>
+              <option value="">Válassz típust</option>
+              <option value="dolgozat">Dolgozat</option>
+              <option value="zh">ZH</option>
+              <option value="feleles">Felelés</option>
+              <option value="erettsegi">Érettségi</option>
+              <option value="vizsga">Vizsga</option>
+              <option value="prezentacio">Prezentáció</option>
+              <option value="projekt">Projekt beadás</option>
+              <option value="teszt">Teszt</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-exam-date">📅 Dátum *</label>
+            <input type="date" id="edit-exam-date" required>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-exam-time">🕐 Időpont</label>
+            <input type="time" id="edit-exam-time">
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-exam-priority">⚡ Prioritás</label>
+            <select id="edit-exam-priority">
+              <option value="low">🟢 Alacsony</option>
+              <option value="medium">🟡 Közepes</option>
+              <option value="high">🔴 Magas</option>
+            </select>
+          </div>
+          
+          <div class="input-group full-width">
+            <label for="edit-exam-notes">📝 Jegyzetek</label>
+            <textarea id="edit-exam-notes" placeholder="pl. Témakörök: integrálás, deriválás, függvények..." rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="update-exam" class="primary-btn">
+          <span class="material-icons">save</span>
+          Mentés
+        </button>
+        <button id="delete-exam" class="danger-btn">
+          <span class="material-icons">delete</span>
+          Törlés
+        </button>
+        <button id="cancel-exam-edit" class="secondary-btn">Mégse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Órarend szerkesztő modal -->
+  <div id="timetable-edit-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="timetable-edit-modal-title">✏️ Óra szerkesztése</h3>
+        <button class="close-btn" id="timetable-edit-modal-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="edit-timetable-subject">📚 Tantárgy *</label>
+            <input type="text" id="edit-timetable-subject" placeholder="pl. Matematika, Fizika..." required>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-timetable-day">📅 Nap *</label>
+            <select id="edit-timetable-day" required>
+              <option value="">Válassz napot</option>
+              <option value="monday">Hétfő</option>
+              <option value="tuesday">Kedd</option>
+              <option value="wednesday">Szerda</option>
+              <option value="thursday">Csütörtök</option>
+              <option value="friday">Péntek</option>
+              <option value="saturday">Szombat</option>
+              <option value="sunday">Vasárnap</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-timetable-start-time">🕐 Kezdés *</label>
+            <input type="time" id="edit-timetable-start-time" required>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-timetable-end-time">🕑 Befejezés *</label>
+            <input type="time" id="edit-timetable-end-time" required>
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-timetable-teacher">👨‍🏫 Tanár</label>
+            <input type="text" id="edit-timetable-teacher" placeholder="pl. Kovács Péter">
+          </div>
+          
+          <div class="input-group">
+            <label for="edit-timetable-classroom">🏫 Terem/Helyszín</label>
+            <input type="text" id="edit-timetable-classroom" placeholder="pl. 1/A, Online, Aula">
+          </div>
+          
+          <div class="input-group full-width">
+            <label for="edit-timetable-online-link">🔗 Online link</label>
+            <input type="url" id="edit-timetable-online-link" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="update-timetable-entry" class="primary-btn">
+          <span class="material-icons">save</span>
+          Mentés
+        </button>
+        <button id="delete-timetable-entry" class="danger-btn">
+          <span class="material-icons">delete</span>
+          Törlés
+        </button>
+        <button id="cancel-timetable-edit" class="secondary-btn">Mégse</button>
       </div>
     </div>
   </div>
@@ -955,5 +1389,81 @@
 
   <!-- JavaScript fájlok -->
   <script type="module" src="index.js"></script>
+  <script type="module" src="/js/target-group-advanced.js"></script>
+  <!-- Küldetések manager betöltése UTÁN, amikor már a Firebase inicializálva van -->
+  <script>
+    // Várakozás a Firebase inicializálására, majd a küldetések manager betöltése
+    function loadDailyQuestsAfterFirebase() {
+      let attempts = 0;
+      const maxAttempts = 25; // 5 másodperc (25 * 200ms)
+      
+      const checkFirebase = () => {
+        attempts++;
+        if (window.db && window.auth) {
+          console.log('✅ Firebase ready, loading daily quests manager...');
+          import('./js/daily-quests-manager.js').then(() => {
+            console.log('✅ Daily quests manager loaded successfully');
+          }).catch(error => {
+            console.error('❌ Error loading daily quests manager:', error);
+          });
+          
+          // Load timetable manager for student users
+          import('./js/timetable-manager.js').then(() => {
+            console.log('✅ Timetable manager loaded successfully');
+          }).catch(error => {
+            console.error('❌ Error loading timetable manager:', error);
+          });
+          
+          // Load exam calendar manager for student users
+          import('./js/exam-calendar-manager.js').then(() => {
+            console.log('✅ Exam calendar manager loaded successfully');
+          }).catch(error => {
+            console.error('❌ Error loading exam calendar manager:', error);
+          });
+        } else {
+          console.log(`⏳ Waiting for Firebase to be available... (attempt ${attempts}/${maxAttempts})`);
+          if (attempts < maxAttempts) {
+            setTimeout(checkFirebase, 200);
+          } else {
+            console.error('❌ Firebase initialization timeout after 5 seconds');
+            console.log('💡 Try: Check Firebase config, network connection, or manually debug with window.db and window.auth');
+          }
+        }
+      };
+      checkFirebase();
+    }
+    
+    // Debug funkció a Firebase állapot ellenőrzésére
+    window.debugQuests = function() {
+      console.log('🔍 Daily Quests Debug Info:');
+      console.log('  - window.db:', typeof window.db, window.db ? '✅' : '❌');
+      console.log('  - window.auth:', typeof window.auth, window.auth ? '✅' : '❌');
+      console.log('  - dailyQuestsManager:', typeof window.dailyQuestsManager, window.dailyQuestsManager ? '✅' : '❌');
+      console.log('  - daily-quests container:', document.getElementById('daily-quests-container') ? '✅' : '❌');
+      console.log('  - User authenticated:', window.auth && window.auth.currentUser ? '✅' : '❌');
+      console.log('💡 Use generateTestQuests() to create sample quests');
+    };
+    
+    // Test küldetés generálása manuálisan
+    window.generateTestQuests = function() {
+      if (window.dailyQuestsManager) {
+        window.dailyQuestsManager.generateSampleQuests().then(() => {
+          console.log('✅ Test quests generated');
+        }).catch(error => {
+          console.error('❌ Error generating test quests:', error);
+        });
+      } else {
+        console.error('❌ Daily quests manager not available');
+      }
+    };
+    
+    // Kezdjük a betöltést amikor a DOM kész
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadDailyQuestsAfterFirebase);
+    } else {
+      loadDailyQuestsAfterFirebase();
+    }
+  </script>
+  
 </body>
 </html>

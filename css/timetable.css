@@ -1,0 +1,474 @@
+/* Timetable (Órarend) Styling */
+
+/* Student-only visibility */
+.student-only {
+  display: none;
+}
+
+.target-group-student .student-only {
+  display: block;
+}
+
+.target-group-student .nav-tab.student-only {
+  display: flex;
+}
+
+/* Timetable Section */
+#timetable-section {
+  padding: 2rem 1rem;
+  background: var(--bg-primary);
+  min-height: calc(100vh - 140px);
+}
+
+/* Timetable Form */
+.timetable-form {
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.form-header h3 {
+  color: var(--accent-color);
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.input-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.input-group input,
+.input-group select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* Timetable Container */
+.timetable-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.timetable-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: var(--accent-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.timetable-header h3 {
+  color: var(--accent-color);
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.timetable-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.view-toggle-btn:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Table View */
+.timetable-table-container {
+  overflow-x: auto;
+  padding: 2rem;
+}
+
+.timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.timetable-table th {
+  background: var(--accent-light);
+  color: var(--accent-color);
+  padding: 1rem 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.timetable-table td {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  vertical-align: top;
+  min-height: 60px;
+  position: relative;
+}
+
+.time-slot {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.class-cell {
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.class-cell:hover {
+  background: var(--accent-light);
+}
+
+.class-entry {
+  background: var(--accent-color);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.class-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.class-subject {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.class-details {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.class-teacher,
+.class-classroom {
+  display: block;
+}
+
+/* List View */
+.timetable-days {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.timetable-day {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.timetable-day h4 {
+  background: var(--accent-light);
+  color: var(--accent-color);
+  margin: 0;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.day-classes {
+  padding: 1rem;
+  min-height: 100px;
+}
+
+.class-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.class-item:last-child {
+  margin-bottom: 0;
+}
+
+.class-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-color);
+}
+
+.class-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.class-item-subject {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.class-item-time {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.class-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.class-item-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-item-detail .material-icons {
+  font-size: 1rem;
+}
+
+.online-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.online-link:hover {
+  text-decoration: underline;
+  filter: brightness(1.2);
+}
+
+/* Empty State */
+.timetable-empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.timetable-empty-state h3 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.timetable-empty-state p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* No classes message for individual days */
+.no-classes-message {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2rem 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #timetable-section {
+    padding: 1rem 0.5rem;
+  }
+  
+  .timetable-form {
+    padding: 1.5rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+  
+  .timetable-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .timetable-table {
+    font-size: 0.8rem;
+  }
+  
+  .timetable-table th,
+  .timetable-table td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .class-entry {
+    padding: 0.3rem;
+    font-size: 0.75rem;
+  }
+  
+  .timetable-days {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .class-item {
+    padding: 0.75rem;
+  }
+  
+  .class-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timetable-form {
+    padding: 1rem;
+  }
+  
+  .timetable-table-container {
+    padding: 1rem;
+  }
+  
+  .timetable-table {
+    font-size: 0.7rem;
+  }
+  
+  .class-entry {
+    padding: 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .class-details {
+    display: none;
+  }
+  
+  .timetable-days {
+    padding: 0.5rem;
+  }
+  
+  .class-item-details {
+    font-size: 0.8rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .timetable-header,
+  .form-actions,
+  .view-toggle-btn,
+  #new-timetable-entry-btn {
+    display: none;
+  }
+  
+  .timetable-table {
+    font-size: 0.8rem;
+  }
+  
+  .class-entry {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+    box-shadow: none;
+  }
+} 

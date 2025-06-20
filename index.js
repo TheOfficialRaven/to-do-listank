@@ -28,7 +28,87 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-console.log('🔧 Firebase initialized, defining PWA functions...');
+// Make Firebase instances globally available for other modules
+window.db = db;
+window.auth = auth;
+
+// Legacy Firebase compatibility layer for manager files
+window.firebase = {
+  auth: () => {
+    console.log(`👤 Firebase auth accessed, currentUser:`, auth.currentUser ? 'logged in' : 'not logged in');
+    return auth;
+  },
+  database: () => {
+    return {
+      ref: (path) => {
+        console.log(`🔗 Firebase ref created for path: ${path}`);
+        return {
+          push: (data) => {
+            console.log(`📤 Firebase push called with data:`, data ? 'data provided' : 'no data');
+            if (data) {
+              // With data - return promise
+              return push(ref(db, path), data);
+            } else {
+              // Without data - return ref with key and set method
+              const newRef = push(ref(db, path));
+              console.log(`🆔 New Firebase ref created with key: ${newRef.key}`);
+              return {
+                key: newRef.key,
+                set: async (setData) => {
+                  console.log(`💾 Firebase set called with data:`, setData);
+                  return await set(newRef, setData);
+                }
+              };
+            }
+          },
+          once: async (eventType) => {
+            console.log(`📖 Firebase once called for eventType: ${eventType} on path: ${path}`);
+            const snapshot = await get(ref(db, path));
+            console.log(`📊 Firebase snapshot exists: ${snapshot.exists()}, data:`, snapshot.exists() ? 'data available' : 'no data');
+            return snapshot;
+          },
+          set: async (data) => {
+            return await set(ref(db, path), data);
+          },
+          update: async (data) => {
+            return await update(ref(db, path), data);
+          },
+          remove: async () => {
+            return await remove(ref(db, path));
+          },
+          on: (eventType, callback) => {
+            return onValue(ref(db, path), callback);
+          },
+          off: () => {
+            // Placeholder for unsubscribe
+          }
+        };
+      }
+    };
+  },
+  app: app
+};
+
+// Firebase auth ready check function for managers
+window.waitForFirebaseAuth = function() {
+  return new Promise((resolve) => {
+    if (auth.currentUser) {
+      console.log('✅ Firebase auth already ready');
+      resolve(auth.currentUser);
+    } else {
+      console.log('⏳ Waiting for Firebase auth...');
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log('✅ Firebase auth ready with user:', user.email);
+          unsubscribe();
+          resolve(user);
+        }
+      });
+    }
+  });
+};
+
+console.log('🔧 Firebase initialized and exposed globally (modern + legacy), defining PWA functions...');
 
 // ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
 // Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
@@ -684,6 +764,20 @@ navTabs.forEach(tab => {
       updateOverview();
     } else if (targetTab === 'achievements') {
       updateAchievements();
+    } else if (targetTab === 'daily-quests') {
+      // Daily quests fül aktiválása - biztosítsuk, hogy a manager betöltött
+      if (window.dailyQuestsManager && window.dailyQuestsManager.isInitialized) {
+        console.log('✅ Daily quests tab activated, manager ready');
+      } else {
+        console.log('⏳ Daily quests tab activated, waiting for manager...');
+      }
+    } else if (targetTab === 'exam-calendar') {
+      // Exam calendar fül aktiválása
+      if (window.examCalendarManager) {
+        console.log('📚 Exam calendar tab activated, manager ready');
+      } else {
+        console.log('⏳ Exam calendar tab activated, waiting for manager...');
+      }
     }
   });
 });
@@ -2011,7 +2105,7 @@ function updateStatistics() {
   // Progress bar-ok frissítése
   updateProgressBar('lists-progress', totalLists, 10); // max 10 lista
   updateProgressBar('items-progress', totalItems, Math.max(50, totalItems)); // dinamikus max
-  updateProgressBar('completed-progress', completedItems, totalItems || 1);
+  updateProgressBar('completed-progress', completionRate, 100); // százalékos teljesítés
   
   // Kördiagram frissítése
   updateCircularProgress(completionRate);
@@ -2602,17 +2696,465 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Hamburger ikon és nyelvválasztó menü kezelése
-const hamburgerIcon = document.getElementById("hamburger-icon");
+// Navigation system initialization
+function initNavigationSystem() {
+  // Mobile hamburger menu
+  const navHamburger = document.getElementById("nav-hamburger");
+  const navTabs = document.getElementById("nav-tabs");
+  const navMobileOverlay = document.getElementById("nav-mobile-overlay");
+  
+  if (navHamburger && navTabs && navMobileOverlay) {
+    navHamburger.addEventListener("click", () => {
+      const isOpen = navTabs.classList.contains("show");
+      
+      if (isOpen) {
+        navTabs.classList.remove("show");
+        navMobileOverlay.classList.remove("show");
+        navHamburger.classList.remove("active");
+        navHamburger.querySelector('.material-icons').textContent = 'menu';
+      } else {
+        navTabs.classList.add("show");
+        navMobileOverlay.classList.add("show");
+        navHamburger.classList.add("active");
+        navHamburger.querySelector('.material-icons').textContent = 'close';
+      }
+    });
+    
+    // Close mobile menu when overlay is clicked
+    navMobileOverlay.addEventListener("click", () => {
+      navTabs.classList.remove("show");
+      navMobileOverlay.classList.remove("show");
+      navHamburger.classList.remove("active");
+      navHamburger.querySelector('.material-icons').textContent = 'menu';
+    });
+    
+    // Close mobile menu when a tab is clicked
+    const mobileNavTabs = navTabs.querySelectorAll('.nav-tab');
+    mobileNavTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navTabs.classList.remove("show");
+          navMobileOverlay.classList.remove("show");
+          navHamburger.classList.remove("active");
+          navHamburger.querySelector('.material-icons').textContent = 'menu';
+        }
+      });
+    });
+  }
+  
+  // Language dropdown
+  const languageBtn = document.getElementById("language-selector-btn");
 const languageDropdown = document.getElementById("language-dropdown");
 
-hamburgerIcon.addEventListener("click", () => {
-  if (languageDropdown.style.display === "none" || languageDropdown.style.display === "") {
-    languageDropdown.style.display = "block";
+  if (languageBtn && languageDropdown) {
+    languageBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      languageDropdown.classList.toggle("show");
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+        languageDropdown.classList.remove("show");
+      }
+    });
+  }
+}
+
+// Initialize navigation system on page load
+document.addEventListener('DOMContentLoaded', () => {
+  // Azonnal elrejtjük a student-only szekciókat betöltéskor
+  hideStudentOnlySectionsForNonStudents();
+  
+  initNavigationSystem();
+  updateTimetableTabVisibility();
+  initScrollableNavigation();
+  
+  // Ismételt ellenőrzés az első 5 másodpercben (target group betöltésére várva)
+  let checkCount = 0;
+  const maxChecks = 10;
+  const checkInterval = setInterval(() => {
+    checkCount++;
+    hideStudentOnlySectionsForNonStudents();
+    updateTimetableTabVisibility();
+    
+    // Ha diák target group-ot találunk vagy elértük a max ellenőrzést, leállítjuk
+    if (document.body.classList.contains('target-group-student') || checkCount >= maxChecks) {
+      clearInterval(checkInterval);
+      console.log(`✅ Student-only sections check completed after ${checkCount} attempts`);
+    }
+  }, 500);
+});
+
+// Function to update timetable tab visibility based on target group
+function updateTimetableTabVisibility() {
+  const timetableTab = document.querySelector('.nav-tab[data-tab="timetable"]');
+  const examCalendarTab = document.querySelector('.nav-tab[data-tab="exam-calendar"]');
+  const timetableSection = document.getElementById('timetable-section');
+  const examCalendarSection = document.getElementById('exam-calendar-section');
+  
+  // Check if current target group is student
+  const isStudentGroup = document.body.classList.contains('target-group-student');
+  
+  if (timetableTab) {
+    if (isStudentGroup) {
+      timetableTab.style.display = '';
+      console.log('👨‍🎓 Timetable tab shown for student group');
   } else {
-    languageDropdown.style.display = "none";
+      timetableTab.style.display = 'none';
+      console.log('🚫 Timetable tab hidden for non-student group');
+      // Ha nem diák, akkor elrejtjük a szekciót is és deaktiváljuk
+      if (timetableSection) {
+        timetableSection.style.display = 'none';
+        timetableSection.classList.remove('active');
+      }
+    }
+  }
+  
+  if (examCalendarTab) {
+    if (isStudentGroup) {
+      examCalendarTab.style.display = '';
+      console.log('📚 Exam calendar tab shown for student group');
+    } else {
+      examCalendarTab.style.display = 'none';
+      console.log('🚫 Exam calendar tab hidden for non-student group');
+      // Ha nem diák, akkor elrejtjük a szekciót is és deaktiváljuk
+      if (examCalendarSection) {
+        examCalendarSection.style.display = 'none';
+        examCalendarSection.classList.remove('active');
+      }
+    }
+  }
+  
+  // Biztosítsuk, hogy minden student-only szekció elrejtve maradjon nem-diákok számára
+  if (!isStudentGroup) {
+    const studentOnlySections = document.querySelectorAll('.tab-content.student-only');
+    studentOnlySections.forEach(section => {
+      section.style.display = 'none';
+      section.classList.remove('active');
+    });
+    
+    // Elrejtjük a student-only tabokat is
+    const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
+    studentOnlyTabs.forEach(tab => {
+      tab.style.display = 'none';
+    });
+    
+    console.log('🚫 All student-only sections and tabs hidden for non-student group');
+  } else {
+    // Ha diák, akkor megjelenítjük a student-only tabokat
+    const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
+    studentOnlyTabs.forEach(tab => {
+      tab.style.display = '';
+    });
+    console.log('👨‍🎓 Student-only tabs shown for student group');
+  }
+}
+
+// Listen for target group changes to update timetable tab visibility
+document.addEventListener('targetGroupChanged', (event) => {
+  console.log('🔄 Target group changed, updating tab visibility, UI texts and quests');
+  updateTimetableTabVisibility();
+  updateStudentOnlyVisibilityCSS();
+  hideStudentOnlySectionsForNonStudents();
+  
+  // Frissítsük az UI szövegeket is az új target group alapján
+  setTimeout(() => {
+    updateUITexts();
+    console.log('🔄 UI texts updated after target group change');
+  }, 200);
+  
+  // Frissítsük a küldetéseket is az új target group alapján
+  if (window.dailyQuestsManager && window.dailyQuestsManager.isInitialized) {
+    setTimeout(() => {
+      window.dailyQuestsManager.ensureDailyQuestsExist();
+      window.dailyQuestsManager.updateQuestUI();
+    }, 500);
   }
 });
+
+// Listen for target group system initialization
+document.addEventListener('advancedTargetGroupReady', (event) => {
+  console.log('🎯 Advanced target group system ready');
+  updateTimetableTabVisibility();
+  updateStudentOnlyVisibilityCSS();
+  hideStudentOnlySectionsForNonStudents();
+  
+  // Frissítsük az UI szövegeket is a target group rendszer inicializálása után
+  setTimeout(() => {
+    updateUITexts();
+    console.log('🔄 UI texts updated after target group system ready');
+  }, 150);
+});
+
+// Additional safety check when Firebase auth loads
+if (window.auth) {
+  window.auth.onAuthStateChanged((user) => {
+    if (user) {
+      // Várunk egy kicsit, hogy a target group betöltődjön
+      setTimeout(() => {
+        updateTimetableTabVisibility();
+        hideStudentOnlySectionsForNonStudents();
+      }, 2000);
+    }
+  });
+}
+
+// Utility function to hide student-only sections for non-students
+function hideStudentOnlySectionsForNonStudents() {
+  const isStudentGroup = document.body.classList.contains('target-group-student');
+  
+  console.log(`🔍 Checking student-only sections visibility. Is student: ${isStudentGroup}`);
+  
+  if (!isStudentGroup) {
+    // Elrejtjük a student-only szekciókat
+    const studentOnlySections = document.querySelectorAll('.tab-content.student-only');
+    studentOnlySections.forEach(section => {
+      section.style.display = 'none !important';
+      section.classList.remove('active');
+    });
+    
+    // Elrejtjük a student-only tabokat és távolítsuk el a click handlereket
+    const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
+    studentOnlyTabs.forEach(tab => {
+      tab.style.display = 'none';
+      tab.style.pointerEvents = 'none'; // Extra védelem
+      tab.setAttribute('disabled', 'true');
+    });
+    
+    // Ellenőrizzük, hogy jelenleg aktív tab student-only-e
+    const activeTab = document.querySelector('.nav-tab.active');
+    if (activeTab) {
+      const targetTab = activeTab.dataset.tab;
+      const targetSection = document.getElementById(`${targetTab}-section`);
+      if (targetSection && targetSection.classList.contains('student-only')) {
+        // Ha a jelenlegi tab student-only, váltunk a dashboard-ra
+        const dashboardTab = document.querySelector('.nav-tab[data-tab="dashboard"]');
+        const dashboardSection = document.getElementById('dashboard-section');
+        if (dashboardTab && dashboardSection) {
+          document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+          dashboardTab.classList.add('active');
+          dashboardSection.style.display = 'block';
+          dashboardSection.classList.add('active');
+          console.log('🔄 Redirected to dashboard from student-only section');
+        }
+      }
+    }
+    
+    console.log('🚫 Student-only sections and tabs hidden for non-student user');
+  } else {
+    // Ha diák, akkor biztosítsuk, hogy a student-only tabok láthatóak és működnek
+    const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
+    studentOnlyTabs.forEach(tab => {
+      tab.style.display = '';
+      tab.style.pointerEvents = ''; // Visszaállítjuk a kattinthatóságot
+      tab.removeAttribute('disabled');
+    });
+    console.log('👨‍🎓 Student-only tabs made available for student user');
+  }
+}
+
+// Early initialization - hide student-only sections immediately
+function earlyInitializeStudentOnlySections() {
+  // Korai elrejtés CSS-sel - csak nem-diák felhasználóknak
+  const style = document.createElement('style');
+  style.id = 'student-only-visibility-rules';
+  style.textContent = `
+    /* Alapértelmezés szerint elrejtjük a diák-only szekciókat */
+    body:not(.target-group-student) .tab-content.student-only {
+      display: none !important;
+    }
+    
+    /* Diák felhasználóknak láthatóak legyenek */
+    body.target-group-student .tab-content.student-only {
+      display: none; /* Alapból elrejtve, de JS-sel megjeleníthetők */
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Ha a DOM már kész, akkor JS-sel is
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideStudentOnlySectionsForNonStudents);
+  } else {
+    hideStudentOnlySectionsForNonStudents();
+  }
+}
+
+// Function to update CSS rules based on current target group
+function updateStudentOnlyVisibilityCSS() {
+  const existingStyle = document.getElementById('student-only-visibility-rules');
+  if (existingStyle) {
+    existingStyle.remove();
+  }
+  
+  const isStudentGroup = document.body.classList.contains('target-group-student');
+  const style = document.createElement('style');
+  style.id = 'student-only-visibility-rules';
+  
+  if (isStudentGroup) {
+    // Diák felhasználónak - ne legyen CSS override, hagyjuk a JS-t kezelni
+    style.textContent = `
+      /* Diák felhasználónak minden szekció kezelése JS-sel történik */
+    `;
+  } else {
+    // Nem-diák felhasználónak - erős CSS blokkolás
+    style.textContent = `
+      body:not(.target-group-student) .tab-content.student-only {
+        display: none !important;
+      }
+    `;
+  }
+  
+  document.head.appendChild(style);
+  console.log(`🔄 Updated CSS rules for student-only sections (isStudent: ${isStudentGroup})`);
+}
+
+// Immediate execution
+earlyInitializeStudentOnlySections();
+
+// Initialize student-only sections visibility on page load
+document.addEventListener('DOMContentLoaded', () => {
+  // Ensure student-only sections are hidden by default
+  updateStudentOnlyVisibilityCSS();
+  hideStudentOnlySectionsForNonStudents();
+});
+
+// Debug functions for managers
+window.debugManagers = function() {
+  console.log('🔍 Manager Debug Info:');
+  console.log('  - examCalendarManager:', typeof window.examCalendarManager, window.examCalendarManager ? '✅' : '❌');
+  console.log('  - timetableManager:', typeof window.timetableManager, window.timetableManager ? '✅' : '❌');
+  console.log('  - Firebase auth:', firebase.auth().currentUser ? '✅' : '❌');
+  console.log('  - Target group:', document.body.classList.contains('target-group-student') ? 'student' : 'other');
+  console.log('💡 Available commands: testTimetableSave(), testExamSave()');
+};
+
+window.testTimetableSave = function() {
+  if (window.timetableManager) {
+    console.log('🧪 Testing timetable save functionality...');
+    // Fill test data
+    const testData = {
+      subject: 'Test Tantárgy',
+      day: 'hétfő',
+      startTime: '08:00',
+      endTime: '09:30',
+      teacher: 'Test Tanár'
+    };
+    
+    Object.keys(testData).forEach(key => {
+      const element = document.getElementById(`timetable-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+      if (element) {
+        element.value = testData[key];
+        console.log(`✅ Set ${key}: ${testData[key]}`);
+      } else {
+        console.warn(`❌ Element not found: timetable-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+      }
+    });
+    
+    console.log('📝 Test data filled, call timetableManager.saveTimetableEntry() manually');
+  } else {
+    console.error('❌ Timetable manager not available');
+  }
+};
+
+window.testExamSave = function() {
+  if (window.examCalendarManager) {
+    console.log('🧪 Testing exam save functionality...');
+    const testData = {
+      subject: 'Test Tantárgy',
+      type: 'dolgozat',
+      date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
+      time: '10:00',
+      priority: 'high',
+      notes: 'Test vizsga'
+    };
+    
+    Object.keys(testData).forEach(key => {
+      const element = document.getElementById(`exam-${key}`);
+      if (element) {
+        element.value = testData[key];
+        console.log(`✅ Set ${key}: ${testData[key]}`);
+      } else {
+        console.warn(`❌ Element not found: exam-${key}`);
+      }
+    });
+    
+    console.log('📝 Test data filled, call examCalendarManager.saveExam() manually');
+  } else {
+    console.error('❌ Exam calendar manager not available');
+  }
+};
+
+// Scrollable navigation system for overflow handling
+function initScrollableNavigation() {
+  const navTabs = document.getElementById('nav-tabs');
+  if (!navTabs) return;
+  
+  function updateScrollIndicators() {
+    const isScrollable = navTabs.scrollWidth > navTabs.clientWidth;
+    const isScrolledLeft = navTabs.scrollLeft > 0;
+    const isScrolledRight = navTabs.scrollLeft < (navTabs.scrollWidth - navTabs.clientWidth);
+    
+    navTabs.classList.toggle('scrollable-left', isScrollable && isScrolledLeft);
+    navTabs.classList.toggle('scrollable-right', isScrollable && isScrolledRight);
+  }
+  
+  // Update indicators on scroll
+  navTabs.addEventListener('scroll', updateScrollIndicators);
+  
+  // Update indicators on resize
+  window.addEventListener('resize', updateScrollIndicators);
+  
+  // Initial update
+  setTimeout(updateScrollIndicators, 100);
+  
+  // Smooth scroll to active tab
+  function scrollToActiveTab() {
+    const activeTab = navTabs.querySelector('.nav-tab.active');
+    if (activeTab) {
+      const tabRect = activeTab.getBoundingClientRect();
+      const navRect = navTabs.getBoundingClientRect();
+      
+      if (tabRect.left < navRect.left || tabRect.right > navRect.right) {
+        activeTab.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }
+  
+  // Add click handlers for smooth scrolling to tabs
+  navTabs.addEventListener('click', (e) => {
+    if (e.target.classList.contains('nav-tab')) {
+      setTimeout(scrollToActiveTab, 50);
+    }
+  });
+  
+  // Keyboard navigation for tabs
+  navTabs.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      const tabs = Array.from(navTabs.querySelectorAll('.nav-tab:not([style*="display: none"])'));
+      const currentIndex = tabs.findIndex(tab => tab.classList.contains('active'));
+      
+      let newIndex;
+      if (e.key === 'ArrowLeft') {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+      } else {
+        newIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+      }
+      
+      if (tabs[newIndex]) {
+        tabs[newIndex].click();
+        tabs[newIndex].focus();
+      }
+    }
+  });
+  
+  console.log('🎯 Scrollable navigation initialized');
+}
 
 // Service Worker regisztráció (PWA támogatás)
 if ('serviceWorker' in navigator) {
@@ -2651,24 +3193,83 @@ function initNavigation() {
   const tabs = document.querySelectorAll('.nav-tab');
   const sections = document.querySelectorAll('.tab-content');
 
+  console.log(`🔧 Navigation initialized with ${tabs.length} tabs and ${sections.length} sections`);
+
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (event) => {
       const targetTab = tab.dataset.tab;
+      
+      console.log(`🔄 Switching to tab: ${targetTab}`);
+      
+      // Ellenőrizzük először, hogy a tab student-only-e és jogosult-e a felhasználó
+      const isStudentGroup = document.body.classList.contains('target-group-student');
+      const isStudentOnlyTab = tab.classList.contains('student-only');
+      
+      if (isStudentOnlyTab && !isStudentGroup) {
+        console.log(`🚫 Tab ${targetTab} is student-only but user is not a student`);
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Visszaváltunk a dashboard-ra
+        const dashboardTab = document.querySelector('.nav-tab[data-tab="dashboard"]');
+        if (dashboardTab && dashboardTab !== tab) {
+          // Kis delay hogy elkerüljük az infinite loop-ot
+          setTimeout(() => {
+            dashboardTab.click();
+          }, 10);
+        }
+        return; // Kilépünk, hogy ne fusson le a többi logika
+      }
       
       // Aktív tab frissítése
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       
-      // Aktív szekció frissítése
+      // Aktív szekció frissítése - mindent elrejtünk először
       sections.forEach(section => {
+        section.style.removeProperty('display'); // Remove any important overrides first
         section.style.display = 'none';
         section.classList.remove('active');
       });
       
+      // Részletes debug info
+      console.log(`🔍 Target group check: isStudentGroup=${isStudentGroup}, body classes:`, document.body.className);
+      
+      // Csak a kiválasztott szekciót jelenítjük meg, ha megfelel a feltételeknek
       const targetSection = document.getElementById(`${targetTab}-section`);
       if (targetSection) {
+        // Ellenőrizzük, hogy a szekció a megfelelő target group-nak szól-e
+        const isStudentOnlySection = targetSection.classList.contains('student-only');
+        
+        console.log(`📋 Section check: ${targetTab}-section isStudentOnly=${isStudentOnlySection}, isStudentGroup=${isStudentGroup}`);
+        
+        if (!isStudentOnlySection || isStudentGroup) {
+          // Ha student-only szekció és a felhasználó diák, akkor explicit CSS override szükséges
+          if (isStudentOnlySection && isStudentGroup) {
+            targetSection.style.removeProperty('display'); // Távolítsuk el a korábbi style-okat
+            targetSection.style.setProperty('display', 'block', 'important');
+            console.log(`🎓 Student-only section ${targetTab}-section activated with CSS override`);
+          } else {
         targetSection.style.display = 'block';
+          }
         targetSection.classList.add('active');
+          console.log(`✅ Section ${targetTab}-section activated`);
+        } else {
+          console.log(`🚫 Section ${targetTab}-section is student-only but user is not a student`);
+          // Ha nem megfelelő target group, visszaváltunk a dashboard-ra
+          const dashboardTab = document.querySelector('.nav-tab[data-tab="dashboard"]');
+          const dashboardSection = document.getElementById('dashboard-section');
+          if (dashboardTab && dashboardSection) {
+            tabs.forEach(t => t.classList.remove('active'));
+            dashboardTab.classList.add('active');
+            dashboardSection.style.display = 'block';
+            dashboardSection.classList.add('active');
+            console.log(`🔄 Redirected to dashboard - unauthorized access to ${targetTab}`);
+          }
+          return; // Kilépünk, hogy ne fusson le a többi logika
+        }
+      } else {
+        console.error(`❌ Section ${targetTab}-section not found!`);
       }
       
       // Speciális működés az egyes fülekhez
@@ -2681,6 +3282,29 @@ function initNavigation() {
         loadEvents();
       } else if (targetTab === 'notes') {
         loadNotes();
+      } else if (targetTab === 'daily-quests') {
+        // Daily quests fül aktiválása - biztosítsuk, hogy a manager betöltött
+        if (window.dailyQuestsManager && window.dailyQuestsManager.isInitialized) {
+          console.log('✅ Daily quests tab activated, manager ready');
+        } else {
+          console.log('⏳ Daily quests tab activated, waiting for manager...');
+        }
+      } else if (targetTab === 'timetable') {
+        // Timetable fül aktiválása - rendereljük az órarendet
+        if (window.timetableManager) {
+          console.log('📅 Timetable tab activated, triggering render');
+          window.timetableManager.renderTimetable();
+        } else {
+          console.log('⏳ Timetable tab activated, manager not ready yet');
+        }
+      } else if (targetTab === 'exam-calendar') {
+        // Exam calendar fül aktiválása - rendereljük a vizsganaptárt
+        if (window.examCalendarManager) {
+          console.log('📚 Exam calendar tab activated, triggering render');
+          window.examCalendarManager.renderExams();
+        } else {
+          console.log('⏳ Exam calendar tab activated, manager not ready yet');
+        }
       }
     });
   });
@@ -3170,6 +3794,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Dashboard kezdeti betöltése
   updateDashboard();
+  
+  // Kérdelem UI szövegek frissítését target group rendszer betöltése után
+  setTimeout(() => {
+    if (window.advancedTargetGroupSystem && window.advancedTargetGroupSystem.getCurrentTargetGroup()) {
+      updateUITexts();
+      console.log('🔄 UI texts refreshed after target group system initialization');
+    }
+  }, 1000);
   
   // Quick actions eseménykezelők
   const quickActionBtns = document.querySelectorAll('.action-btn');
@@ -4266,8 +4898,33 @@ async function loadLanguage(languageCode) {
   }
 }
 
-// Szöveg lekérése
+// Szöveg lekérése target group figyelembevételével
 function getText(key, placeholders = {}) {
+  // Check if we have a target group and if there's a specific translation for it
+  const currentTargetGroup = window.advancedTargetGroupSystem?.getCurrentTargetGroup();
+  
+  if (currentTargetGroup && key.startsWith('navigation.') && translations.target_groups && translations.target_groups[currentTargetGroup.id]) {
+    const targetGroupTranslations = translations.target_groups[currentTargetGroup.id];
+    const keys = key.split('.');
+    let targetValue = targetGroupTranslations;
+    
+    for (const k of keys) {
+      if (targetValue && typeof targetValue === 'object' && k in targetValue) {
+        targetValue = targetValue[k];
+      } else {
+        targetValue = null;
+        break;
+      }
+    }
+    
+    if (targetValue && typeof targetValue === 'string') {
+      return targetValue.replace(/\{(\w+)\}/g, (match, placeholder) => {
+        return placeholders[placeholder] !== undefined ? placeholders[placeholder] : match;
+      });
+    }
+  }
+  
+  // Fallback to regular translations
   const keys = key.split('.');
   let value = translations;
   
@@ -4300,20 +4957,70 @@ function updateButtonText(button, text) {
   }
 }
 
+// Navigációs tabek szövegének frissítése target group figyelembevételével
+function updateNavigationTabTexts() {
+  const tabs = [
+    { selector: '[data-tab="dashboard"] span[data-lang]', key: 'navigation.dashboard' },
+    { selector: '[data-tab="overview"] span[data-lang]', key: 'navigation.overview' },
+    { selector: '[data-tab="lists"] span[data-lang]', key: 'navigation.lists' },
+    { selector: '[data-tab="daily-quests"] span[data-lang]', key: 'navigation.daily-quests' },
+    { selector: '[data-tab="timetable"] span[data-lang]', key: 'navigation.timetable' },
+    { selector: '[data-tab="exam-calendar"] span[data-lang]', key: 'navigation.exam-calendar' },
+    { selector: '[data-tab="notes"] span[data-lang]', key: 'navigation.notes' },
+    { selector: '[data-tab="calendar"] span[data-lang]', key: 'navigation.calendar' }
+  ];
+  
+  tabs.forEach(({ selector, key }) => {
+    const spanElement = document.querySelector(selector);
+    if (spanElement) {
+      // Get target group specific text
+      const targetGroupText = getText(key);
+      spanElement.textContent = targetGroupText;
+    }
+  });
+  
+  console.log('🔄 Navigation tab texts updated with target group context');
+}
+
+// Dashboard szövegek frissítése target group figyelembevételével
+function updateDashboardTexts() {
+  // Check if we have a target group and dashboard specific texts
+  const currentTargetGroup = window.advancedTargetGroupSystem?.getCurrentTargetGroup();
+  
+  // Welcome message - target group specific if available
+  const welcomeTitle = document.querySelector('.welcome-card h2[data-lang="dashboard.welcome"]');
+  if (welcomeTitle) {
+    if (currentTargetGroup && translations.target_groups && 
+        translations.target_groups[currentTargetGroup.id] && 
+        translations.target_groups[currentTargetGroup.id].dashboard &&
+        translations.target_groups[currentTargetGroup.id].dashboard.welcome) {
+      welcomeTitle.textContent = translations.target_groups[currentTargetGroup.id].dashboard.welcome;
+    } else {
+      welcomeTitle.textContent = getText('dashboard.welcome');
+    }
+  }
+  
+  console.log('🏠 Dashboard texts updated with target group context');
+}
+
 // UI szövegek frissítése
 function updateUITexts() {
-  // Navigáció
-  const dashboardTab = document.querySelector('[data-tab="dashboard"]');
-  const overviewTab = document.querySelector('[data-tab="overview"]');
-  const listsTab = document.querySelector('[data-tab="lists"]');
-  const notesTab = document.querySelector('[data-tab="notes"]');
-  const calendarTab = document.querySelector('[data-tab="calendar"]');
+  // Navigáció - target group figyelembevételével
+  updateNavigationTabTexts();
   
-  if (dashboardTab) dashboardTab.innerHTML = getText('navigation.dashboard');
-  if (overviewTab) overviewTab.innerHTML = getText('navigation.overview');
-  if (listsTab) listsTab.innerHTML = getText('navigation.lists');
-  if (notesTab) notesTab.innerHTML = getText('navigation.notes');
-  if (calendarTab) calendarTab.innerHTML = getText('navigation.calendar');
+  // Minden data-lang attribútummal rendelkező elem frissítése
+  const elementsWithLang = document.querySelectorAll('[data-lang]');
+  elementsWithLang.forEach(element => {
+    const key = element.getAttribute('data-lang');
+    if (key) {
+      const text = getText(key);
+      if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+        element.placeholder = text;
+      } else {
+        element.textContent = text;
+      }
+    }
+  });
   
   // Auth szekció szövegek
   const authTitle = document.querySelector('#auth-section h1');
@@ -4330,68 +5037,8 @@ function updateUITexts() {
   if (registerBtn) registerBtn.textContent = getText('auth.register');
   if (logoutBtn) logoutBtn.textContent = getText('auth.logout');
   
-  // Dashboard szövegek
-  const welcomeTitle = document.querySelector('.welcome-card h2');
-  const welcomeText = document.querySelector('.welcome-card p');
-  const streakLabel = document.querySelector('.streak-label');
-  
-  if (welcomeTitle) welcomeTitle.textContent = getText('dashboard.welcome');
-  if (welcomeText) welcomeText.textContent = getText('dashboard.overview_text');
-  if (streakLabel) streakLabel.textContent = getText('dashboard.streak_label');
-  
-  // Quick actions
-  const quickActionsTitle = document.querySelector('.quick-actions h3');
-  if (quickActionsTitle) quickActionsTitle.textContent = getText('dashboard.quick_actions');
-  
-  const quickTaskBtn = document.querySelector('[data-action="quick-task"]');
-  const quickNoteBtn = document.querySelector('[data-action="quick-note"]');
-  const quickEventBtn = document.querySelector('[data-action="quick-event"]');
-  
-  if (quickTaskBtn) quickTaskBtn.textContent = getText('dashboard.quick_task');
-  if (quickNoteBtn) quickNoteBtn.textContent = getText('dashboard.quick_note');
-  if (quickEventBtn) quickEventBtn.textContent = getText('dashboard.quick_event');
-  
-  // Dashboard további szövegek
-  const dailyInspirationTitle = document.querySelector('.daily-quote h3');
-  const todayEventsTitle = document.querySelector('.today-events h3');
-  const pinnedItemsTitle = document.querySelector('.pinned-items h3');
-  const urgentTasksTitle = document.querySelector('.urgent-tasks h3');
-  const noEventsText = document.querySelector('.no-events');
-  const noUrgentText = document.querySelector('.no-urgent');
-  
-  if (dailyInspirationTitle) dailyInspirationTitle.textContent = getText('dashboard.daily_inspiration');
-  if (todayEventsTitle) todayEventsTitle.textContent = getText('dashboard.today_events');
-  if (pinnedItemsTitle) pinnedItemsTitle.textContent = getText('dashboard.pinned_items');
-  if (urgentTasksTitle) urgentTasksTitle.textContent = getText('dashboard.urgent_tasks');
-  if (noEventsText) noEventsText.textContent = getText('dashboard.no_events');
-  if (noUrgentText) noUrgentText.textContent = getText('dashboard.no_urgent');
-  
-  // Pinned items szekcióban
-  const pinnedNotesTitle = document.querySelector('#pinned-notes h4');
-  const pinnedTasksTitle = document.querySelector('#pinned-tasks h4');
-  
-  if (pinnedNotesTitle) pinnedNotesTitle.textContent = getText('dashboard.notes');
-  if (pinnedTasksTitle) pinnedTasksTitle.textContent = getText('dashboard.tasks');
-  
-  // Overview szekció
-  const overviewTitle = document.querySelector('#overview-section .section-header h2');
-  const statisticsTitle = document.querySelector('#main-stats-panel h3');
-  const levelTitle = document.querySelector('.level-card h3');
-  const activityGraphTitle = document.querySelector('.activity-graph h3');
-  const productivityTitle = document.querySelector('.productivity-insights h3');
-  
-  if (overviewTitle) overviewTitle.textContent = getText('overview.title');
-  if (statisticsTitle) statisticsTitle.textContent = getText('overview.statistics');
-  if (levelTitle) levelTitle.textContent = getText('overview.level');
-  if (activityGraphTitle) activityGraphTitle.textContent = getText('overview.activity_graph');
-  if (productivityTitle) productivityTitle.textContent = getText('overview.productivity');
-  
-  // Stat cards
-  const statLabels = document.querySelectorAll('.stat-label');
-  if (statLabels[0]) statLabels[0].textContent = getText('overview.lists');
-  if (statLabels[1]) statLabels[1].textContent = getText('overview.items');
-  if (statLabels[2]) statLabels[2].textContent = getText('overview.completed');
-  if (statLabels[3]) statLabels[3].textContent = getText('overview.completion');
+  // Dashboard szövegek - target group figyelembevételével (ez felülírja a data-lang-ot)
+  updateDashboardTexts();
   
   // Activity legend
   const activityLegendItems = document.querySelectorAll('.activity-legend-item span');
@@ -4757,38 +5404,17 @@ function updateModalSelectOptions() {
 
 // Nyelv dropdown inicializálása
 function initLanguageDropdown() {
-  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const languageBtn = document.getElementById('language-selector-btn');
   const languageDropdown = document.getElementById('language-dropdown');
   
-  if (hamburgerIcon && languageDropdown) {
+  if (languageBtn && languageDropdown) {
     // Aktuális nyelv jelzése
     markCurrentLanguage();
-    
-    hamburgerIcon.addEventListener('click', (e) => {
-      e.stopPropagation();
-      languageDropdown.classList.toggle('show');
-      
-      // Ha megnyitjuk, távolítsuk el az inline style-t
-      if (languageDropdown.classList.contains('show')) {
-        languageDropdown.style.display = '';
-      } else {
-        languageDropdown.style.display = 'none';
-      }
-    });
-    
-    // Kívülre kattintás esetén bezárás
-    document.addEventListener('click', (e) => {
-      if (!hamburgerIcon.contains(e.target) && !languageDropdown.contains(e.target)) {
-        languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none';
-      }
-    });
     
     // ESC billentyű lenyomásakor bezárás
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && languageDropdown.classList.contains('show')) {
         languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none';
       }
     });
     
@@ -4799,11 +5425,10 @@ function initLanguageDropdown() {
         e.preventDefault();
         e.stopPropagation();
         
-        const languageCode = link.getAttribute('data-lang') || 'hu';
+        const languageCode = link.getAttribute('data-language') || 'hu';
         
         // Dropdown azonnal bezárása a nyelv váltás előtt
         languageDropdown.classList.remove('show');
-        languageDropdown.style.display = 'none'; // Erős override
         
         try {
           await loadLanguage(languageCode);
@@ -4812,7 +5437,6 @@ function initLanguageDropdown() {
           // Biztonságos bezárás a nyelv váltás után is
           setTimeout(() => {
             languageDropdown.classList.remove('show');
-            languageDropdown.style.display = 'none';
           }, 100);
         } catch (error) {
           console.error('Hiba a nyelv betöltése során:', error);
@@ -4831,7 +5455,7 @@ function markCurrentLanguage() {
     link.classList.remove('current');
     
     // Ellenőrizzük az aktuális nyelvet
-    const linkLang = link.getAttribute('data-lang');
+    const linkLang = link.getAttribute('data-language');
     if (linkLang === currentLanguage) {
       link.classList.add('current');
       
@@ -4863,6 +5487,8 @@ window.togglePinList = togglePinList;
 window.switchToListsTab = switchToListsTab;
 window.openNoteForEdit = openNoteForEdit;
 window.requestNotePassword = requestNotePassword;
+window.updateNavigationTabTexts = updateNavigationTabTexts;
+window.updateDashboardTexts = updateDashboardTexts;
 
 // Lista kiemelés/kiemelés eltávolítása
 function togglePinList(listId) {
@@ -6087,9 +6713,56 @@ window.updateLanguageCache = async function() {
   console.log('✅ Language cache updated and reloaded');
 };
 
+// Auto-clear problematic caches on startup (run once per session)
+if (!sessionStorage.getItem('cache-cleaned-v2.1.5')) {
+  setTimeout(async () => {
+    console.log('🧹 Auto-clearing problematic caches...');
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        for (const cacheName of cacheNames) {
+          // Remove old version caches
+          if (cacheName.includes('todo-app-v2.1.4') || cacheName.includes('todo-offline-v2.1.4')) {
+            await caches.delete(cacheName);
+            console.log(`🗑️ Deleted old cache: ${cacheName}`);
+          }
+        }
+      }
+      sessionStorage.setItem('cache-cleaned-v2.1.5', 'true');
+      console.log('✅ Cache cleanup completed');
+    } catch (error) {
+      console.warn('⚠️ Cache cleanup failed:', error);
+    }
+  }, 1000);
+}
+
 console.log('✅ Cache management functions loaded:');
 console.log('  - refreshCache() - Refresh language cache');
 console.log('  - clearAllCaches() - Clear all caches and reload');
 console.log('  - forceReload() - Force reload with cache bust');
 console.log('  - checkCacheStatus() - Show current cache contents');
 console.log('  - updateLanguageCache() - Force update language cache');
+
+// Debug function to check target group and language system status
+window.debugUITexts = function() {
+  console.log('🔍 UI Texts Debug Status:');
+  console.log('  - Current language:', currentLanguage);
+  console.log('  - Translations loaded:', !!translations);
+  console.log('  - Advanced target group system:', !!window.advancedTargetGroupSystem);
+  
+  if (window.advancedTargetGroupSystem) {
+    const currentTargetGroup = window.advancedTargetGroupSystem.getCurrentTargetGroup();
+    console.log('  - Current target group:', currentTargetGroup ? currentTargetGroup.id : 'none');
+    console.log('  - Target group data:', currentTargetGroup);
+  }
+  
+  if (translations && translations.target_groups) {
+    console.log('  - Available target groups in translations:', Object.keys(translations.target_groups));
+  }
+  
+  console.log('🔧 Available commands:');
+  console.log('  - updateUITexts() - Force refresh UI texts');
+  console.log('  - debugUITexts() - Show this debug info');
+};
+
+console.log('🔧 Additional debug function: debugUITexts() - Check target group and language status');

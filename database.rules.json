@@ -1,0 +1,122 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        
+        "daily_quests": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid",
+          "$questId": {
+            ".validate": "newData.hasChildren(['id', 'title', 'assignedAt', 'completed'])"
+          }
+        },
+        
+        "goalTarget": {
+          ".validate": "newData.isString() && (newData.val() === 'student' || newData.val() === 'youngProfessional' || newData.val() === 'selfImprover' || newData.val() === 'organizer' || newData.val() === 'none')"
+        },
+        
+        "lastQuestDate": {
+          ".validate": "newData.isString()"
+        },
+        
+        "previousQuestTemplates": {
+          ".validate": "newData.hasChildren()"
+        },
+        
+        "xp": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        
+        "username": {
+          ".validate": "newData.isString() && newData.val().length <= 50"
+        },
+        
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        
+        "timetable": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid",
+          "$entryId": {
+            ".validate": "newData.hasChildren(['subject', 'day', 'startTime', 'endTime', 'createdAt', 'updatedAt'])",
+            "subject": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+            },
+            "day": {
+              ".validate": "newData.isString() && (newData.val() === 'monday' || newData.val() === 'tuesday' || newData.val() === 'wednesday' || newData.val() === 'thursday' || newData.val() === 'friday' || newData.val() === 'saturday' || newData.val() === 'sunday')"
+            },
+            "startTime": {
+              ".validate": "newData.isString() && newData.val().matches(/^[0-2][0-9]:[0-5][0-9]$/)"
+            },
+            "endTime": {
+              ".validate": "newData.isString() && newData.val().matches(/^[0-2][0-9]:[0-5][0-9]$/)"
+            },
+            "teacher": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "classroom": {
+              ".validate": "newData.isString() && newData.val().length <= 50"
+            },
+            "onlineLink": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber()"
+            },
+            "updatedAt": {
+              ".validate": "newData.isNumber()"
+            }
+          }
+        }
+      }
+    },
+    
+    "templates": {
+      ".read": true,
+      "$goalTarget": {
+        ".read": true,
+        ".write": false,
+        "$templateId": {
+          ".validate": "newData.hasChildren(['title', 'description']) && newData.child('title').isString() && newData.child('description').isString()",
+          "title": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 500"
+          },
+          "xp": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+          },
+          "estimatedDuration": {
+            ".validate": "newData.isString()"
+          },
+          "tag": {
+            ".validate": "newData.isString()"
+          },
+          "tags": {
+            ".validate": "newData.hasChildren()"
+          },
+          "active": {
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
+    },
+    
+    "public": {
+      ".read": true,
+      ".write": false
+    },
+    
+    "settings": {
+      ".read": true,
+      ".write": false
+    }
+  }
+} 

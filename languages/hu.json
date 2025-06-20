@@ -1,10 +1,13 @@
 {
   "navigation": {
-    "dashboard": "🏠 Dashboard",
+    "dashboard": "Dashboard",
     "overview": "📊 Áttekintés",
-    "lists": "📝 Listák",
-    "notes": "📒 Jegyzetek",
-    "calendar": "🗓️ Naptár",
+    "lists": "Listák",
+    "daily-quests": "Küldetések",
+    "timetable": "Órarend",
+    "exam-calendar": "Vizsganaptár",
+    "notes": "Jegyzetek",
+    "calendar": "Naptár",
     "privacy": "Adatvédelem"
   },
   "common": {
@@ -260,6 +263,11 @@
       "apply": "Alkalmaz",
       "cancel": "Mégse"
     },
+    "target_group": {
+      "choose_title": "Válaszd ki a célcsoportod",
+      "choose_subtitle": "Személyre szabott feladatokat és élményt kapsz",
+      "confirm_selection": "Kiválasztás megerősítése"
+    },
     "confirm_delete_list": "Biztosan törlöd ezt a listát?",
     "confirm_delete_item": "Biztosan törlöd ezt a listaelemet?",
     "yes": "Igen",
@@ -362,6 +370,277 @@
     "explorer": {
       "title": "Felfedező",
       "description": "Próbáld ki az összes funkciót"
+    }
+  },
+  "profile": {
+    "target_group": "Célcsoport",
+    "no_target_group": "Nincs beállítva célcsoport",
+    "change_target_group": "Célcsoport módosítása",
+    "regenerate_templates": "Sablon feladatok újragenerálása"
+  },
+  "quests": {
+    "system_title": "Küldetési Rendszer",
+    "daily_quests": "Napi Küldetések",
+    "suggested_quests": "Javasolt Küldetések",
+    "change_target": "Célcsoport váltása",
+    "refresh_suggested": "Javaslatok frissítése",
+    "import_to_list": "Importálás listába",
+    "importing": "Importálás...",
+    "imported": "Importálva!",
+    "no_daily": "Még nincsenek napi küldetések. Válassz célcsoportot a generáláshoz!",
+    "no_suggested": "Még nincsenek javasolt küldetések. Válassz célcsoportot a generáláshoz!",
+    "no_target": "Válassz célcsoportot a küldetések megtekintéséhez",
+    "target_selection": {
+      "title": "Célcsoport választása",
+      "description": "Válaszd ki a célcsoportodat a személyre szabott küldetések és sablonok eléréséhez:",
+      "remove": "Célcsoport eltávolítása",
+      "close": "Bezárás"
+    },
+    "goal_targets": {
+      "student": {
+        "name": "Diák",
+        "description": "Akadémiai sikerekhez optimalizált feladatok"
+      },
+      "young_professional": {
+        "name": "Fiatal Szakember", 
+        "description": "Karrierfejlődésre fókuszáló feladatok"
+      },
+      "self_improver": {
+        "name": "Önfejlesztő",
+        "description": "Személyes növekedést támogató feladatok"
+      },
+      "organizer": {
+        "name": "Szervező",
+        "description": "Strukturált tervezésre és szervezésre fókuszáló feladatok"
+      }
+    },
+    "tags": {
+      "daily": "NAPI",
+      "weekly": "HETI", 
+      "event-based": "ESEMÉNY"
+    },
+    "admin": {
+      "title": "Sablon Adminisztráció",
+      "add_template": "Új Sablon Hozzáadása",
+      "current_templates": "Jelenlegi Sablonok",
+      "template_title": "Sablon címe...",
+      "template_description": "Sablon leírása...",
+      "duration_minutes": "Időtartam (perc)",
+      "xp_value": "XP érték",
+      "category": "Kategória",
+      "add_button": "Sablon Hozzáadása",
+      "clear_form": "Űrlap Törlése",
+      "refresh": "Sablonok frissítése",
+      "export": "Export JSON",
+      "import": "Import JSON",
+      "edit": "Szerkesztés",
+      "delete": "Törlés",
+      "close": "Bezárás",
+      "no_templates": "Még nincsenek sablonok ehhez a célcsoporthoz.",
+      "add_first": "Adj hozzá új sablonokat a fenti űrlap segítségével."
+    }
+  },
+  "timetable": {
+    "title": "📅 Órarend",
+    "new_entry": "Új óra hozzáadása",
+    "form_title": "✨ Új óra hozzáadása",
+    "weekly_schedule": "📋 Heti órarend",
+    "table_view": "Táblázat nézet",
+    "list_view": "Lista nézet",
+    "subject_label": "📚 Tantárgy",
+    "subject_placeholder": "pl. Matematika, Fizika...",
+    "day_label": "📅 Nap",
+    "day_placeholder": "Válassz napot",
+    "start_time_label": "🕐 Kezdés",
+    "end_time_label": "🕑 Befejezés",
+    "teacher_label": "👨‍🏫 Tanár",
+    "teacher_placeholder": "pl. Kovács Péter",
+    "classroom_label": "🏫 Terem/Helyszín",
+    "classroom_placeholder": "pl. 1/A, Online, Aula",
+    "online_link_label": "🔗 Online link",
+    "online_link_placeholder": "https://...",
+    "days": {
+      "monday": "Hétfő",
+      "tuesday": "Kedd",
+      "wednesday": "Szerda",
+      "thursday": "Csütörtök",
+      "friday": "Péntek",
+      "saturday": "Szombat",
+      "sunday": "Vasárnap"
+    },
+    "save": "Mentés",
+    "cancel": "Mégse",
+    "edit_title": "✏️ Óra szerkesztése",
+    "update": "Mentés",
+    "delete": "Törlés",
+    "close": "Bezárás",
+    "empty_state": {
+      "title": "Még nincs óráid az órarendben",
+      "subtitle": "Kezdj el felvenni órákat a \"Új óra hozzáadása\" gombbal!"
+    },
+    "no_classes": "Nincs óra ezen a napon",
+    "validation": {
+      "required_fields": "Kérjük, töltse ki a kötelező mezőket!",
+      "invalid_time": "Hibás időpont beállítás!",
+      "time_conflict": "Ütközés: már van óra ebben az időpontban!",
+      "delete_confirm": "Biztosan törölni szeretné ezt az órát?"
+    },
+    "notifications": {
+      "entry_added": "✅ Óra sikeresen hozzáadva!",
+      "entry_updated": "✅ Óra sikeresen frissítve!",
+      "entry_deleted": "✅ Óra sikeresen törölve!",
+      "save_error": "Hiba történt az óra mentésekor",
+      "update_error": "Hiba történt az óra frissítésekor",
+      "delete_error": "Hiba történt az óra törlésekor"
+    }
+  },
+  "exam_calendar": {
+    "title": "📚 Vizsganaptár",
+    "new_exam": "Új vizsga hozzáadása",
+    "form_title": "✨ Új vizsga hozzáadása",
+    "upcoming_exams": "📋 Közelgő vizsgák",
+    "filter_by": "Szűrés:",
+    "all_exams": "Összes vizsga",
+    "this_week": "Ez a hét",
+    "this_month": "Ez a hónap",
+    "high_priority": "Magas prioritás",
+    "medium_priority": "Közepes prioritás",
+    "low_priority": "Alacsony prioritás",
+    "subject_label": "📚 Tantárgy",
+    "subject_placeholder": "pl. Matematika, Fizika...",
+    "exam_type_label": "📝 Vizsga típusa",
+    "exam_type_placeholder": "Válassz típust",
+    "date_label": "📅 Dátum",
+    "time_label": "🕐 Időpont",
+    "time_placeholder": "pl. 10:00",
+    "priority_label": "🔥 Prioritás",
+    "priority_placeholder": "Válassz prioritást",
+    "notes_label": "📝 Jegyzetek",
+    "notes_placeholder": "További információk, tanulnivalók...",
+    "exam_types": {
+      "dolgozat": "Dolgozat",
+      "zh": "Zárthelyi",
+      "feleles": "Felelés",
+      "erettsegi": "Érettségi",
+      "vizsga": "Vizsga",
+      "prezentacio": "Prezentáció",
+      "projekt": "Projekt beadás",
+      "teszt": "Teszt"
+    },
+    "priority_levels": {
+      "high": "Magas",
+      "medium": "Közepes",
+      "low": "Alacsony"
+    },
+    "save": "Mentés",
+    "cancel": "Mégse",
+    "edit_title": "✏️ Vizsga szerkesztése",
+    "update": "Mentés",
+    "delete": "Törlés",
+    "close": "Bezárás",
+    "empty_state": {
+      "title": "Még nincsenek vizsgáid a naptárban",
+      "subtitle": "Kezdj el felvenni vizsgákat a \"Új vizsga hozzáadása\" gombbal!"
+    },
+    "days_until": "nap múlva",
+    "today": "Ma",
+    "tomorrow": "Holnap",
+    "overdue": "Lejárt",
+    "validation": {
+      "required_fields": "Kérjük, töltse ki a kötelező mezőket!",
+      "invalid_date": "Hibás dátum!",
+      "past_date": "A dátum nem lehet múltbeli!",
+      "delete_confirm": "Biztosan törölni szeretné ezt a vizsgát?"
+    },
+    "notifications": {
+      "exam_added": "✅ Vizsga sikeresen hozzáadva!",
+      "exam_updated": "✅ Vizsga sikeresen frissítve!",
+      "exam_deleted": "✅ Vizsga sikeresen törölve!",
+      "save_error": "Hiba történt a vizsga mentésekor",
+      "update_error": "Hiba történt a vizsga frissítésekor",
+      "delete_error": "Hiba történt a vizsga törlésekor"
+    }
+  },
+  "target_groups": {
+    "student": {
+      "navigation": {
+        "dashboard": "Tanulmányi Központ",
+        "overview": "Eredmények",
+        "lists": "Feladatok",
+        "daily-quests": "Napi Célok",
+        "timetable": "Órarend",
+        "exam-calendar": "Vizsganaptár",
+        "notes": "Jegyzetfüzet",
+        "calendar": "Tanrend"
+      },
+      "dashboard": {
+        "welcome": "📚 Üdvözöl a tanulási központod!",
+        "todayGoal": "Mai tanulási célod",
+        "studyStreak": "Tanulási sorozat",
+        "nextExam": "Következő vizsga",
+        "studyTime": "Mai tanulási idő",
+        "completedTasks": "Teljesített feladatok"
+      }
+    },
+    "youngProfessional": {
+      "navigation": {
+        "dashboard": "Karrier Központ",
+        "overview": "Teljesítmény",
+        "lists": "Projektek",
+        "daily-quests": "Karrier Célok",
+        "timetable": "Munkaidő",
+        "exam-calendar": "Tanfolyamok",
+        "notes": "Szakmai Jegyzetek",
+        "calendar": "Üzleti Naptár"
+      },
+      "dashboard": {
+        "welcome": "💼 Üdvözöl a karrier központod!",
+        "todayGoal": "Mai szakmai célod",
+        "networkGrowth": "Hálózat bővítés",
+        "skillProgress": "Készség fejlődés",
+        "projectStatus": "Projekt státusz",
+        "achievements": "Elért eredmények"
+      }
+    },
+    "selfImprover": {
+      "navigation": {
+        "dashboard": "Fejlődési Központ",
+        "overview": "Növekedés",
+        "lists": "Szokások",
+        "daily-quests": "Napi Gyakorlatok",
+        "timetable": "Rutin",
+        "exam-calendar": "Tanulás",
+        "notes": "Tudatosság Napló",
+        "calendar": "Wellness Naptár"
+      },
+      "dashboard": {
+        "welcome": "🌱 Üdvözöl az önfejlesztő központod!",
+        "todayGoal": "Mai fejlődési célod",
+        "habitStreak": "Szokás sorozat",
+        "mindfulMoments": "Tudatos pillanatok",
+        "wellnessScore": "Jóllét pontszám",
+        "growthAreas": "Fejlődési területek"
+      }
+    },
+    "organizer": {
+      "navigation": {
+        "dashboard": "Szervezési Központ",
+        "overview": "Projektek",
+        "lists": "Feladat Listák",
+        "daily-quests": "Szervezési Célok",
+        "timetable": "Időbeosztás",
+        "exam-calendar": "Képzések",
+        "notes": "Tervezési Jegyzetek",
+        "calendar": "Esemény Naptár"
+      },
+      "dashboard": {
+        "welcome": "📋 Üdvözöl a szervezési központod!",
+        "todayGoal": "Mai szervezési célod",
+        "activeProjects": "Aktív projektek",
+        "upcomingDeadlines": "Közelgő határidők",
+        "teamTasks": "Csapat feladatok",
+        "efficiency": "Hatékonysági mutató"
+      }
     }
   }
 } 
