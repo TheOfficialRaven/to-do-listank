@@ -335,7 +335,6 @@ async function refreshLanguageCache() {
         './languages/hu.json',
         './languages/en.json', 
         './languages/de.json'
-        './languages/Pol.json'
       ];
       
       // Delete old language files from cache
