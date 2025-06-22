@@ -1,0 +1,573 @@
+{
+  "navigation": {
+    "dashboard": "Panel główny",
+    "overview": "Przegląd",
+    "lists": "Listy",
+    "daily-quests": "Zadania",
+    "timetable": "Plan lekcji",
+    "exam-calendar": "Kalendarz egzaminów",
+    "notes": "Notatki",
+    "calendar": "Kalendarz",
+    "privacy": "Prywatność"
+  },
+  "common": {
+    "theme": "Motyw",
+    "install": "Zainstaluj",
+    "cancel": "Anuluj",
+    "language_switch": "Zmień język",
+    "theme_switch": "Zmień motyw",
+    "pin": "Przypnij",
+    "unpin": "Odepnij",
+    "delete": "Usuń",
+    "done": "Gotowe"
+  },
+  "dashboard": {
+    "welcome": "👋 Witamy z powrotem!",
+    "overview_text": "Oto Twój dzienny przegląd",
+    "streak_label": "dni z rzędu",
+    "quick_actions": "⚡ Szybkie akcje",
+    "quick_task": "+ Szybkie zadanie",
+    "quick_note": "+ Szybka notatka",
+    "quick_event": "+ Wydarzenie",
+    "daily_inspiration": "💡 Codzienna inspiracja",
+    "today_events": "📅 Dzisiejsze wydarzenia",
+    "no_events": "Brak wydarzeń dziś",
+    "no_upcoming_events": "Brak nadchodzących wydarzeń",
+    "pinned_items": "📌 Przypięte",
+    "notes": "Notatki",
+    "tasks": "Zadania",
+    "no_pinned_notes": "Brak przypiętych notatek",
+    "no_pinned_tasks": "Użyj przycisku 📌 na listach",
+    "urgent_tasks": "⚠️ Pilne zadania",
+    "no_urgent": "🎉 Brak pilnych zadań!",
+    "item_placeholder": "Dodaj nowy element..."
+  },
+  "overview": {
+    "title": "📊 Przegląd i statystyki",
+    "statistics": "📈 Statystyki",
+    "lists": "Lista",
+    "items": "Element",
+    "completed": "Wykonane",
+    "completion": "Zakończenie",
+    "level": "🌟 Twój poziom",
+    "activity_graph": "📊 Wykres aktywności",
+    "activity_less": "Mało",
+    "activity_medium": "Umiarkowanie",
+    "activity_high": "Dużo",
+    "activity_total": "Dni razem",
+    "activity_streak": "Najlepsza seria",
+    "activity_avg": "Średnio/dzień",
+    "achievements": "🏅 Osiągnięcia",
+    "achievements_details": {
+      "explorer": "Odkrywca",
+      "explorer_desc": "Wypróbuj wszystkie funkcje",
+      "available": "Dostępne!"
+    },
+    "productivity": "🔍 Spostrzeżenia o produktywności",
+    "productivity_insights": {
+      "completion": "Wykonanie: {rate}% ({completed}/{total} zadań)",
+      "managing_lists": "Zarządzanie {count} aktywnych list",
+      "streak_active": "{days} dni z rzędu!",
+      "streak_start": "Rozpocznij nową serię już dziś!",
+      "level_progress": "Poziom {level} – {xp} PKT łącznie"
+    }
+  },
+  "auth": {
+    "title": "Rejestracja / Logowanie",
+    "email_placeholder": "Adres e-mail",
+    "password_placeholder": "Hasło",
+    "login": "Zaloguj",
+    "register": "Zarejestruj",
+    "logout": "Wyloguj"
+  },
+  "lists": {
+    "title": "📝 Listy zadań",
+    "reorder": "Przestaw",
+    "create_new": "✨ Stwórz nową listę",
+    "list_name": "Nazwa listy",
+    "list_name_placeholder": "np. Lista zakupów, Zadania do pracy...",
+    "category": "Kategoria",
+    "category_placeholder": "np. Dom, Praca, Hobby...",
+    "create_list": "Utwórz listę",
+    "filter_search": "🔍 Filtruj i szukaj",
+    "filter_category": "Filtr kategorii:",
+    "all_categories": "Wszystkie kategorie",
+    "search": "Szukaj:",
+    "search_placeholder": "🔍 Szukaj na listach i w elementach...",
+    "no_lists": "📝 Nie masz jeszcze żadnych list",
+    "create_first": "Stwórz pierwszą listę przyciskiem powyżej!",
+    "pin_list": "Przypnij listę",
+    "unpin_list": "Odepnij listę",
+    "delete_list": "Usuń listę",
+    "add_item": "Dodaj",
+    "list_name_required": "Wpisz nazwę listy!",
+    "disable_reorder": "Wyłącz przesuwanie"
+  },
+  "notes": {
+    "title": "📒 Notatki",
+    "new_note": "Nowa notatka",
+    "note_title": "📒 Nowa notatka",
+    "edit_note": "✏️ Edytuj notatkę",
+    "title_placeholder": "Tytuł notatki...",
+    "content_placeholder": "Tutaj zapisz szczegóły, hasła lub cokolwiek, by nie zapomnieć...",
+    "category_label": "🏷️ Kategoria:",
+    "private_note": "🔒 Prywatna notatka (chroniona hasłem)",
+    "password_label": "🔐 Do odczytu potrzebne będzie hasło",
+    "password_placeholder": "Wprowadź hasło, by chronić notatkę...",
+    "password_required": "Hasło wymagane dla prywatnych notatek!",
+    "password_needed": "🔒 Wymagane hasło",
+    "password_prompt": "To prywatna notatka. Wprowadź hasło, by zobaczyć:",
+    "password_edit_prompt": "Hasło potrzebne do edycji notatki:",
+    "password_placeholder_input": "Hasło...",
+    "password_error_empty": "❌ Wpisz hasło!",
+    "password_error_wrong": "❌ Błędne hasło! Spróbuj ponownie.",
+    "password_error_decrypt": "❌ Błąd odszyfrowania!",
+    "password_error_access": "❌ Błąd dostępu do notatki!",
+    "password_submit": "Wyślij",
+    "password_cancel": "Anuluj",
+    "protected_content": "Zabezpieczona treść",
+    "password_required_view": "Hasło wymagane do podglądu",
+    "unlock_note": "Wprowadź hasło",
+    "save": "Zapisz",
+    "update": "Zaktualizuj",
+    "edit": "Edytuj",
+    "close": "Zamknij",
+    "cancel": "Anuluj",
+    "no_notes": "📒 Nie masz jeszcze żadnych notatek",
+    "create_first": "Stwórz pierwszą notatkę przyciskiem powyżej!",
+    "delete_note": "🗑️ Usuń notatkę",
+    "delete_confirm": "Czy na pewno chcesz usunąć tę notatkę?",
+    "delete_warning": "Tej akcji nie można cofnąć!",
+    "delete_button": "🗑️ Usuń",
+    "categories": {
+      "general": "Ogólne",
+      "passwords": "Hasła",
+      "ideas": "Pomysły",
+      "important": "Ważne",
+      "work": "Praca",
+      "personal": "Osobiste"
+    }
+  },
+  "calendar": {
+    "title": "🗓️ Kalendarz",
+    "new_event": "Nowe wydarzenie",
+    "upcoming_events": "📅 Nadchodzące wydarzenia",
+    "months": {
+      "january": "Styczeń",
+      "february": "Luty",
+      "march": "Marzec",
+      "april": "Kwiecień",
+      "may": "Maj",
+      "june": "Czerwiec",
+      "july": "Lipiec",
+      "august": "Sierpień",
+      "september": "Wrzesień",
+      "october": "Październik",
+      "november": "Listopad",
+      "december": "Grudzień"
+    },
+    "days": {
+      "monday": "Pn",
+      "tuesday": "Wt",
+      "wednesday": "Śr",
+      "thursday": "Cz",
+      "friday": "Pt",
+      "saturday": "So",
+      "sunday": "Nd"
+    },
+    "no_upcoming": "Brak nadchodzących wydarzeń",
+    "event_title": "Tytuł wydarzenia",
+    "event_date": "Data",
+    "event_time": "Czas",
+    "event_description": "Opis",
+    "event_type": "Typ wydarzenia",
+    "all_day": "Cały dzień",
+    "reminder": "Przypomnienie",
+    "reminder_time": "Czas przypomnienia",
+    "save_event": "Zapisz wydarzenie",
+    "cancel": "Anuluj",
+    "delete_event": "Usuń wydarzenie",
+    "event_name_placeholder": "Nazwa wydarzenia...",
+    "event_desc_placeholder": "Opis wydarzenia...",
+    "date_label": "📅 Data:",
+    "time_label": "⏰ Czas:",
+    "type_label": "🎯 Typ:",
+    "reminder_label": "🔔 Ustaw przypomnienie",
+    "reminder_times": {
+      "0": "W czasie wydarzenia",
+      "15": "15 minut wcześniej",
+      "30": "30 minut wcześniej",
+      "60": "1 godzina wcześniej",
+      "1440": "1 dzień wcześniej"
+    },
+    "event_types": {
+      "birthday": "🎂 Urodziny",
+      "meeting": "💼 Spotkanie",
+      "reminder": "⏰ Przypomnienie",
+      "appointment": "🏥 Wizyta",
+      "event": "🎉 Wydarzenie",
+      "deadline": "📝 Termin"
+    }
+  },
+  "modals": {
+    "quick_task": {
+      "title": "⚡ Dodaj szybkie zadanie",
+      "placeholder": "Wpisz zadanie...",
+      "select_list": "Wybierz listę...",
+      "add": "Dodaj",
+      "cancel": "Anuluj"
+    },
+    "quick_add": {
+      "title": "⚡ Dodaj szybki element",
+      "placeholder": "Wpisz element...",
+      "select_list": "Wybierz listę...",
+      "add": "Dodaj",
+      "cancel": "Anuluj"
+    },
+    "theme": {
+      "title": "🎨 Wybór motywu",
+      "themes": {
+        "default": {
+          "name": "Domyślny",
+          "description": "Klasyczny zielony motyw"
+        },
+        "ocean_blue": {
+          "name": "Ocean Blue",
+          "description": "Orzeźwiający niebieski"
+        },
+        "sakura_pink": {
+          "name": "Sakura Pink",
+          "description": "Delikatny róż kwiatu wiśni"
+        },
+        "forest_green": {
+          "name": "Forest Green",
+          "description": "Naturalna zieleń lasu"
+        },
+        "minimal_mono": {
+          "name": "Minimal Mono",
+          "description": "Czysta monochromia"
+        },
+        "sunset_orange": {
+          "name": "Sunset Orange",
+          "description": "Ciepły pomarańcz zachodu słońca"
+        },
+        "royal_purple": {
+          "name": "Royal Purple",
+          "description": "Elegancki purpurowy"
+        }
+      },
+      "modes": {
+        "light": "Jasny",
+        "dark": "Ciemny"
+      },
+      "apply": "Zastosuj",
+      "cancel": "Anuluj"
+    },
+    "confirm_delete_list": "Czy na pewno usunąć tę listę?",
+    "confirm_delete_item": "Czy na pewno usunąć ten element?",
+    "yes": "Tak",
+    "no": "Nie",
+    "privacy": {
+      "title": "🔒 Polityka prywatności",
+      "intro_title": "📋 Wprowadzenie",
+      "intro_content": "Niniejsza polityka opisuje, jak przetwarzamy i chronimy Twoje dane osobowe podczas korzystania z naszej aplikacji.",
+      "controller_title": "🏢 Administrator danych",
+      "controller_content": "Administrator danych: Zespół deweloperski Chrome Extension Mobile",
+      "data_title": "📊 Dane, które gromadzimy",
+      "data_email": "Adres e-mail (rejestracja i logowanie)",
+      "data_lists": "Listy zadań i ich elementy",
+      "data_notes": "Notatki (w tym prywatne/szyfrowane)",
+      "data_events": "Wydarzenia z kalendarza",
+      "data_settings": "Ustawienia aplikacji (motyw, język)",
+      "data_usage": "Statystyki użycia (PKT, poziom, seria)",
+      "purpose_title": "🎯 Cel przetwarzania danych",
+      "purpose_service": "Świadczenie i obsługa usługi",
+      "purpose_sync": "Synchronizacja danych między urządzeniami",
+      "purpose_security": "Bezpieczeństwo konta i uwierzytelnianie",
+      "purpose_features": "Personalizacja funkcji aplikacji",
+      "legal_title": "⚖️ Podstawa prawna",
+      "legal_content": "Podstawą przetwarzania danych jest Twoja zgoda (RODO art. 6 ust. 1 lit. a) i wykonanie umowy (RODO art. 6 ust. 1 lit. b).",
+      "storage_title": "💾 Przechowywanie danych",
+      "storage_content": "Twoje dane są bezpiecznie przechowywane w bazie Google Firebase. Prywatne notatki są dodatkowo szyfrowane.",
+      "retention_title": "⏱️ Okres przechowywania",
+      "retention_content": "Przechowujemy dane tak długo, jak Twoje konto jest aktywne. Po usunięciu konta wszystkie dane są trwale usuwane.",
+      "rights_title": "👤 Twoje prawa",
+      "right_access": "Dostęp: możesz przeglądać przechowywane dane",
+      "right_rectification": "Poprawka: możesz modyfikować swoje dane",
+      "right_erasure": "Usunięcie: możesz zażądać usunięcia danych",
+      "right_portability": "Przenośność: możesz wyeksportować dane",
+      "right_objection": "Sprzeciw: możesz sprzeciwić się przetwarzaniu danych",
+      "security_title": "🔐 Bezpieczeństwo danych",
+      "security_encryption": "Szyfrowanie end-to-end dla wrażliwych danych",
+      "security_firebase": "Bezpieczna infrastruktura Google Firebase",
+      "security_https": "Połączenie HTTPS",
+      "security_access": "Ograniczony dostęp do danych",
+      "contact_title": "📧 Kontakt",
+      "contact_content": "W razie pytań skontaktuj się z nami za pomocą opcji w aplikacji.",
+      "changes_title": "📝 Zmiany",
+      "changes_content": "Zastrzegamy sobie prawo do modyfikacji tej polityki. Użytkownicy zostaną poinformowani o istotnych zmianach.",
+      "effective_title": "📅 Data wejścia w życie",
+      "effective_content": "Polityka obowiązuje od 19 grudnia 2024.",
+      "accept": "Rozumiem",
+      "close": "Zamknij"
+    }
+  },
+  "notifications": {
+    "task_added": "✅ Zadanie zostało dodane!",
+    "note_saved": "📒 Notatka została zapisana!",
+    "note_updated": "✏️ Notatka została zaktualizowana!",
+    "note_deleted": "🗑️ Notatka została usunięta!",
+    "note_pinned": "📌 Notatka przypięta!",
+    "note_unpinned": "📌 Przypięcie zdjęte!",
+    "task_pinned": "📌 Zadanie przypięte!",
+    "task_unpinned": "📌 Przypięcie zdjęte!",
+    "task_completed": "✅ Zadanie wykonane!",
+    "list_pinned": "📌 Lista przypięta!",
+    "list_unpinned": "📌 Przypięcie zdjęte!",
+    "level_up": "🎉 Poziom {level} osiągnięty! Gratulacje!",
+    "login_required": "⚠️ Musisz się zalogować, aby skorzystać z tej funkcji!",
+    "theme_applied": "Zastosowano motyw",
+    "logout_success": "Pomyślnie wylogowano",
+    "event_reminder": "Przypomnienie o wydarzeniu",
+    "upcoming_event": "Nadchodzące wydarzenie",
+    "snooze_5min": "Drzemka (5 min)",
+    "dismiss": "Odrzuć"
+  },
+  "achievements": {
+    "first_task": {
+      "title": "Pierwszy krok",
+      "description": "Wykonaj pierwsze zadanie"
+    },
+    "task_master": {
+      "title": "Mistrz zadań",
+      "description": "Wykonaj 10 zadań"
+    },
+    "list_creator": {
+      "title": "Twórca list",
+      "description": "Stwórz 3 listy"
+    },
+    "note_taker": {
+      "title": "Notatnik",
+      "description": "Napisz 5 notatek"
+    },
+    "level_up": {
+      "title": "Awans",
+      "description": "Osiągnij poziom 2"
+    },
+    "streak_3": {
+      "title": "Wytrwały",
+      "description": "3 dni z rzędu"
+    },
+    "streak_7": {
+      "title": "Legenda",
+      "description": "7 dni z rzędu"
+    },
+    "explorer": {
+      "title": "Odkrywca",
+      "description": "Wypróbuj wszystkie funkcje"
+    }
+  },
+  "timetable": {
+    "title": "📅 Plan lekcji",
+    "new_entry": "Dodaj nowe zajęcia",
+    "form_title": "✨ Dodaj zajęcia",
+    "weekly_schedule": "📋 Plan tygodniowy",
+    "table_view": "Widok tabeli",
+    "list_view": "Widok listy",
+    "subject_label": "📚 Przedmiot",
+    "subject_placeholder": "np. Matematyka, Fizyka...",
+    "day_label": "📅 Dzień",
+    "day_placeholder": "Wybierz dzień",
+    "start_time_label": "🕐 Godzina rozpoczęcia",
+    "end_time_label": "🕑 Godzina zakończenia",
+    "teacher_label": "👨‍🏫 Nauczyciel",
+    "teacher_placeholder": "np. Jan Kowalski",
+    "classroom_label": "🏫 Sala/Lokalizacja",
+    "classroom_placeholder": "np. Sala 101, Online, Aula",
+    "online_link_label": "🔗 Link online",
+    "online_link_placeholder": "https://...",
+    "days": {
+      "monday": "Poniedziałek",
+      "tuesday": "Wtorek",
+      "wednesday": "Środa",
+      "thursday": "Czwartek",
+      "friday": "Piątek",
+      "saturday": "Sobota",
+      "sunday": "Niedziela"
+    },
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "edit_title": "✏️ Edytuj zajęcia",
+    "update": "Zapisz",
+    "delete": "Usuń",
+    "close": "Zamknij",
+    "empty_state": {
+      "title": "Brak zajęć w planie",
+      "subtitle": "Dodaj zajęcia przyciskiem „Dodaj nowe zajęcia”!"
+    },
+    "no_classes": "Brak zajęć tego dnia",
+    "validation": {
+      "required_fields": "Wypełnij wymagane pola!",
+      "invalid_time": "Nieprawidłowy czas!",
+      "time_conflict": "Konflikt: zajęcia już są o tej porze!",
+      "delete_confirm": "Czy na pewno usunąć te zajęcia?"
+    },
+    "notifications": {
+      "entry_added": "✅ Zajęcia dodane!",
+      "entry_updated": "✅ Zajęcia zaktualizowane!",
+      "entry_deleted": "✅ Zajęcia usunięte!",
+      "save_error": "Błąd zapisu zajęć",
+      "update_error": "Błąd aktualizacji zajęć",
+      "delete_error": "Błąd usunięcia zajęć"
+    }
+  },
+  "exam_calendar": {
+    "title": "📚 Kalendarz egzaminów",
+    "new_exam": "Dodaj egzamin",
+    "form_title": "✨ Dodaj egzamin",
+    "upcoming_exams": "📋 Nadchodzące egzaminy",
+    "filter_by": "Filtruj według:",
+    "all_exams": "Wszystkie egzaminy",
+    "this_week": "Ten tydzień",
+    "this_month": "Ten miesiąc",
+    "high_priority": "Wysoki priorytet",
+    "medium_priority": "Średni priorytet",
+    "low_priority": "Niski priorytet",
+    "subject_label": "📚 Przedmiot",
+    "subject_placeholder": "np. Matematyka, Fizyka...",
+    "exam_type_label": "📝 Rodzaj egzaminu",
+    "exam_type_placeholder": "Wybierz rodzaj",
+    "date_label": "📅 Data",
+    "time_label": "🕐 Godzina",
+    "time_placeholder": "np. 10:00",
+    "priority_label": "🔥 Priorytet",
+    "priority_placeholder": "Wybierz priorytet",
+    "notes_label": "📝 Notatki",
+    "notes_placeholder": "Dodatkowe informacje, materiały...",
+    "exam_types": {
+      "dolgozat": "Sprawdzian",
+      "zh": "Kartkówka",
+      "feleles": "Egzamin ustny",
+      "erettsegi": "Matura",
+      "vizsga": "Egzamin",
+      "prezentacio": "Prezentacja",
+      "projekt": "Projekt",
+      "teszt": "Quiz"
+    },
+    "priority_levels": {
+      "high": "Wysoki",
+      "medium": "Średni",
+      "low": "Niski"
+    },
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "edit_title": "✏️ Edytuj egzamin",
+    "update": "Zapisz",
+    "delete": "Usuń",
+    "close": "Zamknij",
+    "empty_state": {
+      "title": "Brak egzaminów w kalendarzu",
+      "subtitle": "Dodaj egzamin przyciskiem „Dodaj egzamin”!"
+    },
+    "days_until": "dni zostało",
+    "today": "Dziś",
+    "tomorrow": "Jutro",
+    "overdue": "Przeterminowane",
+    "validation": {
+      "required_fields": "Wypełnij wymagane pola!",
+      "invalid_date": "Nieprawidłowa data!",
+      "past_date": "Data nie może być z przeszłości!",
+      "delete_confirm": "Czy na pewno usunąć ten egzamin?"
+    },
+    "notifications": {
+      "exam_added": "✅ Egzamin dodany!",
+      "exam_updated": "✅ Egzamin zaktualizowany!",
+      "exam_deleted": "✅ Egzamin usunięty!",
+      "save_error": "Błąd zapisu egzaminu",
+      "update_error": "Błąd aktualizacji egzaminu",
+      "delete_error": "Błąd usunięcia egzaminu"
+    }
+  },
+  "target_groups": {
+    "student": {
+      "navigation": {
+        "dashboard": "Centrum nauki",
+        "overview": "Wyniki",
+        "lists": "Zadania",
+        "daily-quests": "Codzienne cele",
+        "timetable": "Plan lekcji",
+        "exam-calendar": "Kalendarz egzaminów",
+        "notes": "Notatnik",
+        "calendar": "Grafik"
+      },
+      "dashboard": {
+        "welcome": "📚 Witaj w centrum nauki!",
+        "todayGoal": "Dzisiejszy cel nauki",
+        "studyStreak": "Seria naukowa",
+        "nextExam": "Następny egzamin",
+        "studyTime": "Czas nauki dziś",
+        "completedTasks": "Wykonane zadania"
+      }
+    },
+    "youngProfessional": {
+      "navigation": {
+        "dashboard": "Centrum kariery",
+        "overview": "Wydajność",
+        "lists": "Projekty",
+        "daily-quests": "Cele zawodowe",
+        "timetable": "Plan pracy",
+        "exam-calendar": "Kursy",
+        "notes": "Notatki zawodowe",
+        "calendar": "Kalendarz biznesowy"
+      },
+      "dashboard": {
+        "welcome": "💼 Witaj w centrum kariery!",
+        "todayGoal": "Dzisiejszy cel zawodowy",
+        "networkGrowth": "Rozwój sieci kontaktów",
+        "skillProgress": "Rozwój umiejętności",
+        "projectStatus": "Status projektu",
+        "achievements": "Osiągnięcia"
+      }
+    },
+    "selfImprover": {
+      "navigation": {
+        "dashboard": "Centrum rozwoju",
+        "overview": "Postęp",
+        "lists": "Nawyki",
+        "daily-quests": "Codzienne praktyki",
+        "timetable": "Rutyna",
+        "exam-calendar": "Nauka",
+        "notes": "Dziennik uważności",
+        "calendar": "Kalendarz wellness"
+      },
+      "dashboard": {
+        "welcome": "🌱 Witamy w centrum rozwoju!",
+        "todayGoal": "Dzisiejszy cel rozwoju",
+        "habitStreak": "Seria nawyków",
+        "mindfulMoments": "Chwile mindful",
+        "wellnessScore": "Ocena wellness",
+        "growthAreas": "Obszary rozwoju"
+      }
+    },
+    "organizer": {
+      "navigation": {
+        "dashboard": "Centrum organizacji",
+        "overview": "Projekty",
+        "lists": "Listy zadań",
+        "daily-quests": "Cele organizacyjne",
+        "timetable": "Grafik",
+        "exam-calendar": "Szkolenia",
+        "notes": "Notatki planujące",
+        "calendar": "Kalendarz wydarzeń"
+      },
+      "dashboard": {
+        "welcome": "📋 Witamy w centrum organizacji!",
+        "todayGoal": "Dzisiejszy cel organizacyjny",
+        "activeProjects": "Aktywne projekty",
+        "upcomingDeadlines": "Nadchodzące terminy",
+        "teamTasks": "Zadania zespołu",
+        "efficiency": "Ocena efektywności"
+      }
+    }
+  }
+}
