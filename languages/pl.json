@@ -198,179 +198,124 @@
       "15": "15 minut wcześniej",
       "30": "30 minut wcześniej",
       "60": "1 godzina wcześniej",
+      "120": "2 godziny wcześniej",
       "1440": "1 dzień wcześniej"
     },
     "event_types": {
-      "birthday": "🎂 Urodziny",
-      "meeting": "💼 Spotkanie",
-      "reminder": "⏰ Przypomnienie",
-      "appointment": "🏥 Wizyta",
-      "event": "🎉 Wydarzenie",
-      "deadline": "📝 Termin"
-    }
-  },
-  "modals": {
-    "quick_task": {
-      "title": "⚡ Dodaj szybkie zadanie",
-      "placeholder": "Wpisz zadanie...",
-      "select_list": "Wybierz listę...",
-      "add": "Dodaj",
-      "cancel": "Anuluj"
-    },
-    "quick_add": {
-      "title": "⚡ Dodaj szybki element",
-      "placeholder": "Wpisz element...",
-      "select_list": "Wybierz listę...",
-      "add": "Dodaj",
-      "cancel": "Anuluj"
-    },
-    "theme": {
-      "title": "🎨 Wybór motywu",
-      "themes": {
-        "default": {
-          "name": "Domyślny",
-          "description": "Klasyczny zielony motyw"
-        },
-        "ocean_blue": {
-          "name": "Ocean Blue",
-          "description": "Orzeźwiający niebieski"
-        },
-        "sakura_pink": {
-          "name": "Sakura Pink",
-          "description": "Delikatny róż kwiatu wiśni"
-        },
-        "forest_green": {
-          "name": "Forest Green",
-          "description": "Naturalna zieleń lasu"
-        },
-        "minimal_mono": {
-          "name": "Minimal Mono",
-          "description": "Czysta monochromia"
-        },
-        "sunset_orange": {
-          "name": "Sunset Orange",
-          "description": "Ciepły pomarańcz zachodu słońca"
-        },
-        "royal_purple": {
-          "name": "Royal Purple",
-          "description": "Elegancki purpurowy"
-        }
-      },
-      "modes": {
-        "light": "Jasny",
-        "dark": "Ciemny"
-      },
-      "apply": "Zastosuj",
-      "cancel": "Anuluj"
-    },
-    "confirm_delete_list": "Czy na pewno usunąć tę listę?",
-    "confirm_delete_item": "Czy na pewno usunąć ten element?",
-    "yes": "Tak",
-    "no": "Nie",
-    "privacy": {
-      "title": "🔒 Polityka prywatności",
-      "intro_title": "📋 Wprowadzenie",
-      "intro_content": "Niniejsza polityka opisuje, jak przetwarzamy i chronimy Twoje dane osobowe podczas korzystania z naszej aplikacji.",
-      "controller_title": "🏢 Administrator danych",
-      "controller_content": "Administrator danych: Zespół deweloperski Chrome Extension Mobile",
-      "data_title": "📊 Dane, które gromadzimy",
-      "data_email": "Adres e-mail (rejestracja i logowanie)",
-      "data_lists": "Listy zadań i ich elementy",
-      "data_notes": "Notatki (w tym prywatne/szyfrowane)",
-      "data_events": "Wydarzenia z kalendarza",
-      "data_settings": "Ustawienia aplikacji (motyw, język)",
-      "data_usage": "Statystyki użycia (PKT, poziom, seria)",
-      "purpose_title": "🎯 Cel przetwarzania danych",
-      "purpose_service": "Świadczenie i obsługa usługi",
-      "purpose_sync": "Synchronizacja danych między urządzeniami",
-      "purpose_security": "Bezpieczeństwo konta i uwierzytelnianie",
-      "purpose_features": "Personalizacja funkcji aplikacji",
-      "legal_title": "⚖️ Podstawa prawna",
-      "legal_content": "Podstawą przetwarzania danych jest Twoja zgoda (RODO art. 6 ust. 1 lit. a) i wykonanie umowy (RODO art. 6 ust. 1 lit. b).",
-      "storage_title": "💾 Przechowywanie danych",
-      "storage_content": "Twoje dane są bezpiecznie przechowywane w bazie Google Firebase. Prywatne notatki są dodatkowo szyfrowane.",
-      "retention_title": "⏱️ Okres przechowywania",
-      "retention_content": "Przechowujemy dane tak długo, jak Twoje konto jest aktywne. Po usunięciu konta wszystkie dane są trwale usuwane.",
-      "rights_title": "👤 Twoje prawa",
-      "right_access": "Dostęp: możesz przeglądać przechowywane dane",
-      "right_rectification": "Poprawka: możesz modyfikować swoje dane",
-      "right_erasure": "Usunięcie: możesz zażądać usunięcia danych",
-      "right_portability": "Przenośność: możesz wyeksportować dane",
-      "right_objection": "Sprzeciw: możesz sprzeciwić się przetwarzaniu danych",
-      "security_title": "🔐 Bezpieczeństwo danych",
-      "security_encryption": "Szyfrowanie end-to-end dla wrażliwych danych",
-      "security_firebase": "Bezpieczna infrastruktura Google Firebase",
-      "security_https": "Połączenie HTTPS",
-      "security_access": "Ograniczony dostęp do danych",
-      "contact_title": "📧 Kontakt",
-      "contact_content": "W razie pytań skontaktuj się z nami za pomocą opcji w aplikacji.",
-      "changes_title": "📝 Zmiany",
-      "changes_content": "Zastrzegamy sobie prawo do modyfikacji tej polityki. Użytkownicy zostaną poinformowani o istotnych zmianach.",
-      "effective_title": "📅 Data wejścia w życie",
-      "effective_content": "Polityka obowiązuje od 19 grudnia 2024.",
-      "accept": "Rozumiem",
-      "close": "Zamknij"
+      "meeting": "Spotkanie",
+      "reminder": "Przypomnienie",
+      "deadline": "Termin",
+      "personal": "Osobiste",
+      "work": "Praca",
+      "birthday": "Urodziny",
+      "holiday": "Święto",
+      "appointment": "Wizyta",
+      "other": "Inne"
     }
   },
   "notifications": {
-    "task_added": "✅ Zadanie zostało dodane!",
-    "note_saved": "📒 Notatka została zapisana!",
-    "note_updated": "✏️ Notatka została zaktualizowana!",
-    "note_deleted": "🗑️ Notatka została usunięta!",
-    "note_pinned": "📌 Notatka przypięta!",
-    "note_unpinned": "📌 Przypięcie zdjęte!",
+    "task_added": "✅ Zadanie dodane!",
+    "task_completed": "✅ Zadanie ukończone!",
     "task_pinned": "📌 Zadanie przypięte!",
-    "task_unpinned": "📌 Przypięcie zdjęte!",
-    "task_completed": "✅ Zadanie wykonane!",
-    "list_pinned": "📌 Lista przypięta!",
-    "list_unpinned": "📌 Przypięcie zdjęte!",
-    "level_up": "🎉 Poziom {level} osiągnięty! Gratulacje!",
-    "login_required": "⚠️ Musisz się zalogować, aby skorzystać z tej funkcji!",
-    "theme_applied": "Zastosowano motyw",
-    "logout_success": "Pomyślnie wylogowano",
-    "event_reminder": "Przypomnienie o wydarzeniu",
-    "upcoming_event": "Nadchodzące wydarzenie",
-    "snooze_5min": "Drzemka (5 min)",
-    "dismiss": "Odrzuć"
+    "task_unpinned": "📌 Przypięcie usunięte!",
+    "list_created": "✅ Lista utworzona!",
+    "list_deleted": "✅ Lista usunięta!",
+    "note_saved": "✅ Notatka zapisana!",
+    "note_updated": "✅ Notatka zaktualizowana!",
+    "note_deleted": "✅ Notatka usunięta!",
+    "event_saved": "✅ Wydarzenie zapisane!",
+    "event_deleted": "✅ Wydarzenie usunięte!",
+    "login_required": "Musisz się zalogować!",
+    "sync_completed": "✅ Synchronizacja zakończona!",
+    "offline_mode": "📱 Tryb offline aktywny",
+    "online_mode": "🌐 Połączenie przywrócone"
+  },
+  "modals": {
+    "quick_task": {
+      "title": "⚡ Szybkie zadanie",
+      "task_text": "Tekst zadania:",
+      "task_placeholder": "Wpisz swoje zadanie...",
+      "select_list": "Wybierz listę:",
+      "select_list_placeholder": "-- Wybierz listę --",
+      "submit": "Dodaj zadanie",
+      "cancel": "Anuluj"
+    },
+    "confirm_delete": {
+      "title": "Potwierdź usunięcie",
+      "message": "Czy na pewno chcesz usunąć ten element?",
+      "message_list": "Czy na pewno chcesz usunąć tę listę i wszystkie jej elementy?",
+      "warning": "Ta akcja nie może zostać cofnięta!",
+      "confirm": "Tak, usuń",
+      "cancel": "Anuluj"
+    },
+    "privacy": {
+      "title": "🔒 Informacje o prywatności",
+      "intro": "Twoja prywatność jest dla nas ważna. Oto jak chronimy Twoje dane:",
+      "data_collection": "📊 Zbieranie danych",
+      "data_collection_desc": "Zbieramy tylko dane niezbędne do funkcjonowania aplikacji: listy zadań, notatki i ustawienia.",
+      "data_storage": "💾 Przechowywanie danych",
+      "data_storage_desc": "Wszystkie dane są bezpiecznie przechowywane w Firebase i szyfrowane w transporcie.",
+      "data_sharing": "🔐 Udostępnianie danych",
+      "data_sharing_desc": "Nigdy nie udostępniamy Twoich danych osobowych stronom trzecim bez Twojej zgody.",
+      "cookies": "🍪 Pliki cookie",
+      "cookies_desc": "Używamy tylko niezbędnych plików cookie do funkcjonowania aplikacji.",
+      "rights": "⚖️ Twoje prawa",
+      "rights_desc": "Masz prawo dostępu, poprawiania i usuwania swoich danych w dowolnym momencie.",
+      "contact": "📧 Kontakt",
+      "contact_desc": "W przypadku pytań dotyczących prywatności, skontaktuj się z nami.",
+      "close": "Zamknij"
+    }
   },
   "achievements": {
     "first_task": {
-      "title": "Pierwszy krok",
-      "description": "Wykonaj pierwsze zadanie"
+      "name": "Pierwszy krok",
+      "description": "Dodaj swoje pierwsze zadanie"
     },
     "task_master": {
-      "title": "Mistrz zadań",
-      "description": "Wykonaj 10 zadań"
+      "name": "Mistrz zadań",
+      "description": "Ukończ 50 zadań"
+    },
+    "streak_week": {
+      "name": "Tygodniowiec",
+      "description": "Utrzymaj 7-dniową serię"
     },
     "list_creator": {
-      "title": "Twórca list",
-      "description": "Stwórz 3 listy"
+      "name": "Twórca list",
+      "description": "Utwórz 5 różnych list"
     },
     "note_taker": {
-      "title": "Notatnik",
-      "description": "Napisz 5 notatek"
+      "name": "Notujący",
+      "description": "Zapisz 10 notatek"
     },
-    "level_up": {
-      "title": "Awans",
-      "description": "Osiągnij poziom 2"
-    },
-    "streak_3": {
-      "title": "Wytrwały",
-      "description": "3 dni z rzędu"
-    },
-    "streak_7": {
-      "title": "Legenda",
-      "description": "7 dni z rzędu"
-    },
-    "explorer": {
-      "title": "Odkrywca",
+    "organizer": {
+      "name": "Organizator",
       "description": "Wypróbuj wszystkie funkcje"
+    }
+  },
+  "daily_quests": {
+    "title": "🎯 Codzienne zadania",
+    "subtitle": "Wykonuj codzienne wyzwania, aby rozwijać swoje umiejętności",
+    "available_quests": "Dostępne zadania",
+    "completed_quests": "Ukończone zadania",
+    "quest_progress": "Postęp zadań",
+    "daily_progress": "Dzienny postęp",
+    "refresh_quests": "Odśwież zadania",
+    "complete_quest": "Ukończ zadanie",
+    "quest_completed": "✅ Zadanie ukończone!",
+    "all_completed": "🎉 Wszystkie dzisiejsze zadania ukończone!",
+    "xp_earned": "Zdobyte XP: {xp}",
+    "categories": {
+      "productivity": "Produktywność",
+      "learning": "Nauka",
+      "health": "Zdrowie",
+      "creativity": "Kreatywność",
+      "organization": "Organizacja"
     }
   },
   "timetable": {
     "title": "📅 Plan lekcji",
-    "new_entry": "Dodaj nowe zajęcia",
-    "form_title": "✨ Dodaj zajęcia",
+    "new_class": "Dodaj nowe zajęcia",
+    "form_title": "✨ Dodaj nowe zajęcia",
     "weekly_schedule": "📋 Plan tygodniowy",
     "table_view": "Widok tabeli",
     "list_view": "Widok listy",
@@ -403,7 +348,7 @@
     "close": "Zamknij",
     "empty_state": {
       "title": "Brak zajęć w planie",
-      "subtitle": "Dodaj zajęcia przyciskiem „Dodaj nowe zajęcia”!"
+      "subtitle": "Dodaj zajęcia przyciskiem \"Dodaj nowe zajęcia\"!"
     },
     "no_classes": "Brak zajęć tego dnia",
     "validation": {
@@ -467,7 +412,7 @@
     "close": "Zamknij",
     "empty_state": {
       "title": "Brak egzaminów w kalendarzu",
-      "subtitle": "Dodaj egzamin przyciskiem „Dodaj egzamin”!"
+      "subtitle": "Dodaj egzamin przyciskiem \"Dodaj egzamin\"!"
     },
     "days_until": "dni zostało",
     "today": "Dziś",
@@ -570,4 +515,4 @@
       }
     }
   }
-}
+} 

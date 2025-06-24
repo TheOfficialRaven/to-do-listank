@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .language-btn { margin: 5px; padding: 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+        .language-btn.active { background: #28a745; }
+        .test-text { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Language Switch Test</h1>
+    
+    <div class="debug">
+        <h3>Debug Info:</h3>
+        <p>Current Language: <span id="current-lang">Loading...</span></p>
+        <p>Translations Loaded: <span id="translations-status">Loading...</span></p>
+        <p>Available Languages: <span id="available-langs">Loading...</span></p>
+    </div>
+    
+    <div>
+        <h3>Language Buttons:</h3>
+        <button class="language-btn" onclick="testLanguage('hu')">🇭🇺 Magyar</button>
+        <button class="language-btn" onclick="testLanguage('en')">🇺🇸 English</button>
+        <button class="language-btn" onclick="testLanguage('de')">🇩🇪 Deutsch</button>
+        <button class="language-btn" onclick="testLanguage('pl')">🇵🇱 Polski</button>
+    </div>
+    
+    <div class="test-text">
+        <h3>Test Translations:</h3>
+        <p><strong>Navigation Dashboard:</strong> <span id="test-nav-dashboard">Loading...</span></p>
+        <p><strong>Dashboard Welcome:</strong> <span id="test-dashboard-welcome">Loading...</span></p>
+        <p><strong>Lists Title:</strong> <span id="test-lists-title">Loading...</span></p>
+        <p><strong>Notes Title:</strong> <span id="test-notes-title">Loading...</span></p>
+    </div>
+
+    <script>
+        let currentLanguage = 'hu';
+        let translations = {};
+
+        async function loadLanguage(languageCode) {
+            try {
+                console.log(`🔄 Loading language: ${languageCode}`);
+                const response = await fetch(`languages/${languageCode}.json?t=${Date.now()}`);
+                console.log(`📡 Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    translations = await response.json();
+                    currentLanguage = languageCode;
+                    console.log(`✅ Language loaded: ${languageCode}`);
+                    console.log(`📦 Translations sections:`, Object.keys(translations));
+                    updateDebugInfo();
+                    updateTestTranslations();
+                } else {
+                    console.error(`❌ Failed to load ${languageCode}`);
+                    updateDebugInfo();
+                }
+            } catch (error) {
+                console.error(`❌ Error loading ${languageCode}:`, error);
+                updateDebugInfo();
+            }
+        }
+
+        function getText(key) {
+            const keys = key.split('.');
+            let value = translations;
+            
+            for (const k of keys) {
+                if (value && typeof value === 'object' && k in value) {
+                    value = value[k];
+                } else {
+                    console.warn(`Translation key not found: ${key}`);
+                    return key;
+                }
+            }
+            
+            return value;
+        }
+
+        function updateDebugInfo() {
+            document.getElementById('current-lang').textContent = currentLanguage;
+            document.getElementById('translations-status').textContent = Object.keys(translations).length > 0 ? 'Loaded' : 'Not loaded';
+            document.getElementById('available-langs').textContent = Object.keys(translations).join(', ');
+        }
+
+        function updateTestTranslations() {
+            document.getElementById('test-nav-dashboard').textContent = getText('navigation.dashboard');
+            document.getElementById('test-dashboard-welcome').textContent = getText('dashboard.welcome');
+            document.getElementById('test-lists-title').textContent = getText('lists.title');
+            document.getElementById('test-notes-title').textContent = getText('notes.title');
+        }
+
+        async function testLanguage(lang) {
+            console.log(`🖱️ Testing language: ${lang}`);
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.language-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            await loadLanguage(lang);
+        }
+
+        // Initialize with Hungarian
+        loadLanguage('hu');
+    </script>
+</body>
+</html> 

@@ -334,7 +334,8 @@ async function refreshLanguageCache() {
       const languageFiles = [
         './languages/hu.json',
         './languages/en.json', 
-        './languages/de.json'
+        './languages/de.json',
+        './languages/pl.json'
       ];
       
       // Delete old language files from cache
@@ -2017,8 +2018,8 @@ function updateAchievements() {
     const title = getText(`achievements.${achievement.id.replace('-', '_')}.title`);
     const description = getText(`achievements.${achievement.id.replace('-', '_')}.description`);
     
-          const unlockedText = isUnlocked ? '🔓 ' + (currentLanguage === 'en' ? 'Unlocked!' : currentLanguage === 'de' ? 'Erreicht!' : 'Elérve!') : 
-                                           '🔒 ' + (currentLanguage === 'en' ? 'Locked' : currentLanguage === 'de' ? 'Gesperrt' : 'Zárva');
+              const unlockedText = isUnlocked ? '🔓 ' + (currentLanguage === 'en' ? 'Unlocked!' : currentLanguage === 'de' ? 'Erreicht!' : currentLanguage === 'pl' ? 'Odblokowane!' : 'Elérve!') :
+      '🔒 ' + (currentLanguage === 'en' ? 'Locked' : currentLanguage === 'de' ? 'Gesperrt' : currentLanguage === 'pl' ? 'Zablokowane' : 'Zárva');
       
       badgeElement.innerHTML = `
         <div class="badge-icon">${achievement.icon}</div>
@@ -4209,7 +4210,7 @@ function loadUpcomingEvents() {
       } else {
         upcomingEventsList.innerHTML = upcomingEvents.map(event => `
           <div class="upcoming-event">
-            <div class="event-date">${new Date(event.date).toLocaleDateString(currentLanguage === 'hu' ? 'hu-HU' : currentLanguage === 'de' ? 'de-DE' : 'en-US')}</div>
+            <div class="event-date">${new Date(event.date).toLocaleDateString(currentLanguage === 'hu' ? 'hu-HU' : currentLanguage === 'de' ? 'de-DE' : currentLanguage === 'pl' ? 'pl-PL' : 'en-US')}</div>
             <div class="event-title">${event.title}</div>
             <div class="event-type">${getEventTypeIcon(event.type)}</div>
             <button class="delete-event-btn" onclick="deleteEvent('${event.id}')" title="${getText('common.delete')}">
@@ -4870,28 +4871,38 @@ async function initLanguageSystem() {
 // Nyelvi fájl betöltése
 async function loadLanguage(languageCode) {
   try {
+    console.log(`🔄 Attempting to load language: ${languageCode}`);
     // Force fresh fetch with cache busting
     const response = await fetch(`languages/${languageCode}.json?t=${Date.now()}`);
+    console.log(`📡 Fetch response for ${languageCode}:`, response.status, response.statusText);
+    
     if (response.ok) {
       translations = await response.json();
       currentLanguage = languageCode;
       localStorage.setItem('language', languageCode);
       
-      // Refresh language cache for this specific file
-      await refreshLanguageCache();
+      console.log(`📦 Translations loaded for ${languageCode}:`, Object.keys(translations).length, 'sections');
+      console.log(`🌐 Current language set to: ${currentLanguage}`);
+      console.log(`🔍 Before UI update - currentLanguage: ${currentLanguage}`);
       
       // UI frissítése
       updateUITexts();
       
-      console.log(`✅ Language loaded and cached: ${languageCode}`);
+      console.log(`🔍 After UI update - currentLanguage: ${currentLanguage}`);
+      
+      // Refresh language cache for this specific file - AFTER UI updates
+      await refreshLanguageCache();
+      
+      console.log(`🔍 After cache refresh - currentLanguage: ${currentLanguage}`);
+      console.log(`✅ Language loaded and cached: ${currentLanguage}`);
     } else {
-      console.error(`Language file ${languageCode}.json not found, falling back to Hungarian`);
+      console.error(`❌ Language file ${languageCode}.json not found (${response.status}), falling back to Hungarian`);
       if (languageCode !== 'hu') {
         await loadLanguage('hu');
       }
     }
   } catch (error) {
-    console.error('Error loading language:', error);
+    console.error('❌ Error loading language:', error);
     if (languageCode !== 'hu') {
       await loadLanguage('hu');
     }
@@ -4900,6 +4911,7 @@ async function loadLanguage(languageCode) {
 
 // Szöveg lekérése target group figyelembevételével
 function getText(key, placeholders = {}) {
+  // console.log(`🔍 Getting text for key: ${key}, current language: ${currentLanguage}`);
   // Check if we have a target group and if there's a specific translation for it
   const currentTargetGroup = window.advancedTargetGroupSystem?.getCurrentTargetGroup();
   
@@ -5426,20 +5438,33 @@ function initLanguageDropdown() {
         e.stopPropagation();
         
         const languageCode = link.getAttribute('data-language') || 'hu';
+        console.log(`🖱️ Language link clicked: ${languageCode}`);
         
         // Dropdown azonnal bezárása a nyelv váltás előtt
         languageDropdown.classList.remove('show');
         
         try {
+          console.log(`🔄 Starting language change to: ${languageCode}`);
           await loadLanguage(languageCode);
-          markCurrentLanguage();
+          
+          // Explicit debug: check current language before marking
+          console.log(`🔍 Before markCurrentLanguage - currentLanguage: ${currentLanguage}`);
+          console.log(`🔍 Before markCurrentLanguage - languageCode: ${languageCode}`);
+          console.log(`🔍 Before markCurrentLanguage - localStorage: ${localStorage.getItem('language')}`);
+          
+          // Add a small delay to ensure all async operations are completed
+          setTimeout(() => {
+            console.log(`🔍 In setTimeout - currentLanguage: ${currentLanguage}`);
+            markCurrentLanguage();
+            console.log(`✅ Language change completed to: ${currentLanguage}`);
+          }, 50);
           
           // Biztonságos bezárás a nyelv váltás után is
           setTimeout(() => {
             languageDropdown.classList.remove('show');
           }, 100);
         } catch (error) {
-          console.error('Hiba a nyelv betöltése során:', error);
+          console.error('❌ Hiba a nyelv betöltése során:', error);
         }
       });
     });
@@ -5448,6 +5473,7 @@ function initLanguageDropdown() {
 
 // Aktuális nyelv jelölése
 function markCurrentLanguage() {
+  console.log(`🏷️ Marking current language: ${currentLanguage}`);
   const languageLinks = document.querySelectorAll('.language-dropdown a');
   const languageText = document.querySelector('.language-text');
   
@@ -5458,6 +5484,7 @@ function markCurrentLanguage() {
     const linkLang = link.getAttribute('data-language');
     if (linkLang === currentLanguage) {
       link.classList.add('current');
+      console.log(`✅ Marked ${linkLang} as current language`);
       
       // Frissítjük a hamburger menü szövegét
       if (languageText) {
@@ -5468,11 +5495,16 @@ function markCurrentLanguage() {
           case 'de':
             languageText.textContent = 'DE';
             break;
+          case 'pl':
+            languageText.textContent = 'PL';
+            console.log(`🇵🇱 Language text set to PL`);
+            break;
           case 'hu':
           default:
             languageText.textContent = 'HU';
             break;
         }
+        console.log(`📝 Language button text updated to: ${languageText.textContent}`);
       }
     }
   });
@@ -5550,6 +5582,7 @@ function submitQuickTask() {
   if (!taskText || !selectedListId) {
     const message = currentLanguage === 'en' ? 'Please fill in the task text and choose a list!' : 
                    currentLanguage === 'de' ? 'Bitte füllen Sie den Aufgabentext aus und wählen Sie eine Liste!' : 
+                   currentLanguage === 'pl' ? 'Proszę wpisać tekst zadania i wybrać listę!' :
                    'Kérjük, töltsd ki a feladat szövegét és válassz egy listát!';
     alert(message);
     return;
@@ -6701,16 +6734,43 @@ window.updateLanguageCache = async function() {
         await cache.delete('./languages/hu.json');
         await cache.delete('./languages/en.json');
         await cache.delete('./languages/de.json');
+        await cache.delete('./languages/pl.json');
         console.log(`🗑️ Cleared language files from ${cacheName}`);
       }
     }
   }
   
-  // Force reload language files
-  const currentLang = localStorage.getItem('language') || 'hu';
+  // Force reload language files - keep current language instead of defaulting to Hungarian
+  const currentLang = currentLanguage || localStorage.getItem('language') || 'hu';
+  console.log(`🌐 Cache update: reloading current language: ${currentLang}`);
   await loadLanguage(currentLang);
   
   console.log('✅ Language cache updated and reloaded');
+};
+
+// Complete cache reset and language reload
+window.resetLanguageSystem = async function() {
+  console.log('🔄 Complete language system reset...');
+  
+  // Clear all caches
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    for (const cacheName of cacheNames) {
+      await caches.delete(cacheName);
+      console.log(`🗑️ Deleted cache: ${cacheName}`);
+    }
+  }
+  
+  // Clear localStorage language setting
+  localStorage.removeItem('language');
+  
+  // Reset currentLanguage to default
+  currentLanguage = 'hu';
+  
+  // Reload the page to start fresh
+  window.location.reload(true);
+  
+  console.log('✅ Language system reset completed');
 };
 
 // Auto-clear problematic caches on startup (run once per session)
@@ -6742,6 +6802,7 @@ console.log('  - clearAllCaches() - Clear all caches and reload');
 console.log('  - forceReload() - Force reload with cache bust');
 console.log('  - checkCacheStatus() - Show current cache contents');
 console.log('  - updateLanguageCache() - Force update language cache');
+console.log('  - resetLanguageSystem() - Complete reset of language system');
 
 // Debug function to check target group and language system status
 window.debugUITexts = function() {
@@ -6766,3 +6827,36 @@ window.debugUITexts = function() {
 };
 
 console.log('🔧 Additional debug function: debugUITexts() - Check target group and language status');
+
+// Debug language switching issues
+window.debugLanguage = function() {
+  console.log('🌐 Language Debug:');
+  console.log('  - Current Language Variable:', currentLanguage);
+  console.log('  - LocalStorage Language:', localStorage.getItem('language'));
+  console.log('  - Translations Object:', translations);
+  console.log('  - Translations Keys:', Object.keys(translations));
+  console.log('  - Available Language Files:', ['hu', 'en', 'de', 'pl']);
+  
+  // Test Polish translations
+  if (translations.navigation) {
+    console.log('  - Dashboard text:', translations.navigation.dashboard);
+    console.log('  - Lists text:', translations.lists.title);
+    console.log('  - Notes text:', translations.notes.title);
+  }
+};
+
+// Quick language switch functions for testing
+window.switchToPolish = function() {
+  console.log('🇵🇱 Manually switching to Polish...');
+  loadLanguage('pl');
+};
+
+window.switchToHungarian = function() {
+  console.log('🇭🇺 Manually switching to Hungarian...');
+  loadLanguage('hu');
+};
+
+console.log('🔧 Language debug functions:');
+console.log('  - debugLanguage() - Show language debug info');
+console.log('  - switchToPolish() - Force switch to Polish');
+console.log('  - switchToHungarian() - Force switch to Hungarian');
