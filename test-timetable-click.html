@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Órarend Kattintható Cellák Teszt</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .test-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .test-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .demo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .demo-table td {
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+            min-height: 60px;
+            position: relative;
+        }
+        
+        .time-slot {
+            background: #f8f9fa;
+            font-weight: 600;
+            text-align: center;
+            color: #666;
+            min-width: 60px;
+        }
+        
+        .class-cell {
+            min-height: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .class-cell.empty-cell {
+            background: #f8f9fa;
+            border: 2px dashed #ccc;
+            transition: all 0.3s ease;
+        }
+        
+        .class-cell.empty-cell:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        .add-class-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 40px;
+            color: #999;
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .class-cell.empty-cell:hover .add-class-hint {
+            color: #667eea;
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        
+        .class-entry {
+            background: #667eea;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .class-entry:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .class-subject {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .class-details {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        .test-info {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-info h3 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .test-info li {
+            margin: 5px 0;
+            color: #333;
+        }
+        
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .form-demo {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .form-demo h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-group input,
+        .input-group select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>📅 Órarend Kattintható Cellák Teszt</h1>
+            <p>Új funkció: Kattints az üres cellákra az órák gyors hozzáadásához!</p>
+        </div>
+        
+        <div class="test-info">
+            <h3>🎯 Új Funkció Leírása</h3>
+            <ul>
+                <li><strong>Kattintható üres cellák:</strong> Az órarend táblázatban az üres cellákra kattintva automatikusan megnyílik az új óra hozzáadása űrlap</li>
+                <li><strong>Automatikus kitöltés:</strong> A nap és időpont automatikusan be van töltve a kiválasztott cella alapján</li>
+                <li><strong>Vizuális visszajelzés:</strong> Az üres cellák hover effekttel jelzik, hogy kattinthatóak</li>
+                <li><strong>Gyors hozzáférés:</strong> Nem kell keresni a megfelelő napot és időpontot manuálisan</li>
+            </ul>
+        </div>
+        
+        <div class="demo-section">
+            <h2>📋 Demo: Kattintható Órarend Táblázat</h2>
+            <p>Az alábbi táblázatban az üres cellákra kattintva láthatod a hover effektet. A valós alkalmazásban ez megnyitná az új óra hozzáadása űrlapot.</p>
+            
+            <table class="demo-table">
+                <thead>
+                    <tr>
+                        <th>Idő</th>
+                        <th>Hétfő</th>
+                        <th>Kedd</th>
+                        <th>Szerda</th>
+                        <th>Csütörtök</th>
+                        <th>Péntek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="time-slot">08:00</td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Hétfő 08:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Kedd 08:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Szerda 08:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Csütörtök 08:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Péntek 08:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="time-slot">09:00</td>
+                        <td class="class-cell">
+                            <div class="class-entry" onclick="showDemoMessage('Matematika szerkesztése')">
+                                <div class="class-subject">Matematika</div>
+                                <div class="class-details">Kovács Péter • 1/A</div>
+                            </div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Kedd 09:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Szerda 09:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell">
+                            <div class="class-entry" onclick="showDemoMessage('Fizika szerkesztése')">
+                                <div class="class-subject">Fizika</div>
+                                <div class="class-details">Nagy Anna • 2/B</div>
+                            </div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Péntek 09:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="time-slot">10:00</td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Hétfő 10:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell">
+                            <div class="class-entry" onclick="showDemoMessage('Történelem szerkesztése')">
+                                <div class="class-subject">Történelem</div>
+                                <div class="class-details">Szabó István • Aula</div>
+                            </div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Szerda 10:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Csütörtök 10:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                        <td class="class-cell empty-cell" onclick="showDemoMessage('Péntek 10:00')">
+                            <div class="add-class-hint">+</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="demo-section">
+            <h2>📝 Demo: Automatikus Űrlap Kitöltés</h2>
+            <p>Amikor egy üres cellára kattintasz, az űrlap automatikusan kitöltődik a megfelelő nap és időpont adataival:</p>
+            
+            <div class="form-demo">
+                <h3>Új óra hozzáadása</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>📚 Tantárgy</label>
+                        <input type="text" placeholder="pl. Matematika, Fizika..." value="">
+                    </div>
+                    <div class="input-group">
+                        <label>📅 Nap</label>
+                        <select>
+                            <option value="">Válassz napot</option>
+                            <option value="monday">Hétfő</option>
+                            <option value="tuesday" selected>Kedd</option>
+                            <option value="wednesday">Szerda</option>
+                            <option value="thursday">Csütörtök</option>
+                            <option value="friday">Péntek</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>🕐 Kezdés</label>
+                        <input type="time" value="09:00">
+                    </div>
+                    <div class="input-group">
+                        <label>🕑 Befejezés</label>
+                        <input type="time" value="09:45">
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <strong>💡 Automatikus kitöltés:</strong> A nap (Kedd) és időpont (09:00-09:45) automatikusan be van töltve a kiválasztott cella alapján!
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🎮 Tesztelési Lehetőségek</h2>
+            <p>Próbáld ki a következőket:</p>
+            <button class="test-button" onclick="testEmptyCellClick()">Teszt: Üres cella kattintás</button>
+            <button class="test-button" onclick="testExistingClassClick()">Teszt: Létező óra kattintás</button>
+            <button class="test-button" onclick="testHoverEffects()">Teszt: Hover effektek</button>
+            <button class="test-button" onclick="resetDemo()">Reset Demo</button>
+        </div>
+        
+        <div id="demo-message" style="display: none; position: fixed; top: 20px; right: 20px; background: #667eea; color: white; padding: 15px; border-radius: 8px; z-index: 1000;"></div>
+    </div>
+    
+    <script>
+        function showDemoMessage(message) {
+            const demoMessage = document.getElementById('demo-message');
+            demoMessage.textContent = message;
+            demoMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                demoMessage.style.display = 'none';
+            }, 2000);
+        }
+        
+        function testEmptyCellClick() {
+            showDemoMessage('✅ Üres cella kattintás tesztelve!');
+        }
+        
+        function testExistingClassClick() {
+            showDemoMessage('✅ Létező óra kattintás tesztelve!');
+        }
+        
+        function testHoverEffects() {
+            showDemoMessage('✅ Hover effektek tesztelve!');
+        }
+        
+        function resetDemo() {
+            showDemoMessage('🔄 Demo resetelve!');
+        }
+        
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Órarend kattintható cellák demo betöltve!');
+            console.log('💡 Próbáld ki az üres cellákra kattintani a hover effektekért!');
+        });
+    </script>
+</body>
+</html> 

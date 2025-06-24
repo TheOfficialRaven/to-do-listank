@@ -102,13 +102,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Timetable Header and Controls */
 .timetable-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  background: var(--accent-light);
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .timetable-header h3 {
@@ -120,7 +121,26 @@
 
 .timetable-controls {
   display: flex;
+  align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.timetable-hint {
+  background: var(--accent-light);
+  color: var(--accent-color);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--accent-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
 }
 
 .view-toggle-btn {
@@ -128,7 +148,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: var(--bg-secondary);
+  background: var(--card-bg);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-primary);
@@ -139,39 +159,43 @@
 }
 
 .view-toggle-btn:hover {
-  background: var(--accent-color);
-  color: white;
   border-color: var(--accent-color);
+  background: var(--accent-light);
+  color: var(--accent-color);
 }
 
-/* Table View */
+.view-toggle-btn .material-icons {
+  font-size: 1.1rem;
+}
+
+/* Timetable Table Styles */
 .timetable-table-container {
   overflow-x: auto;
-  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .timetable-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .timetable-table th {
-  background: var(--accent-light);
-  color: var(--accent-color);
-  padding: 1rem 0.75rem;
+  background: var(--accent-color);
+  color: white;
+  padding: 1rem 0.5rem;
   text-align: center;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 0.9rem;
   border: 1px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 .timetable-table td {
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: 1px solid var(--border-color);
-  text-align: center;
   vertical-align: top;
   min-height: 60px;
   position: relative;
@@ -179,41 +203,74 @@
 
 .time-slot {
   background: var(--bg-secondary);
-  color: var(--text-secondary);
   font-weight: 600;
-  white-space: nowrap;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  min-width: 60px;
 }
 
 .class-cell {
-  background: var(--card-bg);
+  min-height: 60px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Empty cell styles for adding new classes */
+.class-cell.empty-cell {
+  background: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
   transition: all 0.3s ease;
 }
 
-.class-cell:hover {
+.class-cell.empty-cell:hover {
   background: var(--accent-light);
+  border-color: var(--accent-color);
+  transform: scale(1.02);
 }
 
+.add-class-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 40px;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.class-cell.empty-cell:hover .add-class-hint {
+  color: var(--accent-color);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Existing class styles */
 .class-entry {
   background: var(--accent-color);
   color: white;
   padding: 0.5rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  line-height: 1.3;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .class-entry:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .class-subject {
-  font-weight: 700;
-  margin-bottom: 0.2rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
 }
 
 .class-details {
@@ -224,6 +281,7 @@
 .class-teacher,
 .class-classroom {
   display: block;
+  margin-bottom: 0.1rem;
 }
 
 /* List View */
@@ -391,18 +449,18 @@
     padding: 1rem;
   }
   
-  .timetable-table {
+  .timetable-table th,
+  .timetable-table td {
+    padding: 0.25rem;
     font-size: 0.8rem;
   }
   
-  .timetable-table th,
-  .timetable-table td {
-    padding: 0.5rem 0.25rem;
+  .time-slot {
+    min-width: 50px;
   }
   
-  .class-entry {
-    padding: 0.3rem;
-    font-size: 0.75rem;
+  .add-class-hint {
+    font-size: 1.2rem;
   }
   
   .timetable-days {

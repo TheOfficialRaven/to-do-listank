@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Intelligens Küldetések Teszt</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1F2937;
+            color: #F8FAFC;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-container {
+            background: #2B3849;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #10B981;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #374151;
+            border-radius: 8px;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            background: #1F2937;
+            border: 1px solid #4B5563;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            border-color: #10B981;
+            color: #10B981;
+        }
+        
+        .error {
+            border-color: #EF4444;
+            color: #EF4444;
+        }
+        
+        .info {
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+        
+        h1, h2, h3 {
+            color: #10B981;
+        }
+        
+        .mission-card {
+            background: #2B3849;
+            border: 1px solid #4B5563;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .mission-title {
+            font-weight: bold;
+            color: #10B981;
+            margin-bottom: 5px;
+        }
+        
+        .mission-description {
+            color: #D1D5DB;
+            margin-bottom: 10px;
+        }
+        
+        .mission-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Intelligens Küldetések Rendszer Teszt</h1>
+    
+    <div class="test-container">
+        <h2>📋 Teszt Funkciók</h2>
+        
+        <div class="test-section">
+            <h3>🔧 Rendszer Inicializálás</h3>
+            <button class="test-btn" onclick="testInitialization()">Rendszer Inicializálása</button>
+            <button class="test-btn" onclick="checkSystemStatus()">Rendszer Állapot Ellenőrzése</button>
+            <div id="init-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎯 Küldetés Generálás</h3>
+            <button class="test-btn" onclick="testMissionGeneration()">Küldetések Generálása</button>
+            <button class="test-btn" onclick="testSubjectExtraction()">Tantárgyak Kinyerése</button>
+            <button class="test-btn" onclick="testEventExtraction()">Események Kinyerése</button>
+            <div id="generation-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🤖 AI Küldetés Generálás</h3>
+            <button class="test-btn" onclick="testAIPromptPreparation()">AI Prompt Előkészítése</button>
+            <button class="test-btn" onclick="testAIMissionGeneration()">AI Küldetések Generálása</button>
+            <button class="test-btn" onclick="testSampleAIResponse()">Minta AI Válasz</button>
+            <div id="ai-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Küldetés Sablonok</h3>
+            <button class="test-btn" onclick="testTemplates()">Sablonok Tesztelése</button>
+            <button class="test-btn" onclick="testTemplateSelection()">Sablon Választás</button>
+            <div id="templates-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎮 UI Tesztelés</h3>
+            <button class="test-btn" onclick="testUI()">UI Frissítés</button>
+            <button class="test-btn" onclick="testMissionCompletion()">Küldetés Teljesítés</button>
+            <div id="ui-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 Teljes Rendszer Teszt</h3>
+            <button class="test-btn" onclick="runFullTest()">Teljes Teszt Futtatása</button>
+            <button class="test-btn" onclick="clearResults()">Eredmények Törlése</button>
+            <div id="full-test-result" class="result"></div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📈 Generált Küldetések</h2>
+        <div id="missions-display"></div>
+    </div>
+    
+    <script>
+        // Test functions
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            
+            element.innerHTML += `[${timestamp}] ${message}\n`;
+            element.className = `result ${className}`;
+            element.scrollTop = element.scrollHeight;
+        }
+        
+        async function testInitialization() {
+            logResult('init-result', '🧠 Intelligens küldetések rendszer inicializálása...');
+            
+            try {
+                if (typeof window.testSmartMissions === 'function') {
+                    await window.testSmartMissions();
+                    logResult('init-result', '✅ Rendszer sikeresen inicializálva!', 'success');
+                } else {
+                    logResult('init-result', '❌ testSmartMissions függvény nem található', 'error');
+                }
+            } catch (error) {
+                logResult('init-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkSystemStatus() {
+            logResult('init-result', '🔍 Rendszer állapot ellenőrzése...');
+            
+            const status = {
+                smartMissionsManager: !!window.smartMissionsManager,
+                dailyQuestsManager: !!window.dailyQuestsManager,
+                firebase: !!(window.db && window.auth),
+                currentUser: !!window.auth?.currentUser
+            };
+            
+            logResult('init-result', `📊 Állapot:\n${JSON.stringify(status, null, 2)}`, 'info');
+        }
+        
+        async function testMissionGeneration() {
+            logResult('generation-result', '🎯 Küldetések generálása...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const missions = await window.smartMissionsManager.generateSmartMissionsForStudent();
+                    logResult('generation-result', `✅ ${missions.length} küldetés generálva!`, 'success');
+                    
+                    // Display missions
+                    const display = document.getElementById('missions-display');
+                    display.innerHTML = '<h3>Generált Küldetések:</h3>';
+                    
+                    missions.forEach((mission, index) => {
+                        const missionCard = document.createElement('div');
+                        missionCard.className = 'mission-card';
+                        missionCard.innerHTML = `
+                            <div class="mission-title">${mission.title}</div>
+                            <div class="mission-description">${mission.description}</div>
+                            <div class="mission-meta">
+                                XP: ${mission.xp} | Idő: ${mission.estimatedDuration} | 
+                                Tantárgy: ${mission.subject} | Típus: ${mission.missionType}
+                            </div>
+                        `;
+                        display.appendChild(missionCard);
+                    });
+                } else {
+                    logResult('generation-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('generation-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSubjectExtraction() {
+            logResult('generation-result', '📚 Tantárgyak kinyerése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const subjects = await window.smartMissionsManager.getStudentSubjects();
+                    logResult('generation-result', `✅ ${subjects.length} tantárgy találva: ${subjects.join(', ')}`, 'success');
+                } else {
+                    logResult('generation-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('generation-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testEventExtraction() {
+            logResult('generation-result', '📅 Események kinyerése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const events = await window.smartMissionsManager.getStudentEvents();
+                    logResult('generation-result', `✅ ${events.length} esemény találva`, 'success');
+                    
+                    if (events.length > 0) {
+                        events.forEach((event, index) => {
+                            logResult('generation-result', `  ${index + 1}. ${event.title || 'Névtelen'} - ${event.date || 'Dátum nélkül'}`, 'info');
+                        });
+                    }
+                } else {
+                    logResult('generation-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('generation-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        function testTemplates() {
+            logResult('templates-result', '📋 Sablonok tesztelése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const templates = window.smartMissionsManager.getStudentMissionTemplates();
+                    const templateCount = Object.values(templates).reduce((sum, arr) => sum + arr.length, 0);
+                    
+                    logResult('templates-result', `✅ ${templateCount} sablon találva:`, 'success');
+                    
+                    Object.entries(templates).forEach(([type, templateArray]) => {
+                        logResult('templates-result', `  ${type}: ${templateArray.length} sablon`, 'info');
+                    });
+                } else {
+                    logResult('templates-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('templates-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        function testTemplateSelection() {
+            logResult('templates-result', '🎲 Sablon választás tesztelése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const templates = window.smartMissionsManager.getStudentMissionTemplates();
+                    const allTemplates = [
+                        ...templates.study_preparation,
+                        ...templates.exam_preparation,
+                        ...templates.homework_focus,
+                        ...templates.review_and_practice
+                    ];
+                    
+                    // Test random selection
+                    for (let i = 0; i < 5; i++) {
+                        const randomTemplate = window.smartMissionsManager.getRandomFromArray(allTemplates);
+                        logResult('templates-result', `  ${i + 1}. ${randomTemplate}`, 'info');
+                    }
+                    
+                    logResult('templates-result', '✅ Sablon választás tesztelése sikeres', 'success');
+                } else {
+                    logResult('templates-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('templates-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUI() {
+            logResult('ui-result', '🎨 UI frissítés tesztelése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    window.smartMissionsManager.updateSmartMissionsUI();
+                    logResult('ui-result', '✅ UI frissítés meghívva', 'success');
+                } else {
+                    logResult('ui-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('ui-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testMissionCompletion() {
+            logResult('ui-result', '✅ Küldetés teljesítés tesztelése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    // Generate a test mission first
+                    const missions = await window.smartMissionsManager.generateSmartMissionsForStudent();
+                    if (missions.length > 0) {
+                        const testMission = missions[0];
+                        logResult('ui-result', `🧪 Teszt küldetés: ${testMission.title}`, 'info');
+                        
+                        // Test completion
+                        await window.smartMissionsManager.completeSmartMission(testMission.id);
+                        logResult('ui-result', '✅ Küldetés teljesítés tesztelése sikeres', 'success');
+                    } else {
+                        logResult('ui-result', '⚠️ Nincs küldetés a teszteléshez', 'info');
+                    }
+                } else {
+                    logResult('ui-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('ui-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runFullTest() {
+            logResult('full-test-result', '🚀 Teljes rendszer teszt indítása...');
+            
+            try {
+                // 1. Initialization
+                logResult('full-test-result', '1️⃣ Rendszer inicializálása...');
+                await testInitialization();
+                
+                // 2. Status check
+                logResult('full-test-result', '2️⃣ Állapot ellenőrzése...');
+                await checkSystemStatus();
+                
+                // 3. Mission generation
+                logResult('full-test-result', '3️⃣ Küldetések generálása...');
+                await testMissionGeneration();
+                
+                // 4. AI prompt preparation
+                logResult('full-test-result', '4️⃣ AI prompt előkészítése...');
+                await testAIPromptPreparation();
+                
+                // 5. AI mission generation
+                logResult('full-test-result', '5️⃣ AI küldetések generálása...');
+                await testAIMissionGeneration();
+                
+                // 6. Templates test
+                logResult('full-test-result', '6️⃣ Sablonok tesztelése...');
+                testTemplates();
+                
+                // 7. UI test
+                logResult('full-test-result', '7️⃣ UI tesztelése...');
+                await testUI();
+                
+                logResult('full-test-result', '🎉 Teljes teszt sikeresen befejezve!', 'success');
+                
+            } catch (error) {
+                logResult('full-test-result', `❌ Teszt hibával végződött: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearResults() {
+            const resultElements = document.querySelectorAll('.result');
+            resultElements.forEach(element => {
+                element.innerHTML = '';
+                element.className = 'result';
+            });
+            
+            document.getElementById('missions-display').innerHTML = '';
+        }
+        
+        async function testAIPromptPreparation() {
+            logResult('ai-result', '🤖 AI prompt előkészítése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const prompt = await window.smartMissionsManager.prepareMissionPromptForAI();
+                    logResult('ai-result', '✅ AI prompt sikeresen előkészítve!', 'success');
+                    logResult('ai-result', `📝 Prompt:\n${prompt}`, 'info');
+                } else {
+                    logResult('ai-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('ai-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAIMissionGeneration() {
+            logResult('ai-result', '🤖 AI küldetések generálása...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const missions = await window.smartMissionsManager.generateMissionsWithAI();
+                    logResult('ai-result', `✅ ${missions.length} AI küldetés generálva!`, 'success');
+                    
+                    // Display AI missions
+                    const display = document.getElementById('missions-display');
+                    display.innerHTML = '<h3>AI Generált Küldetések:</h3>';
+                    
+                    missions.forEach((mission, index) => {
+                        const missionCard = document.createElement('div');
+                        missionCard.className = 'mission-card';
+                        missionCard.innerHTML = `
+                            <div class="mission-title">${mission.title}</div>
+                            <div class="mission-description">${mission.description}</div>
+                            <div class="mission-meta">
+                                XP: ${mission.xp} | Idő: ${mission.estimatedDuration} | 
+                                Tantárgy: ${mission.subject} | Típus: ${mission.missionType} | AI: ${mission.isAIGenerated ? 'Igen' : 'Nem'}
+                            </div>
+                        `;
+                        display.appendChild(missionCard);
+                    });
+                } else {
+                    logResult('ai-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('ai-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSampleAIResponse() {
+            logResult('ai-result', '🤖 Minta AI válasz tesztelése...');
+            
+            try {
+                if (window.smartMissionsManager) {
+                    const samplePrompt = `
+Kérlek, készíts 3 rövid, motiváló, napi küldetést egy diák számára a mai feladataihoz.
+
+📚 A mai órái: ["matematika", "történelem", "fizika"].
+📅 Közelgő események: ["holnap: matek dolgozat", "pénteken: angol prezentáció"].
+🔄 A tegnapi küldetései: ["Ismételd át a matekot!", "Írj egy vázlatot a prezentációhoz"].
+                    `;
+                    
+                    const sampleResponse = window.smartMissionsManager.getSampleMissionResponse(samplePrompt);
+                    logResult('ai-result', '✅ Minta AI válasz generálva!', 'success');
+                    
+                    sampleResponse.forEach((mission, index) => {
+                        logResult('ai-result', `  ${index + 1}. ${mission}`, 'info');
+                    });
+                } else {
+                    logResult('ai-result', '❌ Smart missions manager nem inicializálva', 'error');
+                }
+            } catch (error) {
+                logResult('ai-result', `❌ Hiba: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-initialize when page loads
+        window.addEventListener('load', () => {
+            logResult('init-result', '🌐 Oldal betöltve, tesztelési környezet kész', 'info');
+        });
+    </script>
+</body>
+</html> 

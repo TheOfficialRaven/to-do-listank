@@ -3,8 +3,8 @@
 // Todo & Shopping List - Personal Organizer
 // ===============================================
 
-const CACHE_NAME = 'todo-app-v2.1.5';
-const OFFLINE_CACHE = 'todo-offline-v2.1.5';
+const CACHE_NAME = 'todo-app-v1.5.0';
+const OFFLINE_CACHE = 'todo-offline-v2.1.6';
 
 // Cache stratégia - mit cache-eljünk
 const CACHE_RESOURCES = [
@@ -90,25 +90,24 @@ self.addEventListener('install', (event) => {
 // 🔄 SERVICE WORKER ACTIVATION
 // ===============================================
 self.addEventListener('activate', (event) => {
-  console.log('✅ Service Worker activated');
+  console.log('🔄 Service Worker aktiválva - cache frissítés...');
   
   event.waitUntil(
-    Promise.all([
-      // Clean up old caches
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((cacheName) => cacheName !== CACHE_NAME && cacheName !== OFFLINE_CACHE)
-            .map((cacheName) => {
-              console.log('🗑️ Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-        );
-      }),
-      
-      // Take control of all clients immediately
-      self.clients.claim()
-    ])
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          // Töröljük az összes régi cache-t
+          if (cacheName !== CACHE_NAME && cacheName !== OFFLINE_CACHE) {
+            console.log('🗑️ Régi cache törlése:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      console.log('✅ Cache frissítés befejezve');
+      // Kliens frissítése
+      return self.clients.claim();
+    })
   );
 });
 

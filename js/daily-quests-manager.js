@@ -9,7 +9,8 @@ import {
   ref, 
   onValue, 
   off,
-  update
+  update,
+  get
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { 
   getAuth,
@@ -24,7 +25,7 @@ import {
 function waitForFirebase() {
   return new Promise((resolve) => {
     const checkFirebase = () => {
-      if (window.db && window.auth) {
+      if (window.db && window.auth && window.functions) {
         resolve();
       } else {
         setTimeout(checkFirebase, 100);
@@ -293,52 +294,43 @@ class DailyQuestsManager {
    */
   async init() {
     try {
+      console.log('🚀 Initializing Daily Quests Manager...');
+      
       // Wait for Firebase to be available
       await waitForFirebase();
       
       // Get Firebase instances from global scope
       db = window.db;
       auth = window.auth;
+      functions = window.functions; // Use global functions instance
       
-      // Try to get functions, but don't fail if not available
-      try {
-        // Use the same app instance as the global db and auth
-        const app = window.app || window.firebaseApp;
-        if (app) {
-          functions = getFunctions(app);
-        } else {
-          functions = getFunctions();
-        }
-        this.completeQuestFunction = httpsCallable(functions, 'completeQuest');
-        this.triggerQuestGenerationFunction = httpsCallable(functions, 'triggerDailyQuestGeneration');
-        console.log('✅ Firebase Functions initialized successfully');
-      } catch (functionsError) {
-        console.warn('⚠️ Firebase Functions not available:', functionsError);
-        // Functions will work without Cloud Functions (using fallback behavior)
+      if (!db || !auth || !functions) {
+        throw new Error('Firebase instances not available');
       }
       
-      console.log('🔧 Daily Quests Manager: Firebase instances ready');
-      
-      // Wait for authentication state
-      onAuthStateChanged(auth, (user) => {
+      // Set up auth state listener
+      this.authUnsubscribe = onAuthStateChanged(auth, (user) => {
+        this.currentUser = user;
         if (user) {
-          this.currentUser = user;
+          console.log('✅ User authenticated for Daily Quests Manager');
           this.setupQuestListeners();
-          this.isInitialized = true;
-          console.log('✅ Daily Quests Manager initialized for user:', user.uid);
-          
-          // Generate initial quests if none exist
-          setTimeout(() => this.ensureDailyQuestsExist(), 2000);
+          this.ensureDailyQuestsExist();
         } else {
-          this.currentUser = null;
+          console.log('❌ User signed out from Daily Quests Manager');
           this.cleanupListeners();
-          this.isInitialized = false;
-          console.log('📤 User logged out, cleaning up quest listeners');
         }
       });
       
+      // Initialize Cloud Functions
+      this.completeQuestFunction = httpsCallable(functions, 'completeQuest');
+      this.triggerQuestGenerationFunction = httpsCallable(functions, 'triggerQuestGeneration');
+      
+      this.isInitialized = true;
+      console.log('✅ Daily Quests Manager initialized successfully');
+      
     } catch (error) {
       console.error('❌ Error initializing Daily Quests Manager:', error);
+      this.isInitialized = false;
     }
   }
   
@@ -607,20 +599,41 @@ class DailyQuestsManager {
     
     try {
       console.log(`🎯 Completing quest: ${questId}`);
+      console.log('🔍 Debug: completeQuestFunction exists:', !!this.completeQuestFunction);
+      console.log('🔍 Debug: functions instance:', !!functions);
       
       // Try Cloud Function first, fallback to direct database update
       if (this.completeQuestFunction) {
         try {
+          console.log('🚀 Attempting Cloud Function call...');
           const result = await this.completeQuestFunction({ questId });
           
           if (result.data.success) {
             console.log(`✅ Quest completed! Awarded ${result.data.xpAwarded} XP`);
+            
+            // Update global XP display
+            if (typeof window.addXP === 'function') {
+              window.addXP(result.data.xpAwarded);
+            }
+            
+            // Update level display
+            if (typeof window.updateLevelDisplay === 'function') {
+              window.updateLevelDisplay();
+            }
+            
             this.showQuestCompletionNotification(result.data);
             return result.data;
           }
         } catch (cloudError) {
           console.warn('⚠️ Cloud Function failed, using fallback:', cloudError);
+          console.warn('⚠️ Cloud Function error details:', {
+            code: cloudError.code,
+            message: cloudError.message,
+            details: cloudError.details
+          });
         }
+      } else {
+        console.warn('⚠️ completeQuestFunction not initialized, using fallback directly');
       }
       
       // Fallback: Direct database update
@@ -662,22 +675,38 @@ class DailyQuestsManager {
     const userData = userSnapshot.val() || {};
     const currentXP = userData.xp || 0;
     const xpAwarded = quest.xp || 10;
+    const newTotalXP = currentXP + xpAwarded;
     
     // Update quest and user XP
     const updates = {};
     updates[`users/${this.currentUser.uid}/daily_quests/${questId}/completed`] = true;
     updates[`users/${this.currentUser.uid}/daily_quests/${questId}/completedAt`] = Date.now();
-    updates[`users/${this.currentUser.uid}/xp`] = currentXP + xpAwarded;
+    updates[`users/${this.currentUser.uid}/xp`] = newTotalXP;
     
     await update(ref(db), updates);
+    
+    // Update global XP display if the function exists
+    if (typeof window.addXP === 'function') {
+      window.addXP(xpAwarded);
+    }
+    
+    // Update level display if the function exists
+    if (typeof window.updateLevelDisplay === 'function') {
+      window.updateLevelDisplay();
+    }
+    
+    // Save user progress if the function exists
+    if (typeof window.saveUserProgress === 'function') {
+      window.saveUserProgress();
+    }
     
     const result = {
       success: true,
       xpAwarded: xpAwarded,
-      totalXP: currentXP + xpAwarded
+      totalXP: newTotalXP
     };
     
-    console.log(`✅ Quest completed (fallback)! Awarded ${xpAwarded} XP`);
+    console.log(`✅ Quest completed (fallback)! Awarded ${xpAwarded} XP (Total: ${newTotalXP})`);
     this.showQuestCompletionNotification(result);
     
     return result;
@@ -902,6 +931,941 @@ class DailyQuestsManager {
       totalXP: todayQuests.filter(q => q.completed).reduce((sum, q) => sum + (q.xp || 0), 0)
     };
   }
+
+  // ===============================================
+  // 🧠 INTELLIGENT MISSION GENERATION FOR STUDENTS
+  // ===============================================
+  
+  // Smart mission templates for students
+  getStudentMissionTemplates() {
+    return {
+      study_preparation: [
+        "{subject} órára készülj fel ma legalább 15 percet!",
+        "Ismételd át a {subject} témakört a holnapi dolgozatra!",
+        "Készíts jegyzeteket a {subject} anyagból!",
+        "Gyakorolj 5 példát a {subject} háziból!",
+        "Olvasd el a {subject} következő fejezetét!",
+        "Készíts összefoglalót a {subject} témakörből!"
+      ],
+      exam_preparation: [
+        "Készülj fel a {subject} dolgozatra 30 percet!",
+        "Ismételd át a {subject} képleteket!",
+        "Oldj meg 3 feladatot a {subject} dolgozatból!",
+        "Készíts jegyzeteket a {subject} fontos pontjairól!",
+        "Gyakorolj a {subject} nehéz részein!"
+      ],
+      homework_focus: [
+        "Fejezd be a {subject} házi feladatot!",
+        "Ellenőrizd a {subject} megoldásaidat!",
+        "Kérdezd meg a tanárodat a {subject} bizonytalan részeiről!",
+        "Készíts prezentációt a {subject} témáról!",
+        "Írj esszét a {subject} témakörből!"
+      ],
+      review_and_practice: [
+        "Ismételd át a tegnapi {subject} anyagot!",
+        "Gyakorolj a {subject} gyakorlati feladataival!",
+        "Készíts kvízt a {subject} témakörből!",
+        "Olvasd el a {subject} jegyzeteidet!",
+        "Beszélj meg egy {subject} feladatot egy osztálytárssal!"
+      ]
+    };
+  }
+  
+  // Generate smart missions for students based on timetable and events
+  async generateSmartMissionsForStudent(useAI = false) {
+    console.log('🧠 Generating smart missions for student...');
+    
+    try {
+      if (useAI) {
+        // Use AI-based generation
+        return await this.generateMissionsWithAI();
+      }
+      
+      // Original template-based generation
+      const subjects = await this.getStudentSubjects();
+      const events = await this.getStudentEvents();
+      const existingTasks = await this.getExistingTasks();
+      
+      // Generate 2-4 missions
+      const missionCount = Math.min(4, Math.max(2, subjects.length));
+      const missions = [];
+      
+      // Get mission templates
+      const templates = this.getStudentMissionTemplates();
+      const allTemplates = [
+        ...templates.study_preparation,
+        ...templates.exam_preparation,
+        ...templates.homework_focus,
+        ...templates.review_and_practice
+      ];
+      
+      // Track used subjects and mission types to avoid duplicates
+      const usedSubjects = new Set();
+      const usedMissionTypes = new Set();
+      
+      for (let i = 0; i < missionCount; i++) {
+        const mission = await this.createSmartMission(
+          subjects, 
+          events, 
+          existingTasks, 
+          allTemplates, 
+          usedSubjects, 
+          usedMissionTypes
+        );
+        
+        if (mission) {
+          missions.push(mission);
+        }
+      }
+      
+      console.log(`✅ Generated ${missions.length} smart missions`);
+      return missions;
+      
+    } catch (error) {
+      console.error('❌ Error generating smart missions:', error);
+      return [];
+    }
+  }
+  
+  // Get student subjects from timetable
+  async getStudentSubjects() {
+    try {
+      if (!this.currentUser) return [];
+      
+      const timetableRef = ref(db, `users/${this.currentUser.uid}/timetable`);
+      const snapshot = await get(timetableRef);
+      
+      if (!snapshot.exists()) return [];
+      
+      const timetable = snapshot.val();
+      const subjects = new Set();
+      
+      // Extract subjects from timetable
+      Object.values(timetable).forEach(day => {
+        if (day && Array.isArray(day)) {
+          day.forEach(lesson => {
+            if (lesson && lesson.subject) {
+              subjects.add(lesson.subject);
+            }
+          });
+        }
+      });
+      
+      return Array.from(subjects);
+    } catch (error) {
+      console.error('❌ Error getting student subjects:', error);
+      return [];
+    }
+  }
+  
+  // Get student events from calendar
+  async getStudentEvents() {
+    try {
+      if (!this.currentUser) return [];
+      
+      const eventsRef = ref(db, `users/${this.currentUser.uid}/events`);
+      const snapshot = await get(eventsRef);
+      
+      if (!snapshot.exists()) return [];
+      
+      const events = snapshot.val();
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      // Filter events for today and tomorrow
+      return Object.values(events).filter(event => {
+        const eventDate = event.date || event.startDate;
+        return eventDate === today || eventDate === tomorrow;
+      });
+    } catch (error) {
+      console.error('❌ Error getting student events:', error);
+      return [];
+    }
+  }
+  
+  // Get existing tasks to avoid duplicates
+  async getExistingTasks() {
+    try {
+      if (!this.currentUser) return [];
+      
+      const listsRef = ref(db, `users/${this.currentUser.uid}/lists`);
+      const snapshot = await get(listsRef);
+      
+      if (!snapshot.exists()) return [];
+      
+      const lists = snapshot.val();
+      const tasks = [];
+      
+      Object.values(lists).forEach(list => {
+        if (list.items) {
+          Object.values(list.items).forEach(item => {
+            if (item.text) {
+              tasks.push(item.text.toLowerCase());
+            }
+          });
+        }
+      });
+      
+      return tasks;
+    } catch (error) {
+      console.error('❌ Error getting existing tasks:', error);
+      return [];
+    }
+  }
+  
+  // Create a single smart mission
+  async createSmartMission(subjects, events, existingTasks, templates, usedSubjects, usedMissionTypes) {
+    try {
+      // Select a subject (prioritize subjects with upcoming events)
+      const subject = this.selectSubjectForMission(subjects, events, usedSubjects);
+      if (!subject) return null;
+      
+      // Select mission type and template
+      const missionType = this.selectMissionType(events, usedMissionTypes);
+      const template = this.selectTemplate(templates, missionType, subject);
+      if (!template) return null;
+      
+      // Generate mission text
+      const missionText = template.replace('{subject}', subject);
+      
+      // Check for duplicates
+      if (this.isDuplicateMission(missionText, existingTasks)) {
+        return null;
+      }
+      
+      // Create mission object
+      const mission = {
+        id: this.generateQuestId(),
+        title: `🎯 ${subject} - ${this.getMissionTypeTitle(missionType)}`,
+        description: missionText,
+        xp: this.calculateMissionXP(missionType),
+        estimatedDuration: this.getMissionDuration(missionType),
+        tag: missionType,
+        questType: "task",
+        priority: this.getMissionPriority(missionType),
+        icon: this.getMissionIcon(missionType),
+        subject: subject,
+        missionType: missionType,
+        isSmartMission: true,
+        generatedAt: Date.now(),
+        dueDate: this.getMissionDueDate(missionType)
+      };
+      
+      // Update tracking sets
+      usedSubjects.add(subject);
+      usedMissionTypes.add(missionType);
+      
+      return mission;
+      
+    } catch (error) {
+      console.error('❌ Error creating smart mission:', error);
+      return null;
+    }
+  }
+  
+  // Select subject for mission (prioritize subjects with events)
+  selectSubjectForMission(subjects, events, usedSubjects) {
+    // First, try to find subjects with upcoming events
+    const subjectsWithEvents = new Set();
+    events.forEach(event => {
+      if (event.title) {
+        const eventText = event.title.toLowerCase();
+        subjects.forEach(subject => {
+          if (eventText.includes(subject.toLowerCase())) {
+            subjectsWithEvents.add(subject);
+          }
+        });
+      }
+    });
+    
+    // Prioritize subjects with events that haven't been used
+    const availableSubjectsWithEvents = Array.from(subjectsWithEvents)
+      .filter(subject => !usedSubjects.has(subject));
+    
+    if (availableSubjectsWithEvents.length > 0) {
+      return this.getRandomFromArray(availableSubjectsWithEvents);
+    }
+    
+    // Fallback to any available subject
+    const availableSubjects = subjects.filter(subject => !usedSubjects.has(subject));
+    return this.getRandomFromArray(availableSubjects);
+  }
+  
+  // Select mission type based on events and used types
+  selectMissionType(events, usedMissionTypes) {
+    const missionTypes = ['study_preparation', 'exam_preparation', 'homework_focus', 'review_and_practice'];
+    const availableTypes = missionTypes.filter(type => !usedMissionTypes.has(type));
+    
+    // If we have exam events, prioritize exam preparation
+    const hasExamEvents = events.some(event => 
+      event.title && event.title.toLowerCase().includes('dolgozat')
+    );
+    
+    if (hasExamEvents && availableTypes.includes('exam_preparation')) {
+      return 'exam_preparation';
+    }
+    
+    return this.getRandomFromArray(availableTypes);
+  }
+  
+  // Select template based on mission type and subject
+  selectTemplate(templates, missionType, subject) {
+    const templateGroups = this.getStudentMissionTemplates();
+    const availableTemplates = templateGroups[missionType] || templates;
+    
+    return this.getRandomFromArray(availableTemplates);
+  }
+  
+  // Check if mission is duplicate
+  isDuplicateMission(missionText, existingTasks) {
+    const missionWords = missionText.toLowerCase().split(' ');
+    
+    return existingTasks.some(task => {
+      const taskWords = task.toLowerCase().split(' ');
+      const commonWords = missionWords.filter(word => taskWords.includes(word));
+      return commonWords.length >= 3; // If 3+ words match, consider it duplicate
+    });
+  }
+  
+  // Get mission type title
+  getMissionTypeTitle(missionType) {
+    const titles = {
+      study_preparation: 'Tanulási felkészülés',
+      exam_preparation: 'Vizsga felkészülés',
+      homework_focus: 'Házi feladat',
+      review_and_practice: 'Átismétlés és gyakorlás'
+    };
+    return titles[missionType] || 'Küldetés';
+  }
+  
+  // Calculate mission XP
+  calculateMissionXP(missionType) {
+    const xpValues = {
+      study_preparation: 15,
+      exam_preparation: 25,
+      homework_focus: 20,
+      review_and_practice: 18
+    };
+    return xpValues[missionType] || 15;
+  }
+  
+  // Get mission duration
+  getMissionDuration(missionType) {
+    const durations = {
+      study_preparation: '15-20 perc',
+      exam_preparation: '30-45 perc',
+      homework_focus: '25-40 perc',
+      review_and_practice: '20-30 perc'
+    };
+    return durations[missionType] || '20 perc';
+  }
+  
+  // Get mission priority
+  getMissionPriority(missionType) {
+    const priorities = {
+      study_preparation: 'medium',
+      exam_preparation: 'high',
+      homework_focus: 'high',
+      review_and_practice: 'medium'
+    };
+    return priorities[missionType] || 'medium';
+  }
+  
+  // Get mission icon
+  getMissionIcon(missionType) {
+    const icons = {
+      study_preparation: '📚',
+      exam_preparation: '📝',
+      homework_focus: '✏️',
+      review_and_practice: '🔄'
+    };
+    return icons[missionType] || '🎯';
+  }
+  
+  // Get mission due date
+  getMissionDueDate(missionType) {
+    const today = new Date();
+    
+    if (missionType === 'exam_preparation') {
+      // Exam preparation due tomorrow
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    }
+    
+    // Other missions due today
+    return today.toISOString().split('T')[0];
+  }
+  
+  // Prepare mission prompt for AI integration (future use)
+  prepareMissionPrompt(subjects, events) {
+    const prompt = {
+      subjects: subjects,
+      events: events.map(event => ({
+        title: event.title,
+        date: event.date,
+        description: event.description
+      })),
+      context: `Generate personalized daily missions for a student based on their subjects: ${subjects.join(', ')} and upcoming events.`,
+      requirements: [
+        '2-4 missions per day',
+        'Relevant to current subjects',
+        'Appropriate difficulty level',
+        'Varied mission types',
+        'No duplicates with existing tasks'
+      ],
+      format: 'JSON array with mission objects'
+    };
+    
+    return prompt;
+  }
+  
+  // ===============================================
+  // 🤖 AI-BASED MISSION GENERATION
+  // ===============================================
+  
+  // Global variable to store AI mission prompt
+  aiMissionPrompt = null;
+  
+  // Prepare comprehensive AI prompt for mission generation
+  async prepareMissionPromptForAI() {
+    try {
+      console.log('🤖 Preparing AI mission prompt...');
+      
+      // Get today's schedule
+      const todaySchedule = await this.getTodaySchedule();
+      
+      // Get calendar events
+      const calendarEvents = await this.getCalendarEvents();
+      
+      // Get previous missions
+      const previousMissions = await this.getPreviousMissions();
+      
+      // Build the AI prompt
+      const prompt = this.buildAIPrompt(todaySchedule, calendarEvents, previousMissions);
+      
+      // Store the prompt globally
+      this.aiMissionPrompt = prompt;
+      
+      console.log('✅ AI mission prompt prepared:', prompt);
+      return prompt;
+      
+    } catch (error) {
+      console.error('❌ Error preparing AI mission prompt:', error);
+      return null;
+    }
+  }
+  
+  // Get today's schedule from timetable
+  async getTodaySchedule() {
+    try {
+      if (!this.currentUser) return [];
+      const timetableRef = ref(db, `users/${this.currentUser.uid}/timetable`);
+      const snapshot = await get(timetableRef);
+      if (!snapshot.exists()) return [];
+      const timetable = snapshot.val();
+      // Use 'long' and convert to lowercase
+      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+      const todaySchedule = timetable[today] || [];
+      // Extract subjects and times
+      return todaySchedule.map(lesson => ({
+        subject: lesson.subject,
+        startTime: lesson.startTime,
+        endTime: lesson.endTime,
+        teacher: lesson.teacher,
+        classroom: lesson.classroom
+      }));
+    } catch (error) {
+      console.error('❌ Error getting today schedule:', error);
+      return [];
+    }
+  }
+  
+  // Get calendar events for today and upcoming days
+  async getCalendarEvents() {
+    try {
+      if (!this.currentUser) return [];
+      
+      const eventsRef = ref(db, `users/${this.currentUser.uid}/events`);
+      const snapshot = await get(eventsRef);
+      
+      if (!snapshot.exists()) return [];
+      
+      const events = snapshot.val();
+      const today = new Date().toISOString().split('T')[0];
+      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      // Filter events for today and next week
+      return Object.values(events).filter(event => {
+        const eventDate = event.date || event.startDate;
+        return eventDate >= today && eventDate <= nextWeek;
+      }).map(event => ({
+        title: event.title,
+        date: event.date || event.startDate,
+        description: event.description,
+        type: event.type
+      }));
+      
+    } catch (error) {
+      console.error('❌ Error getting calendar events:', error);
+      return [];
+    }
+  }
+  
+  // Get previous missions from last few days
+  async getPreviousMissions() {
+    try {
+      if (!this.currentUser) return [];
+      
+      const smartMissionsRef = ref(db, `users/${this.currentUser.uid}/smartMissions`);
+      const snapshot = await get(smartMissionsRef);
+      
+      if (!snapshot.exists()) return [];
+      
+      const allMissions = snapshot.val();
+      const previousMissions = [];
+      
+      // Get missions from last 3 days
+      for (let i = 1; i <= 3; i++) {
+        const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const dayMissions = allMissions[date];
+        if (dayMissions && dayMissions.missions) {
+          previousMissions.push(...dayMissions.missions.map(m => m.description));
+        }
+      }
+      
+      return previousMissions;
+      
+    } catch (error) {
+      console.error('❌ Error getting previous missions:', error);
+      return [];
+    }
+  }
+  
+  // Build comprehensive AI prompt
+  buildAIPrompt(todaySchedule, calendarEvents, previousMissions) {
+    const subjects = todaySchedule.map(lesson => lesson.subject);
+    const uniqueSubjects = [...new Set(subjects)];
+    
+    const events = calendarEvents.map(event => {
+      const eventDate = new Date(event.date);
+      const today = new Date();
+      const daysDiff = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff === 0) return `ma: ${event.title}`;
+      if (daysDiff === 1) return `holnap: ${event.title}`;
+      return `${daysDiff} nap múlva: ${event.title}`;
+    });
+    
+    const prompt = `
+Kérlek, készíts 3 rövid, motiváló, napi küldetést egy diák számára a mai feladataihoz.
+
+📚 A mai órái: ${uniqueSubjects.length > 0 ? `["${uniqueSubjects.join('", "')}"]` : "nincs óra ma"}.
+📅 Közelgő események: ${events.length > 0 ? `["${events.join('", "')}"]` : "nincs közelgő esemény"}.
+🔄 A tegnapi küldetései: ${previousMissions.length > 0 ? `["${previousMissions.slice(0, 3).join('", "')}"]` : "nincs előző küldetés"}.
+
+🎯 A cél, hogy:
+- Ne ismétlődjenek a tegnapi küldetésekkel
+- Legyenek hasznosak és relevánsak a mai órákhoz
+- Adják érzetet, hogy 'küldetést' teljesít a felhasználó
+- Motiválóak és rövidek legyenek (max 2-3 mondat)
+- Különböző nehézségi szintűek legyenek
+
+📝 Válasz formátum:
+Válaszolj csak a 3 küldetéssel, mindegyik új sorban, magyar nyelven, motiváló stílusban. Ne használj számozást vagy bullet pointokat.
+
+Példa formátum:
+"Készülj fel a matematika órára 15 percet, ismételd át a tegnapi képleteket!"
+"Készíts egy rövid összefoglalót a történelem témakörből a holnapi dolgozatra!"
+"Gyakorolj 5 feladatot a fizika háziból, és kérdezd meg a tanárodat a bizonytalan részekről!"
+`;
+
+    return prompt;
+  }
+  
+  // Generate sample AI response (dummy function for testing)
+  getSampleMissionResponse(prompt) {
+    console.log('🤖 Generating sample AI response...');
+    
+    // Extract subjects from prompt
+    const subjectMatch = prompt.match(/A mai órái: \[(.*?)\]/);
+    const subjects = subjectMatch ? subjectMatch[1].replace(/"/g, '').split(', ') : ['matematika', 'történelem', 'fizika'];
+    
+    // Extract events from prompt
+    const eventMatch = prompt.match(/Közelgő események: \[(.*?)\]/);
+    const events = eventMatch ? eventMatch[1].replace(/"/g, '').split(', ') : [];
+    
+    // Generate contextual missions based on subjects and events
+    const missions = [];
+    
+    // Mission 1: Study preparation
+    if (subjects.length > 0) {
+      const subject = subjects[0];
+      missions.push(`Készülj fel a ${subject} órára 15 percet, ismételd át a tegnapi anyagot és készíts jegyzeteket a fontos pontokról!`);
+    }
+    
+    // Mission 2: Exam preparation (if there are events)
+    if (events.length > 0) {
+      const examEvent = events.find(event => event.includes('dolgozat') || event.includes('vizsga'));
+      if (examEvent) {
+        const subject = subjects.length > 1 ? subjects[1] : subjects[0];
+        missions.push(`Készülj fel a ${subject} dolgozatra 30 percet, gyakorolj a nehéz részeken és készíts egy rövid összefoglalót!`);
+      } else {
+        const subject = subjects.length > 1 ? subjects[1] : subjects[0];
+        missions.push(`Gyakorolj 5 feladatot a ${subject} háziból, és kérdezd meg a tanárodat a bizonytalan részekről!`);
+      }
+    }
+    
+    // Mission 3: Review and practice
+    if (subjects.length > 2) {
+      const subject = subjects[2];
+      missions.push(`Ismételd át a ${subject} témakört, készíts egy kvízt magadnak és teszteld a tudásodat!`);
+    } else if (subjects.length > 0) {
+      const subject = subjects[0];
+      missions.push(`Készíts egy kreatív összefoglalót a ${subject} anyagból, használj rajzokat vagy diagramokat a jobb megértéshez!`);
+    }
+    
+    // Ensure we have exactly 3 missions
+    while (missions.length < 3) {
+      const subject = subjects[missions.length % subjects.length] || 'tanulás';
+      missions.push(`Töltsd el 20 percet a ${subject} anyag mélyebb megértésével, keress fel további forrásokat!`);
+    }
+    
+    return missions.slice(0, 3);
+  }
+  
+  // Generate missions using AI (placeholder for future API integration)
+  async generateMissionsWithAI() {
+    try {
+      console.log('🤖 Generating missions with AI...');
+      
+      // Prepare the AI prompt
+      const prompt = await this.prepareMissionPromptForAI();
+      if (!prompt) {
+        throw new Error('Failed to prepare AI prompt');
+      }
+      
+      // For now, use sample response (replace with actual API call later)
+      const aiResponse = this.getSampleMissionResponse(prompt);
+      
+      // Convert AI response to mission objects
+      const missions = this.convertAIResponseToMissions(aiResponse);
+      
+      console.log('✅ AI missions generated:', missions);
+      return missions;
+      
+    } catch (error) {
+      console.error('❌ Error generating AI missions:', error);
+      return [];
+    }
+  }
+  
+  // Convert AI response to mission objects
+  convertAIResponseToMissions(aiResponse) {
+    return aiResponse.map((description, index) => {
+      // Extract subject from description
+      const subjectMatch = description.match(/(matematika|történelem|fizika|kémia|biológia|angol|magyar|informatika|földrajz|filozófia|szociológia|pszichológia|művészettörténet|irodalom|nyelvtan|irodalomtörténet|társadalomismeret|természettudomány|technika|ének|rajz|testnevelés|vallás|etika)/i);
+      const subject = subjectMatch ? subjectMatch[1] : 'Általános';
+      
+      // Determine mission type based on content
+      let missionType = 'study_preparation';
+      if (description.includes('dolgozat') || description.includes('vizsga')) {
+        missionType = 'exam_preparation';
+      } else if (description.includes('házi') || description.includes('feladat')) {
+        missionType = 'homework_focus';
+      } else if (description.includes('ismételd') || description.includes('átismétlés')) {
+        missionType = 'review_and_practice';
+      }
+      
+      return {
+        id: this.generateQuestId(),
+        title: `🎯 ${subject} - ${this.getMissionTypeTitle(missionType)}`,
+        description: description,
+        xp: this.calculateMissionXP(missionType),
+        estimatedDuration: this.getMissionDuration(missionType),
+        tag: missionType,
+        questType: "task",
+        priority: this.getMissionPriority(missionType),
+        icon: this.getMissionIcon(missionType),
+        subject: subject,
+        missionType: missionType,
+        isSmartMission: true,
+        isAIGenerated: true,
+        generatedAt: Date.now(),
+        dueDate: this.getMissionDueDate(missionType)
+      };
+    });
+  }
+  
+  // Future: Actual AI API integration
+  async callAIMissionAPI(prompt) {
+    // This is a placeholder for future OpenAI/Gemini API integration
+    console.log('🚀 Future: Calling AI API with prompt:', prompt);
+    
+    // Example OpenAI API call structure:
+    /*
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant that generates personalized daily missions for students."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.7
+      })
+    });
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+    */
+    
+    // For now, return sample response
+    return this.getSampleMissionResponse(prompt);
+  }
+  
+  // Generate and display smart missions (with AI option)
+  async generateAndDisplaySmartMissions(useAI = false) {
+    try {
+      console.log(`🎯 Generating smart missions... ${useAI ? 'with AI' : 'with templates'}`);
+      
+      let missions = [];
+      
+      if (useAI) {
+        // Use AI-based generation
+        missions = await this.generateMissionsWithAI();
+      } else {
+        // Use template-based generation (fallback)
+        missions = await this.generateSmartMissionsForStudent();
+      }
+      
+      if (missions.length > 0) {
+        await this.saveSmartMissionsToFirebase(missions);
+        this.updateSmartMissionsUI();
+        this.showSuccessNotification(`✅ ${missions.length} ${useAI ? 'AI-generált' : 'intelligens'} küldetés generálva!`);
+        
+        // Store the AI prompt for debugging
+        if (useAI && this.aiMissionPrompt) {
+          console.log('🤖 AI Prompt used:', this.aiMissionPrompt);
+        }
+      } else {
+        this.showErrorNotification('❌ Nem sikerült küldetéseket generálni. Próbáld újra!');
+      }
+      
+      return missions;
+      
+    } catch (error) {
+      console.error('❌ Error generating and displaying missions:', error);
+      this.showErrorNotification('❌ Hiba történt a küldetések generálásakor!');
+      return [];
+    }
+  }
+
+  // Update smart missions UI
+  updateSmartMissionsUI() {
+    const container = document.getElementById('smart-missions-container');
+    if (!container) return;
+    
+    this.loadSmartMissionsFromFirebase().then(missions => {
+      if (missions.length === 0) {
+        container.innerHTML = `
+          <div class="smart-missions-empty">
+            <h3>🎯 Személyre szabott napi kihívások</h3>
+            <p>Generálj intelligens küldetéseket az órarended alapján!</p>
+            <button class="generate-smart-missions-btn" onclick="window.dailyQuestsManager.generateAndDisplaySmartMissions()">
+              🧠 Küldetések generálása (sablon)
+            </button>
+            <button class="generate-smart-missions-btn ai" onclick="window.dailyQuestsManager.generateAndDisplaySmartMissions(true)">
+              🤖 AI Küldetések generálása
+            </button>
+          </div>
+        `;
+      } else {
+        const missionsHTML = missions.map(mission => this.createSmartMissionHTML(mission)).join('');
+        container.innerHTML = `
+          <div class="smart-missions-header">
+            <h3>🎯 Személyre szabott napi kihívások az órarended alapján</h3>
+            <p>${missions.filter(m => m.completed).length}/${missions.length} teljesítve</p>
+          </div>
+          <div class="smart-missions-list">
+            ${missionsHTML}
+          </div>
+        `;
+        this.attachSmartMissionEventListeners();
+      }
+    });
+  }
+
+  // Load smart missions from Firebase
+  async loadSmartMissionsFromFirebase() {
+    try {
+      if (!this.currentUser) return [];
+      const smartMissionsRef = ref(db, `users/${this.currentUser.uid}/smartMissions`);
+      const snapshot = await get(smartMissionsRef);
+      if (!snapshot.exists()) return [];
+      const today = new Date().toISOString().split('T')[0];
+      const todayMissions = snapshot.val()[today];
+      return todayMissions ? todayMissions.missions : [];
+    } catch (error) {
+      console.error('❌ Error loading smart missions:', error);
+      return [];
+    }
+  }
+
+  // Save smart missions to Firebase
+  async saveSmartMissionsToFirebase(missions) {
+    try {
+      if (!this.currentUser) return;
+      
+      const smartMissionsRef = ref(db, `users/${this.currentUser.uid}/smartMissions`);
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get existing missions for today
+      const existingSnapshot = await get(smartMissionsRef);
+      const existingData = existingSnapshot.exists() ? existingSnapshot.val() : {};
+      const existingMissions = existingData[today]?.missions || [];
+      
+      // Merge existing and new missions (update existing ones, add new ones)
+      const missionMap = new Map();
+      
+      // Add existing missions to map
+      existingMissions.forEach(mission => {
+        missionMap.set(mission.id, mission);
+      });
+      
+      // Update/add new missions
+      missions.forEach(mission => {
+        missionMap.set(mission.id, mission);
+      });
+      
+      // Convert back to array
+      const updatedMissions = Array.from(missionMap.values());
+      
+      const missionsData = {
+        [today]: {
+          missions: updatedMissions,
+          generatedAt: Date.now(),
+          completed: updatedMissions.filter(m => m.completed).length,
+          total: updatedMissions.length
+        }
+      };
+      
+      await update(smartMissionsRef, missionsData);
+      console.log(`✅ Saved ${updatedMissions.length} smart missions to Firebase`);
+      
+    } catch (error) {
+      console.error('❌ Error saving smart missions:', error);
+    }
+  }
+
+  // Create smart mission HTML
+  createSmartMissionHTML(mission) {
+    const completedClass = mission.completed ? 'completed' : '';
+    const completedIcon = mission.completed ? '✅' : '⭕';
+    return `
+      <div class="smart-mission-card ${completedClass}" data-mission-id="${mission.id}">
+        <div class="smart-mission-header">
+          <span class="smart-mission-icon">${mission.icon || '🎯'}</span>
+          <span class="smart-mission-title">${mission.title}</span>
+          <span class="smart-mission-xp">+${mission.xp} XP</span>
+        </div>
+        <div class="smart-mission-description">${mission.description}</div>
+        <div class="smart-mission-footer">
+          <span class="smart-mission-duration">⏱️ ${mission.estimatedDuration}</span>
+          <span class="smart-mission-subject">📚 ${mission.subject}</span>
+          <button class="smart-mission-complete-btn" ${mission.completed ? 'disabled' : ''}>
+            ${completedIcon} ${mission.completed ? 'Teljesítve' : 'Teljesítés'}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Attach event listeners to smart mission cards
+  attachSmartMissionEventListeners() {
+    const missionCards = document.querySelectorAll('.smart-mission-card');
+    
+    missionCards.forEach(card => {
+      const completeBtn = card.querySelector('.smart-mission-complete-btn');
+      const missionId = card.dataset.missionId;
+      
+      if (completeBtn && !completeBtn.disabled) {
+        completeBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          try {
+            console.log(`🎯 Completing smart mission: ${missionId}`);
+            
+            // Update mission as completed
+            await this.completeSmartMission(missionId);
+            
+            // Update UI
+            this.updateSmartMissionsUI();
+            
+            this.showSuccessNotification('✅ Intelligens küldetés teljesítve!');
+            
+          } catch (error) {
+            console.error('❌ Error completing smart mission:', error);
+            this.showErrorNotification('❌ Hiba történt a küldetés teljesítésekor!');
+          }
+        });
+      }
+    });
+  }
+
+  // Complete a smart mission
+  async completeSmartMission(missionId) {
+    if (!this.currentUser) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      // Get current smart missions
+      const missions = await this.loadSmartMissionsFromFirebase();
+      const mission = missions.find(m => m.id === missionId);
+      
+      if (!mission) {
+        throw new Error('Smart mission not found');
+      }
+      
+      if (mission.completed) {
+        throw new Error('Smart mission already completed');
+      }
+      
+      // Update mission as completed
+      mission.completed = true;
+      mission.completedAt = Date.now();
+      
+      // Save updated missions
+      await this.saveSmartMissionsToFirebase(missions);
+      
+      // Award XP (optional - you can integrate with your XP system)
+      if (mission.xp) {
+        // Add XP to user (integrate with your existing XP system)
+        console.log(`🎉 Awarded ${mission.xp} XP for smart mission completion`);
+        // You can call your existing XP system here
+        // window.addXP?.(mission.xp);
+      }
+      
+      console.log(`✅ Smart mission ${missionId} completed successfully`);
+      
+    } catch (error) {
+      console.error('❌ Error completing smart mission:', error);
+      throw error;
+    }
+  }
 }
 
 // Initialize the Daily Quests Manager
@@ -914,5 +1878,8 @@ window.generateTargetGroupQuests = (targetGroup) => {
   }
   console.error('Daily Quests Manager not initialized');
 };
+
+// Export the DailyQuestsManager class
+export { DailyQuestsManager };
 
 // ... rest of the QuestAcceptanceSystem remains the same 

@@ -71,13 +71,26 @@
     margin-bottom: 1rem;
   }
   
+  .progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: rgba(16, 185, 129, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 1rem;
+    position: relative;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-    border-radius: 4px;
+    border-radius: 6px;
     width: 0%;
-    transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    min-width: 0%;
+    max-width: 100%;
   }
   
   .progress-fill::after {
@@ -89,16 +102,17 @@
     right: 0;
     background-image: linear-gradient(
       -45deg,
-      rgba(255, 255, 255, .2) 25%,
+      rgba(255, 255, 255, .3) 25%,
       transparent 25%,
       transparent 50%,
-      rgba(255, 255, 255, .2) 50%,
-      rgba(255, 255, 255, .2) 75%,
+      rgba(255, 255, 255, .3) 50%,
+      rgba(255, 255, 255, .3) 75%,
       transparent 75%,
       transparent
     );
-    background-size: 50px 50px;
-    animation: move 2s linear infinite;
+    background-size: 30px 30px;
+    animation: shimmer 2s linear infinite;
+    border-radius: 6px;
   }
   
   .completion-circle {
@@ -128,42 +142,93 @@
     font-size: 1.1em;
   }
   
-  .xp-fill::before, .progress-fill::before {
+  .xp-bar {
+    width: 100%;
+    height: 12px;
+    background-color: rgba(16, 185, 129, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+    position: relative;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+      var(--accent-primary) 0%, 
+      var(--accent-secondary) 50%, 
+      var(--accent-primary) 100%);
+    border-radius: 6px;
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  
+  .xp-fill::after {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, .3) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, .3) 50%,
+      rgba(255, 255, 255, .3) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 30px 30px;
+    animation: shimmer 2s linear infinite;
+    border-radius: 6px;
   }
   
   .achievement-progress .progress-bar {
-    background: rgba(16, 185, 129, 0.2);
-    border-radius: 10px;
-    height: 8px;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 8px;
+    height: 10px;
     overflow: hidden;
     margin-bottom: 0.5rem;
+    border: 1px solid rgba(16, 185, 129, 0.25);
   }
   
   .achievement-progress .progress-fill {
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    background: linear-gradient(90deg, 
+      var(--accent-primary) 0%, 
+      var(--accent-secondary) 50%, 
+      var(--accent-primary) 100%);
     height: 100%;
-    border-radius: 10px;
-    transition: width 0.3s ease;
+    border-radius: 8px;
+    transition: width 0.8s ease;
     position: relative;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
   }
   
   .achievement-progress .progress-fill::after {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, .3) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, .3) 50%,
+      rgba(255, 255, 255, .3) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 25px 25px;
+    animation: shimmer 2s linear infinite;
+    border-radius: 8px;
   }
   
   #stats-grid {
@@ -241,4 +306,53 @@
     margin: 10px auto;
     max-width: 80%;
     max-height: 250px;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .progress-bar {
+      height: 10px;
+      margin-top: 1rem;
+    }
+    
+    .stat-card .progress-bar {
+      height: 8px;
+      margin-top: 1.2rem;
+    }
+    
+    .xp-bar {
+      height: 10px;
+    }
+    
+    .achievement-progress .progress-bar {
+      height: 8px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .progress-bar {
+      height: 8px;
+      margin-top: 0.8rem;
+    }
+    
+    .stat-card .progress-bar {
+      height: 6px;
+      margin-top: 1rem;
+    }
+    
+    .xp-bar {
+      height: 8px;
+    }
+    
+    .achievement-progress .progress-bar {
+      height: 6px;
+    }
   }

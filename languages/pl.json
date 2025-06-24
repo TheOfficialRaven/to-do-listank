@@ -412,13 +412,14 @@
     },
     "save": "Zapisz",
     "cancel": "Anuluj",
-    "edit_title": "✏️ Edytuj zajęcia",
-    "update": "Zapisz",
+    "edit_title": "✏️ Edytuj lekcję",
+    "update": "Aktualizuj",
     "delete": "Usuń",
     "close": "Zamknij",
+    "click_hint": "Kliknij na puste komórki, aby dodać nowe lekcje!",
     "empty_state": {
-      "title": "Brak zajęć w planie",
-      "subtitle": "Dodaj zajęcia przyciskiem \"Dodaj nowe zajęcia\"!"
+      "title": "Nie masz jeszcze lekcji w planie zajęć",
+      "subtitle": "Zacznij dodawać lekcje przyciskiem \"Dodaj nową lekcję\" lub kliknij na puste komórki!"
     },
     "no_classes": "Brak zajęć tego dnia",
     "validation": {

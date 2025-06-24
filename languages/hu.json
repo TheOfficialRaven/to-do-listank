@@ -474,9 +474,10 @@
     "update": "Mentés",
     "delete": "Törlés",
     "close": "Bezárás",
+    "click_hint": "Kattints az üres cellákra új óra hozzáadásához!",
     "empty_state": {
       "title": "Még nincs óráid az órarendben",
-      "subtitle": "Kezdj el felvenni órákat a \"Új óra hozzáadása\" gombbal!"
+      "subtitle": "Kezdj el felvenni órákat a \"Új óra hozzáadása\" gombbal vagy kattints az üres cellákra!"
     },
     "no_classes": "Nincs óra ezen a napon",
     "validation": {

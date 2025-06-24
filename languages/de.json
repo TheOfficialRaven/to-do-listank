@@ -397,13 +397,14 @@
     },
     "save": "Speichern",
     "cancel": "Abbrechen",
-    "edit_title": "✏️ Stunde bearbeiten",
-    "update": "Speichern",
+    "edit_title": "✏️ Unterricht bearbeiten",
+    "update": "Aktualisieren",
     "delete": "Löschen",
     "close": "Schließen",
+    "click_hint": "Klicke auf leere Zellen, um neue Kurse hinzuzufügen!",
     "empty_state": {
-      "title": "Noch keine Stunden in deinem Stundenplan",
-      "subtitle": "Beginne mit dem Hinzufügen von Stunden über den \"Neue Stunde hinzufügen\" Button!"
+      "title": "Noch keine Kurse in deinem Stundenplan",
+      "subtitle": "Beginne mit dem Hinzufügen von Kursen mit der \"Neuen Kurs hinzufügen\" Schaltfläche oder klicke auf leere Zellen!"
     },
     "no_classes": "Keine Stunden an diesem Tag",
     "validation": {

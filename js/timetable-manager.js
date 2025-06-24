@@ -178,14 +178,15 @@ class TimetableManager {
     });
   }
   
-  showTimetableForm() {
+  showTimetableForm(skipClear = false) {
     const form = document.getElementById('timetable-form');
     if (form) {
       form.style.display = 'block';
       form.scrollIntoView({ behavior: 'smooth' });
-      
-      // Clear form
-      this.clearForm();
+      if (!skipClear) {
+        // Clear form only if not skipping
+        this.clearForm();
+      }
     }
   }
   
@@ -416,27 +417,69 @@ class TimetableManager {
           return entry.day === day && entryStart <= slotTime && entryEnd > slotTime;
         });
         
-        classesInSlot.forEach(classEntry => {
-          const classDiv = document.createElement('div');
-          classDiv.className = 'class-entry';
-          classDiv.onclick = () => this.openEditModal(classEntry);
-          
-          classDiv.innerHTML = `
-            <div class="class-subject">${classEntry.subject}</div>
-            <div class="class-details">
-              ${classEntry.teacher ? `<span class="class-teacher">${classEntry.teacher}</span>` : ''}
-              ${classEntry.classroom ? `<span class="class-classroom">${classEntry.classroom}</span>` : ''}
-            </div>
-          `;
-          
-          dayCell.appendChild(classDiv);
-        });
+        if (classesInSlot.length > 0) {
+          // Existing classes - make them clickable for editing
+          classesInSlot.forEach(classEntry => {
+            const classDiv = document.createElement('div');
+            classDiv.className = 'class-entry';
+            classDiv.onclick = (e) => {
+              e.stopPropagation();
+              this.openEditModal(classEntry);
+            };
+            
+            classDiv.innerHTML = `
+              <div class="class-subject">${classEntry.subject}</div>
+              <div class="class-details">
+                ${classEntry.teacher ? `<span class="class-teacher">${classEntry.teacher}</span>` : ''}
+                ${classEntry.classroom ? `<span class="class-classroom">${classEntry.classroom}</span>` : ''}
+              </div>
+            `;
+            
+            dayCell.appendChild(classDiv);
+          });
+        } else {
+          // Empty cell - make it clickable for adding new class
+          dayCell.className = 'class-cell empty-cell';
+          dayCell.onclick = () => this.addClassToCell(day, timeSlot);
+          dayCell.innerHTML = '<div class="add-class-hint">+</div>';
+        }
         
         row.appendChild(dayCell);
       });
       
       tableBody.appendChild(row);
     }
+  }
+  
+  // Add new class by clicking on empty cell
+  addClassToCell(day, timeSlot) {
+    console.log(`➕ Adding class for ${day} at ${timeSlot}`);
+    // Calculate end time (45 minutes later by default)
+    const startTime = timeSlot;
+    const endTime = this.calculateEndTime(timeSlot, 45);
+    // Fill the form with pre-selected values
+    document.getElementById('timetable-day').value = day;
+    document.getElementById('timetable-start-time').value = startTime;
+    document.getElementById('timetable-end-time').value = endTime;
+    document.getElementById('timetable-subject').value = '';
+    document.getElementById('timetable-teacher').value = '';
+    document.getElementById('timetable-classroom').value = '';
+    document.getElementById('timetable-online-link').value = '';
+    // Show the form, do not clear
+    this.showTimetableForm(true);
+    // Focus on subject field
+    setTimeout(() => {
+      document.getElementById('timetable-subject').focus();
+    }, 100);
+  }
+  
+  // Calculate end time based on start time and duration in minutes
+  calculateEndTime(startTime, durationMinutes) {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + durationMinutes;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
   }
   
   renderListView() {

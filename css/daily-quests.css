@@ -1280,4 +1280,341 @@
   .target-group-description {
     font-size: 0.85rem;
   }
+}
+
+/* ===============================================
+   🧠 INTELLIGENT MISSIONS STYLES
+   =============================================== */
+
+.smart-missions-container {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.smart-missions-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.smart-missions-empty h3 {
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.smart-missions-empty p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.generate-smart-missions-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.generate-smart-missions-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.generate-smart-missions-btn:active {
+  transform: translateY(0);
+}
+
+.smart-missions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.smart-missions-header h3 {
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.smart-missions-header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  background: var(--accent-bg);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.smart-missions-list {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.smart-mission-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.smart-mission-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.smart-mission-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+}
+
+.smart-mission-card:hover::before {
+  opacity: 1;
+}
+
+.smart-mission-card.completed {
+  opacity: 0.7;
+  background: var(--success-bg);
+  border-color: var(--success-color);
+}
+
+.smart-mission-card.completed::before {
+  background: var(--success-color);
+  opacity: 1;
+}
+
+.smart-mission-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.smart-mission-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-bg);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.smart-mission-title {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+
+.smart-mission-xp {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.smart-mission-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.smart-mission-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.smart-mission-duration,
+.smart-mission-subject {
+  background: var(--secondary-bg);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.smart-mission-complete-btn {
+  margin-left: auto;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.smart-mission-complete-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.smart-mission-complete-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.smart-mission-complete-btn:disabled {
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .smart-missions-container {
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .smart-missions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .smart-missions-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .smart-mission-card {
+    padding: 16px;
+  }
+  
+  .smart-mission-header {
+    gap: 8px;
+  }
+  
+  .smart-mission-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+  
+  .smart-mission-title {
+    font-size: 1rem;
+  }
+  
+  .smart-mission-footer {
+    gap: 8px;
+  }
+  
+  .smart-mission-complete-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+}
+
+/* Animation for new missions */
+@keyframes missionAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.smart-mission-card {
+  animation: missionAppear 0.5s ease-out;
+}
+
+/* Success animation for completed missions */
+@keyframes missionComplete {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.smart-mission-card.completed {
+  animation: missionComplete 0.6s ease-out;
+}
+
+/* Loading state for generation */
+.smart-missions-loading {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.smart-missions-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mission type indicators */
+.smart-mission-card[data-mission-type="study_preparation"] .smart-mission-icon {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+}
+
+.smart-mission-card[data-mission-type="exam_preparation"] .smart-mission-icon {
+  background: linear-gradient(135deg, #fff3e0, #ffcc02);
+}
+
+.smart-mission-card[data-mission-type="homework_focus"] .smart-mission-icon {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+}
+
+.smart-mission-card[data-mission-type="review_and_practice"] .smart-mission-icon {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
 } 

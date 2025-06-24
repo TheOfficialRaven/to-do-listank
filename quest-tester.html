@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Küldetések Tesztelő</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .section h2 {
+            margin: 0 0 20px 0;
+            color: #667eea;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .xp-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .xp-display h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+        
+        .xp-amount {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+        
+        .quest-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .quest-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .quest-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Küldetések Tesztelő</h1>
+            <p>Egyszerű eszköz a küldetések generálásához és XP teszteléséhez</p>
+        </div>
+        
+        <div class="content">
+            <!-- XP Display -->
+            <div class="xp-display">
+                <h3>Jelenlegi XP</h3>
+                <p class="xp-amount" id="currentXP">0</p>
+                <p>Szint: <span id="currentLevel">1</span></p>
+            </div>
+            
+            <!-- Firebase Status -->
+            <div class="section">
+                <h2>🔧 Firebase Kapcsolat</h2>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="testAuth()">Hitelesítés Teszt</button>
+                    <button class="btn btn-success" onclick="refreshXP()">XP Frissítése</button>
+                </div>
+                <div id="firebaseStatus"></div>
+            </div>
+            
+            <!-- Quest Generation -->
+            <div class="section">
+                <h2>🎯 Küldetések Generálása</h2>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateTestQuests()">Teszt Küldetések</button>
+                    <button class="btn btn-success" onclick="generateSmartMissions()">Intelligens Küldetések</button>
+                    <button class="btn btn-warning" onclick="testQuestCompletion()">Küldetés Teljesítés Teszt</button>
+                    <button class="btn btn-warning" onclick="deleteAllQuests()">Összes Küldetés Törlése</button>
+                    <button class="btn btn-info" onclick="showCurrentQuests()">Jelenlegi Küldetések</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetGroup">Célcsoport:</label>
+                    <select id="targetGroup">
+                        <option value="student">Diák</option>
+                        <option value="youngProfessional">Fiatal Szakember</option>
+                        <option value="selfImprover">Önfejlesztő</option>
+                    </select>
+                </div>
+                
+                <div id="questGenerationStatus"></div>
+                <div id="currentQuestsDisplay"></div>
+            </div>
+            
+            <!-- Custom Quest Creator -->
+            <div class="section">
+                <h2>✨ Egyedi Küldetés Létrehozása</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customTitle">Cím:</label>
+                        <input type="text" id="customTitle" placeholder="Küldetés címe">
+                    </div>
+                    <div class="form-group">
+                        <label for="customXP">XP:</label>
+                        <input type="number" id="customXP" value="10" min="1" max="100">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="customDescription">Leírás:</label>
+                    <textarea id="customDescription" rows="3" placeholder="Küldetés leírása"></textarea>
+                </div>
+                <button class="btn btn-success" onclick="createCustomQuest()">Egyedi Küldetés Létrehozása</button>
+                <div id="customQuestStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, update, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqX",
+            authDomain: "leads-tracker-app-78b83.firebaseapp.com",
+            databaseURL: "https://leads-tracker-app-78b83-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "leads-tracker-app-78b83",
+            storageBucket: "leads-tracker-app-78b83.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdefghijklmnop"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Global variables
+        let currentUser = null;
+
+        // Test authentication
+        window.testAuth = async function() {
+            console.log('Hitelesítés tesztelése...');
+            
+            try {
+                if (!currentUser) {
+                    console.log('Anonim bejelentkezés...');
+                    const result = await signInAnonymously(auth);
+                    currentUser = result.user;
+                    console.log(`Anonim felhasználó bejelentkezett: ${currentUser.uid}`);
+                } else {
+                    console.log(`Felhasználó már bejelentkezett: ${currentUser.uid}`);
+                }
+                
+                const statusDiv = document.getElementById('firebaseStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Felhasználó bejelentkezett: ${currentUser.uid}
+                    </div>
+                `;
+                
+                window.refreshXP();
+            } catch (error) {
+                console.error(`Hitelesítési hiba: ${error.message}`);
+                const statusDiv = document.getElementById('firebaseStatus');
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Hitelesítési hiba: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        // Refresh XP display
+        window.refreshXP = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            try {
+                const userRef = ref(db, `users/${currentUser.uid}`);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val() || {};
+                const xp = userData.xp || 0;
+                const level = Math.floor(xp / 100) + 1;
+                
+                document.getElementById('currentXP').textContent = xp;
+                document.getElementById('currentLevel').textContent = level;
+                
+                console.log(`XP frissítve: ${xp} XP, Szint: ${level}`);
+            } catch (error) {
+                console.error(`XP frissítési hiba: ${error.message}`);
+            }
+        };
+
+        // Generate test quests
+        window.generateTestQuests = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            const targetGroup = document.getElementById('targetGroup').value;
+            console.log(`${targetGroup} célcsoport küldetéseinek generálása...`);
+            
+            try {
+                // Create sample quests
+                const quests = [
+                    {
+                        id: `quest_${Date.now()}_1`,
+                        title: 'Teszt Küldetés 1',
+                        description: 'Ez egy teszt küldetés a fejlesztéshez',
+                        xp: 15,
+                        tag: 'test',
+                        icon: '🧪',
+                        completed: false,
+                        accepted: false,
+                        assignedDate: new Date().toISOString().split('T')[0],
+                        assignedAt: Date.now(),
+                        targetGroup: targetGroup
+                    },
+                    {
+                        id: `quest_${Date.now()}_2`,
+                        title: 'Teszt Küldetés 2',
+                        description: 'Második teszt küldetés',
+                        xp: 25,
+                        tag: 'test',
+                        icon: '🎯',
+                        completed: false,
+                        accepted: false,
+                        assignedDate: new Date().toISOString().split('T')[0],
+                        assignedAt: Date.now(),
+                        targetGroup: targetGroup
+                    }
+                ];
+                
+                // Save to Firebase
+                const updates = {};
+                quests.forEach(quest => {
+                    updates[`users/${currentUser.uid}/daily_quests/${quest.id}`] = quest;
+                });
+                
+                await update(ref(db), updates);
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ ${quests.length} teszt küldetés generálva a(z) ${targetGroup} célcsoporthoz!
+                    </div>
+                `;
+                
+                console.log(`${quests.length} teszt küldetés generálva`);
+                
+            } catch (error) {
+                console.error(`Küldetés generálási hiba: ${error.message}`);
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Hiba a küldetések generálásakor: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        // Generate smart missions
+        window.generateSmartMissions = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            console.log('Intelligens küldetések generálása...');
+            
+            try {
+                // Create smart missions
+                const missions = [
+                    {
+                        id: `mission_${Date.now()}_1`,
+                        title: 'Matematika felkészülés',
+                        description: 'Készülj fel a holnapi matek órára 20 percet',
+                        xp: 20,
+                        type: 'study_preparation',
+                        subject: 'Matematika',
+                        completed: false,
+                        createdAt: Date.now(),
+                        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                    },
+                    {
+                        id: `mission_${Date.now()}_2`,
+                        title: 'Történelem házi',
+                        description: 'Fejezd be a történelem házi feladatot',
+                        xp: 30,
+                        type: 'homework_focus',
+                        subject: 'Történelem',
+                        completed: false,
+                        createdAt: Date.now(),
+                        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                    }
+                ];
+                
+                // Save to Firebase
+                const updates = {};
+                missions.forEach(mission => {
+                    updates[`users/${currentUser.uid}/smart_missions/${mission.id}`] = mission;
+                });
+                
+                await update(ref(db), updates);
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ ${missions.length} intelligens küldetés generálva!
+                    </div>
+                `;
+                
+                console.log(`${missions.length} intelligens küldetés generálva`);
+                
+            } catch (error) {
+                console.error(`Intelligens küldetés generálási hiba: ${error.message}`);
+            }
+        };
+
+        // Create custom quest
+        window.createCustomQuest = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            const title = document.getElementById('customTitle').value;
+            const description = document.getElementById('customDescription').value;
+            const xp = parseInt(document.getElementById('customXP').value);
+            
+            if (!title || !description) {
+                console.log('Cím és leírás megadása kötelező!');
+                return;
+            }
+            
+            try {
+                const quest = {
+                    id: `custom_quest_${Date.now()}`,
+                    title: title,
+                    description: description,
+                    xp: xp,
+                    tag: 'custom',
+                    icon: '🎯',
+                    completed: false,
+                    accepted: false,
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    assignedAt: Date.now(),
+                    targetGroup: 'custom'
+                };
+                
+                const questRef = ref(db, `users/${currentUser.uid}/daily_quests/${quest.id}`);
+                await update(ref(db), { [questRef.toString()]: quest });
+                
+                const statusDiv = document.getElementById('customQuestStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Egyedi küldetés létrehozva: ${title}
+                    </div>
+                `;
+                
+                console.log(`Egyedi küldetés létrehozva: ${title}`);
+                
+                // Clear form
+                document.getElementById('customTitle').value = '';
+                document.getElementById('customDescription').value = '';
+                
+            } catch (error) {
+                console.error(`Egyedi küldetés létrehozási hiba: ${error.message}`);
+            }
+        };
+
+        // Test quest completion
+        window.testQuestCompletion = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            console.log('Küldetés teljesítés tesztelése...');
+            
+            try {
+                // Get a quest to complete
+                const questsRef = ref(db, `users/${currentUser.uid}/daily_quests`);
+                const snapshot = await get(questsRef);
+                const quests = snapshot.val();
+                
+                if (!quests) {
+                    console.log('Nincsenek küldetések a teszteléshez!');
+                    return;
+                }
+                
+                const questIds = Object.keys(quests);
+                const incompleteQuests = questIds.filter(id => !quests[id].completed);
+                
+                if (incompleteQuests.length === 0) {
+                    console.log('Nincs befejezetlen küldetés!');
+                    return;
+                }
+                
+                const questId = incompleteQuests[0];
+                const quest = quests[questId];
+                
+                console.log(`Küldetés teljesítése: ${quest.title}`);
+                
+                // Complete the quest
+                const updates = {};
+                updates[`users/${currentUser.uid}/daily_quests/${questId}/completed`] = true;
+                updates[`users/${currentUser.uid}/daily_quests/${questId}/completedAt`] = Date.now();
+                
+                // Get current XP and add quest XP
+                const userRef = ref(db, `users/${currentUser.uid}`);
+                const userSnapshot = await get(userRef);
+                const userData = userSnapshot.val() || {};
+                const currentXP = userData.xp || 0;
+                const newXP = currentXP + quest.xp;
+                
+                updates[`users/${currentUser.uid}/xp`] = newXP;
+                
+                await update(ref(db), updates);
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Küldetés teljesítve: ${quest.title}<br>
+                        XP nyert: ${quest.xp}<br>
+                        Új összes XP: ${newXP}
+                    </div>
+                `;
+                
+                console.log(`Küldetés teljesítve: ${quest.title}, XP: +${quest.xp}`);
+                window.refreshXP();
+                
+            } catch (error) {
+                console.error(`Küldetés teljesítési hiba: ${error.message}`);
+            }
+        };
+
+        // Delete all quests
+        window.deleteAllQuests = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            if (!confirm('Biztosan törölni szeretnéd az összes küldetést?')) {
+                console.log('Törlés megszakítva');
+                return;
+            }
+            
+            console.log('Összes küldetés törlése...');
+            
+            try {
+                // Töröljük az összes küldetést
+                await update(ref(db), { [`users/${currentUser.uid}/daily_quests`]: null });
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Összes küldetés törölve!
+                    </div>
+                `;
+                
+                console.log('Összes küldetés törölve');
+                
+                // Töröljük a jelenlegi küldetések megjelenítését
+                document.getElementById('currentQuestsDisplay').innerHTML = '';
+                
+                window.refreshXP();
+            } catch (error) {
+                console.error(`Összes küldetés törlési hiba: ${error.message}`);
+                
+                const statusDiv = document.getElementById('questGenerationStatus');
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Hiba a küldetések törlésekor: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        // Show current quests
+        window.showCurrentQuests = async function() {
+            if (!currentUser) {
+                console.log('Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            console.log('Jelenlegi küldetések megjelenítése...');
+            
+            try {
+                const questsRef = ref(db, `users/${currentUser.uid}/daily_quests`);
+                const snapshot = await get(questsRef);
+                const quests = snapshot.val();
+                
+                if (!quests) {
+                    console.log('Nincsenek küldetések a megjelenítéshez!');
+                    return;
+                }
+                
+                const currentQuestsDisplay = document.getElementById('currentQuestsDisplay');
+                currentQuestsDisplay.innerHTML = `
+                    <div class="status success">
+                        ✅ Jelenlegi küldetések:
+                    </div>
+                `;
+                
+                const questList = document.createElement('ul');
+                questList.className = 'quest-list';
+                
+                for (const questId in quests) {
+                    const quest = quests[questId];
+                    const questItem = document.createElement('li');
+                    questItem.className = 'quest-item';
+                    questItem.textContent = `${quest.title} - ${quest.description} - XP: ${quest.xp}`;
+                    questList.appendChild(questItem);
+                }
+                
+                currentQuestsDisplay.appendChild(questList);
+                
+                console.log('Jelenlegi küldetések megjelenítve');
+            } catch (error) {
+                console.error(`Jelenlegi küldetések megjelenítési hiba: ${error.message}`);
+            }
+        };
+
+        // Initialize
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                console.log(`Felhasználó bejelentkezett: ${user.uid}`);
+                window.refreshXP();
+            } else {
+                console.log('Nincs bejelentkezett felhasználó');
+            }
+        });
+
+        // Global console functions
+        window.deleteAllQuestsConsole = async function() {
+            if (!currentUser) {
+                console.log('❌ Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            if (!confirm('Biztosan törölni szeretnéd az összes küldetést?')) {
+                console.log('❌ Törlés megszakítva');
+                return;
+            }
+            
+            try {
+                // Töröljük az összes küldetést
+                await update(ref(db), { [`users/${currentUser.uid}/daily_quests`]: null });
+                console.log('✅ Összes küldetés törölve!');
+            } catch (error) {
+                console.error('❌ Hiba a küldetések törlésekor:', error);
+            }
+        };
+
+        window.showQuestsConsole = async function() {
+            if (!currentUser) {
+                console.log('❌ Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            try {
+                const questsRef = ref(db, `users/${currentUser.uid}/daily_quests`);
+                const snapshot = await get(questsRef);
+                const quests = snapshot.val();
+                
+                if (!quests) {
+                    console.log('📋 Nincsenek küldetések');
+                    return;
+                }
+                
+                console.log('📋 Jelenlegi küldetések:');
+                Object.keys(quests).forEach((questId, index) => {
+                    const quest = quests[questId];
+                    console.log(`${index + 1}. ${quest.title} (${quest.xp} XP) - ${quest.completed ? '✅ Teljesítve' : '⏳ Várakozik'}`);
+                });
+            } catch (error) {
+                console.error('❌ Hiba a küldetések lekérdezésekor:', error);
+            }
+        };
+
+        window.generateTestQuestConsole = async function() {
+            if (!currentUser) {
+                console.log('❌ Nincs bejelentkezett felhasználó!');
+                return;
+            }
+            
+            try {
+                const quest = {
+                    id: `console_quest_${Date.now()}`,
+                    title: 'Konzol Küldetés',
+                    description: 'Ez egy konzolból generált teszt küldetés',
+                    xp: 15,
+                    tag: 'console',
+                    icon: '🖥️',
+                    completed: false,
+                    accepted: false,
+                    assignedDate: new Date().toISOString().split('T')[0],
+                    assignedAt: Date.now(),
+                    targetGroup: 'console'
+                };
+                
+                const questRef = ref(db, `users/${currentUser.uid}/daily_quests/${quest.id}`);
+                await update(ref(db), { [questRef.toString()]: quest });
+                console.log('✅ Konzol küldetés létrehozva:', quest.title);
+            } catch (error) {
+                console.error('❌ Hiba a konzol küldetés létrehozásakor:', error);
+            }
+        };
+
+        console.log('🎯 Küldetések tesztelő inicializálva');
+        console.log('📝 Használható konzol függvények:');
+        console.log('  - deleteAllQuestsConsole() - Összes küldetés törlése');
+        console.log('  - showQuestsConsole() - Küldetések megjelenítése');
+        console.log('  - generateTestQuestConsole() - Teszt küldetés létrehozása');
+    </script>
+</body>
+</html> 

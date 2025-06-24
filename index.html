@@ -592,16 +592,18 @@
         <p>A napi küldetéseid hamarosan megjelennek itt.</p>
       </div>
     </div>
+    
+    <!-- Smart Missions Container - csak diákoknak -->
+    <div id="smart-missions-container" class="smart-missions-container student-only" style="display: none;">
+      <!-- Intelligens küldetések dinamikusan töltődnek fel -->
+    </div>
   </section>
 
   <!-- Timetable (Órarend) szekció - csak diákoknak -->
   <section id="timetable-section" class="tab-content student-only" style="display: none;">
     <div class="section-header">
       <h2 data-lang="timetable.title">📅 Órarend</h2>
-      <button id="new-timetable-entry-btn" class="primary-btn">
-        <span class="material-icons">add</span>
-        <span data-lang="timetable.new_entry">Új óra hozzáadása</span>
-      </button>
+      <!-- Új óra hozzáadása gomb eltávolítva -->
     </div>
     
     <!-- Órarend hozzáadás form -->
@@ -675,6 +677,9 @@
       <div class="timetable-header">
         <h3 data-lang="timetable.weekly_schedule">📋 Heti órarend</h3>
         <div class="timetable-controls">
+          <div class="timetable-hint">
+            💡 <span data-lang="timetable.click_hint">Kattints az üres cellákra új óra hozzáadásához!</span>
+          </div>
           <button id="timetable-view-toggle" class="view-toggle-btn" data-view="table">
             <span class="material-icons">view_list</span>
             <span data-lang="timetable.list_view">Lista nézet</span>

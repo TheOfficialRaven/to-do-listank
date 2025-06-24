@@ -401,9 +401,10 @@
     "update": "Save",
     "delete": "Delete",
     "close": "Close",
+    "click_hint": "Click on empty cells to add new classes!",
     "empty_state": {
       "title": "No classes in your timetable yet",
-      "subtitle": "Start adding classes with the \"Add New Class\" button!"
+      "subtitle": "Start adding classes with the \"Add New Class\" button or click on empty cells!"
     },
     "no_classes": "No classes on this day",
     "validation": {
