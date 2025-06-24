@@ -3,8 +3,8 @@
   "short_name": "TodoApp",
   "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
   "version": "2.1.4",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#10B981",
@@ -17,13 +17,13 @@
       "src": "favicon-16x16.png",
       "sizes": "16x16",
       "type": "image/png",
-      "purpose": "favicon"
+      "purpose": "any"
     },
     {
       "src": "favicon-32x32.png",
       "sizes": "32x32",
       "type": "image/png",
-      "purpose": "favicon"
+      "purpose": "any"
     },
     {
       "src": "android-chrome-192x192.png",
@@ -41,7 +41,7 @@
       "src": "apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png",
-      "purpose": "apple touch icon"
+      "purpose": "any"
     }
   ],
   "screenshots": [
@@ -70,21 +70,21 @@
       "name": "Quick Task",
       "short_name": "Add Task",
       "description": "Quickly add a new task to your lists",
-      "url": "./?action=quick-task",
+      "url": "/?action=quick-task",
       "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "New Note",
       "short_name": "Add Note",
       "description": "Create a new note",
-      "url": "./?action=quick-note",
+      "url": "/?action=quick-note",
       "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "Calendar",
       "short_name": "Events",
       "description": "View and add calendar events",
-      "url": "./?tab=calendar",
+      "url": "/?tab=calendar",
       "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
     }
   ],

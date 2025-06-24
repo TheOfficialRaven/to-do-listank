@@ -419,31 +419,41 @@ class TemplateManager {
 
   async setupDailyQuests() {
     const today = new Date().toDateString();
-    
     // Check if daily quests need to be rotated
     if (this.lastDailyQuestUpdate === today && this.dailyQuests.length > 0) {
       console.log('📅 Daily quests already current for today');
       return;
     }
-
     if (!this.currentGoalTarget || !this.templates.length) return;
-
     // Generate 2-3 daily quests
     const dailyQuestCount = Math.min(3, this.templates.length);
+    // Csak magyar szöveget tartalmazó példányokat készítünk
     this.dailyQuests = [...this.templates]
       .filter(template => template.tag === 'daily' || Math.random() > 0.6)
       .sort(() => Math.random() - 0.5)
       .slice(0, dailyQuestCount)
-      .map((template, index) => ({
-        ...template,
-        id: `daily_${this.currentGoalTarget}_${Date.now()}_${index}`,
-        type: 'daily',
-        createdAt: Date.now(),
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
-      }));
-
+      .map((template, index) => {
+        // duration prioritás: template.duration (szám) > template.estimatedDuration (szöveg, számot keresünk benne)
+        let duration = template.duration;
+        if (!duration && template.estimatedDuration) {
+          // Próbáljuk kinyerni a számot a szövegből (pl. "45 perc")
+          const match = String(template.estimatedDuration).match(/\d+/);
+          if (match) duration = parseInt(match[0], 10);
+        }
+        return {
+          ...template,
+          id: `daily_${this.currentGoalTarget}_${Date.now()}_${index}`,
+          type: 'daily',
+          createdAt: Date.now(),
+          expiresAt: Date.now() + (24 * 60 * 60 * 1000),
+          // Magyar szövegek biztosítása
+          title: template.title,
+          description: template.description,
+          duration: duration,
+          estimatedDuration: template.estimatedDuration || (duration ? `${duration} perc` : ''),
+        };
+      });
     this.lastDailyQuestUpdate = today;
-    
     // Save to user's Firebase data
     if (auth.currentUser) {
       try {
@@ -456,7 +466,6 @@ class TemplateManager {
         console.error('❌ Error saving daily quests:', error);
       }
     }
-
     console.log(`🌅 Generated ${this.dailyQuests.length} daily quests for today`);
   }
 
@@ -624,4 +633,4 @@ window.GOAL_TARGETS = GOAL_TARGETS;
 export { TemplateManager, GOAL_TARGETS, DEFAULT_TEMPLATES };
 export default templateManager;
 
-console.log('✅ Goal Templates module loaded successfully'); 
+console.log('✅ Goal Templates module loaded successfully');

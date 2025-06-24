@@ -202,6 +202,7 @@
       "1440": "1 dzień wcześniej"
     },
     "event_types": {
+      "event": "Wydarzenie",
       "meeting": "Spotkanie",
       "reminder": "Przypomnienie",
       "deadline": "Termin",
@@ -238,7 +239,9 @@
       "select_list": "Wybierz listę:",
       "select_list_placeholder": "-- Wybierz listę --",
       "submit": "Dodaj zadanie",
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "placeholder": "Wprowadź zadanie...",
+      "add": "Dodaj"
     },
     "confirm_delete": {
       "title": "Potwierdź usunięcie",
@@ -264,16 +267,65 @@
       "contact": "📧 Kontakt",
       "contact_desc": "W przypadku pytań dotyczących prywatności, skontaktuj się z nami.",
       "close": "Zamknij"
+    },
+    "quick_add": {
+      "title": "Szybkie dodawanie",
+      "placeholder": "Wprowadź szczegóły...",
+      "add": "Dodaj",
+      "cancel": "Anuluj"
+    },
+    "yes": "Tak",
+    "no": "Nie",
+    "theme": {
+      "title": "Motyw",
+      "apply": "Zastosuj",
+      "cancel": "Anuluj",
+      "themes": {
+        "default": {
+          "name": "Domyślny",
+          "description": "Domyślny motyw aplikacji"
+        },
+        "ocean_blue": {
+          "name": "Oceaniczny Niebieski",
+          "description": "Motyw inspirowany oceanem"
+        },
+        "sakura_pink": {
+          "name": "Sakura Różowy",
+          "description": "Motyw inspirowany kwiatami sakury"
+        },
+        "forest_green": {
+          "name": "Leśna Zieleń",
+          "description": "Motyw inspirowany lasem"
+        },
+        "minimal_mono": {
+          "name": "Minimalistyczny Monochromatyczny",
+          "description": "Prosty, monochromatyczny motyw"
+        },
+        "sunset_orange": {
+          "name": "Zachód Słońca Pomarańczowy",
+          "description": "Motyw inspirowany zachodem słońca"
+        },
+        "royal_purple": {
+          "name": "Królewski Fiolet",
+          "description": "Motyw inspirowany królewskim fioletem"
+        }
+      },
+      "modes": {
+        "light": "Jasny",
+        "dark": "Ciemny"
+      }
     }
   },
   "achievements": {
     "first_task": {
       "name": "Pierwszy krok",
-      "description": "Dodaj swoje pierwsze zadanie"
+      "description": "Dodaj swoje pierwsze zadanie",
+      "title": "Pierwsze zadanie"
     },
     "task_master": {
       "name": "Mistrz zadań",
-      "description": "Ukończ 50 zadań"
+      "description": "Ukończ 50 zadań",
+      "title": "Mistrz zadań"
     },
     "streak_week": {
       "name": "Tygodniowiec",
@@ -281,14 +333,32 @@
     },
     "list_creator": {
       "name": "Twórca list",
-      "description": "Utwórz 5 różnych list"
+      "description": "Utwórz 5 różnych list",
+      "title": "Twórca list"
     },
     "note_taker": {
       "name": "Notujący",
-      "description": "Zapisz 10 notatek"
+      "description": "Zapisz 10 notatek",
+      "title": "Notatnik"
     },
     "organizer": {
       "name": "Organizator",
+      "description": "Wypróbuj wszystkie funkcje"
+    },
+    "level_up": {
+      "title": "Poziom wyżej",
+      "description": "Osiągnij nowy poziom"
+    },
+    "streak_3": {
+      "title": "Seria 3 dni",
+      "description": "Utrzymaj serię przez 3 dni"
+    },
+    "streak_7": {
+      "title": "Seria 7 dni",
+      "description": "Utrzymaj serię przez 7 dni"
+    },
+    "explorer": {
+      "title": "Odkrywca",
       "description": "Wypróbuj wszystkie funkcje"
     }
   },
@@ -364,7 +434,8 @@
       "save_error": "Błąd zapisu zajęć",
       "update_error": "Błąd aktualizacji zajęć",
       "delete_error": "Błąd usunięcia zajęć"
-    }
+    },
+    "new_entry": "Nowy wpis"
   },
   "exam_calendar": {
     "title": "📚 Kalendarz egzaminów",

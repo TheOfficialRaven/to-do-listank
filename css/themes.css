@@ -166,6 +166,7 @@
       flex-direction: column;
       gap: 0.8rem;
       align-items: stretch;
+      z-index: 1002;
     }
     
     .nav-tabs {

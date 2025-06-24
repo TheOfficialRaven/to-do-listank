@@ -1,7 +1,4 @@
 // === IMMEDIATE DEBUG LOGGING ===
-console.log('🟢 EXTERNAL JS FILE LOADING - index.js started');
-console.log('🟢 Script execution beginning at:', new Date().toLocaleTimeString());
-console.log('🟢 If you see this, the JS file is loading properly');
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -11,7 +8,6 @@ import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-console.log('📦 Firebase imports loaded successfully');
 
 // Firebase konfiguráció – cseréld ki a saját adataidra!
 const firebaseConfig = {
@@ -35,36 +31,29 @@ window.auth = auth;
 // Legacy Firebase compatibility layer for manager files
 window.firebase = {
   auth: () => {
-    console.log(`👤 Firebase auth accessed, currentUser:`, auth.currentUser ? 'logged in' : 'not logged in');
     return auth;
   },
   database: () => {
     return {
       ref: (path) => {
-        console.log(`🔗 Firebase ref created for path: ${path}`);
         return {
           push: (data) => {
-            console.log(`📤 Firebase push called with data:`, data ? 'data provided' : 'no data');
             if (data) {
               // With data - return promise
               return push(ref(db, path), data);
             } else {
               // Without data - return ref with key and set method
               const newRef = push(ref(db, path));
-              console.log(`🆔 New Firebase ref created with key: ${newRef.key}`);
               return {
                 key: newRef.key,
                 set: async (setData) => {
-                  console.log(`💾 Firebase set called with data:`, setData);
                   return await set(newRef, setData);
                 }
               };
             }
           },
           once: async (eventType) => {
-            console.log(`📖 Firebase once called for eventType: ${eventType} on path: ${path}`);
             const snapshot = await get(ref(db, path));
-            console.log(`📊 Firebase snapshot exists: ${snapshot.exists()}, data:`, snapshot.exists() ? 'data available' : 'no data');
             return snapshot;
           },
           set: async (data) => {
@@ -93,13 +82,10 @@ window.firebase = {
 window.waitForFirebaseAuth = function() {
   return new Promise((resolve) => {
     if (auth.currentUser) {
-      console.log('✅ Firebase auth already ready');
       resolve(auth.currentUser);
     } else {
-      console.log('⏳ Waiting for Firebase auth...');
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
-          console.log('✅ Firebase auth ready with user:', user.email);
           unsubscribe();
           resolve(user);
         }
@@ -108,60 +94,39 @@ window.waitForFirebaseAuth = function() {
   });
 };
 
-console.log('🔧 Firebase initialized and exposed globally (modern + legacy), defining PWA functions...');
 
 // ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
 // Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
 window.showPWAButton = function() {
-  console.log('🔧 showPWAButton() called');
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'block';
-    console.log('✅ PWA button shown');
   } else {
     console.error('❌ PWA container not found! DOM might not be ready yet.');
-    console.log('💡 Try calling this function after page load');
   }
 };
 
 window.hidePWAButton = function() {
-  console.log('🔧 hidePWAButton() called');
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'none';
-    console.log('✅ PWA button hidden');
   } else {
     console.error('❌ PWA container not found! DOM might not be ready yet.');
   }
 };
 
 window.debugPWA = function() {
-  console.log('🔧 debugPWA() called');
   const container = document.getElementById('pwa-floating-install');
   const btn = document.getElementById('pwa-install-btn');
   const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
   const userDismissedTime = localStorage.getItem('pwa-user-dismissed');
   
-  console.log('🔍 PWA DEBUG INFO:');
-  console.log('  - container found:', !!container);
-  console.log('  - button found:', !!btn);
-  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
-  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
-  console.log('  - iOS standalone:', window.navigator.standalone === true);
-  console.log('  - container display:', container ? container.style.display : 'N/A');
-  console.log('  - DOM ready:', document.readyState);
-  console.log('  - recently installed:', wasRecentlyInstalled ? new Date(parseInt(wasRecentlyInstalled)).toLocaleString() : 'no');
-  console.log('  - user dismissed until:', userDismissedTime ? new Date(parseInt(userDismissedTime)).toLocaleString() : 'no');
-  console.log('  - Current timestamp:', new Date().toLocaleTimeString());
-  console.log('💡 Use resetPWA() to clear localStorage flags');
 };
 
 window.installPWA = function() {
-  console.log('🔧 installPWA() called');
   const installBtn = document.getElementById('pwa-install-btn');
   if (installBtn) {
     installBtn.click();
-    console.log('✅ PWA install triggered');
   } else {
     console.error('❌ PWA install button not found! DOM might not be ready yet.');
   }
@@ -171,14 +136,11 @@ window.installPWA = function() {
 window.resetPWA = function() {
   localStorage.removeItem('pwa-recently-installed');
   localStorage.removeItem('pwa-user-dismissed');
-  console.log('🧹 PWA localStorage flags cleared');
-  console.log('🔄 Refresh the page to see install button again');
   
   // Force show the install button for testing
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'block';
-    console.log('📱 PWA install button forced visible for testing');
   }
 };
 
@@ -186,28 +148,21 @@ window.resetPWA = function() {
 window.clearPWAState = function() {
   localStorage.removeItem('pwa-recently-installed');
   localStorage.removeItem('pwa-user-dismissed');
-  console.log('🧹 PWA state cleared');
   
   // Show the install button immediately
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'block';
-    console.log('📱 PWA install button shown after state clear');
   }
   
   return true;
 };
 
 // Test hogy a függvények elérhetők-e
-console.log('✅ IMMEDIATE PWA functions defined successfully!');
-console.log('🔧 Test immediately: debugPWA()');
-console.log('📱 Available commands: showPWAButton(), hidePWAButton(), debugPWA(), installPWA(), resetPWA()');
 
 // Immediate test
 setTimeout(() => {
-  console.log('🔧 Auto-testing PWA functions after 1 second...');
   if (typeof window.debugPWA === 'function') {
-    console.log('✅ debugPWA function is accessible');
   } else {
     console.error('❌ debugPWA function is NOT accessible');
   }
@@ -226,7 +181,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then((registration) => {
-        console.log('✅ Service Worker registered successfully:', registration.scope);
         serviceWorkerRegistration = registration;
         
         // Check for updates
@@ -234,7 +188,6 @@ if ('serviceWorker' in navigator) {
           const newWorker = registration.installing;
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New Service Worker available');
               // Auto clear cache and refresh for immediate updates
               clearCacheAndRefresh();
               showNotification('🔄 Új verzió elérhető! Az oldal frissül...');
@@ -243,20 +196,17 @@ if ('serviceWorker' in navigator) {
         });
       })
       .catch((error) => {
-        console.log('❌ Service Worker registration failed:', error);
       });
   });
 }
 
 // PWA Install Event
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('📱 PWA install prompt available');
   // Prevent the mini-infobar from appearing on mobile
   e.preventDefault();
   // Stash the event so it can be triggered later
   deferredPrompt = e;
   
-  console.log('PWA install prompt ready');
   
   // Ellenőrizzük, hogy szabad-e megjeleníteni
   setTimeout(() => {
@@ -266,23 +216,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if (!wasRecentlyInstalled && !userDismissedRecently) {
       if (typeof pwaInstall !== 'undefined' && pwaInstall.showInstallButton) {
         pwaInstall.showInstallButton();
-        console.log('📱 PWA install button shown');
       }
     } else {
-      console.log('🔕 PWA install button not shown - user preference/status');
     }
   }, 500); // Kis késleltetés, hogy az elem biztosan létezzen
 });
 
 // PWA Installed Event
 window.addEventListener('appinstalled', (evt) => {
-  console.log('✅ PWA was installed');
   showNotification('🎉 Alkalmazás sikeresen telepítve!');
   deferredPrompt = null;
   
   // Jegyezzük meg, hogy telepítették
   localStorage.setItem('pwa-recently-installed', Date.now().toString());
-  console.log('📝 PWA installation marked in localStorage');
   
   // Elrejtjük a telepítési gombot
   if (typeof pwaInstall !== 'undefined' && pwaInstall.hideInstallButton) {
@@ -293,7 +239,6 @@ window.addEventListener('appinstalled', (evt) => {
 // Cache clearing and refresh function
 async function clearCacheAndRefresh() {
   try {
-    console.log('🗑️ Clearing all caches...');
     
     // Send message to service worker to clear caches
     if (navigator.serviceWorker.controller) {
@@ -308,12 +253,10 @@ async function clearCacheAndRefresh() {
       await Promise.all(
         cacheNames.map(cacheName => caches.delete(cacheName))
       );
-      console.log('✅ All caches cleared');
     }
     
     // Force refresh after a short delay
     setTimeout(() => {
-      console.log('🔄 Refreshing page...');
       window.location.reload(true);
     }, 1000);
     
@@ -327,7 +270,6 @@ async function clearCacheAndRefresh() {
 // Function to force cache refresh for language files
 async function refreshLanguageCache() {
   try {
-    console.log('🌐 Refreshing language cache...');
     
     if ('caches' in window) {
       const cache = await caches.open('todo-app-v2.1.2');
@@ -341,7 +283,6 @@ async function refreshLanguageCache() {
       // Delete old language files from cache
       for (const file of languageFiles) {
         await cache.delete(file);
-        console.log(`🗑️ Cleared cache for ${file}`);
       }
       
       // Fetch fresh versions
@@ -349,7 +290,6 @@ async function refreshLanguageCache() {
         const response = await fetch(file + '?t=' + Date.now());
         if (response.ok) {
           await cache.put(file, response.clone());
-          console.log(`✅ Cached fresh version of ${file}`);
         }
       }
     }
@@ -615,7 +555,6 @@ onAuthStateChanged(auth, (user) => {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: function(evt) {
-          console.log("Drag end event fired");
           if (!listsContainer || !listsContainer.children) {
             console.warn("Lists container no longer exists");
             return;
@@ -624,9 +563,7 @@ onAuthStateChanged(auth, (user) => {
           const children = Array.from(listsContainer.children);
           const updatePromises = children.map((child, index) => {
             const listId = child.getAttribute("data-list-id");
-            console.log("Child index:", index, "ListID:", listId);
             if (listId && auth.currentUser) {
-              console.log("Updating order for list", listId, "to", index + 1);
               return set(ref(db, `users/${auth.currentUser.uid}/lists/${listId}/order`), index + 1);
             } else {
               return Promise.resolve();
@@ -634,7 +571,6 @@ onAuthStateChanged(auth, (user) => {
           });
           Promise.all(updatePromises)
             .then(() => {
-              console.log("All order updates complete");
               if (auth.currentUser) {
                 loadUserLists(auth.currentUser.uid);
               }
@@ -768,16 +704,12 @@ navTabs.forEach(tab => {
     } else if (targetTab === 'daily-quests') {
       // Daily quests fül aktiválása - biztosítsuk, hogy a manager betöltött
       if (window.dailyQuestsManager && window.dailyQuestsManager.isInitialized) {
-        console.log('✅ Daily quests tab activated, manager ready');
       } else {
-        console.log('⏳ Daily quests tab activated, waiting for manager...');
       }
     } else if (targetTab === 'exam-calendar') {
       // Exam calendar fül aktiválása
       if (window.examCalendarManager) {
-        console.log('📚 Exam calendar tab activated, manager ready');
       } else {
-        console.log('⏳ Exam calendar tab activated, waiting for manager...');
       }
     }
   });
@@ -2205,7 +2137,6 @@ if (quickAddSubmit) {
         done: false,
         timestamp: Date.now()
       }).then(() => {
-        console.log("Gyors elem hozzáadva!");
         if (quickAddModal) {
           quickAddModal.style.display = "none";
         }
@@ -2285,7 +2216,6 @@ registerBtn.addEventListener("click", () => {
   if (email && password) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log("Sikeres regisztráció:", userCredential.user.email);
         authMessageEl.textContent = `Sikeres regisztráció! Üdvözlünk, ${userCredential.user.email}!`;
       })
       .catch((error) => {
@@ -2304,7 +2234,6 @@ loginBtn.addEventListener("click", () => {
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log("Sikeres bejelentkezés:", userCredential.user.email);
       })
       .catch((error) => {
         console.error("Bejelentkezési hiba:", error.message);
@@ -2318,13 +2247,11 @@ logoutBtn.addEventListener("click", () => {
   if (auth.currentUser) {
     signOut(auth)
       .then(() => {
-        console.log("Sikeres kijelentkezés");
       })
       .catch((error) => {
         console.error("Kijelentkezési hiba:", error.message);
       });
   } else {
-    console.log("Nincs bejelentkezett felhasználó, nincs mit kijelentkezni.");
   }
 });
 
@@ -2514,7 +2441,6 @@ function renderListItem(itemId, text, done, ulElement, listId, uid) {
 customNewListBtn.addEventListener("click", () => {
   const listName = customListNameInput.value.trim();
   const category = customListCategoryInput.value.trim();
-  console.log("Custom lista hozzáadása:", listName, category);
 
   if (listName === "") {
     const errorMsg = getText('lists.list_name_required') || "Kérjük, add meg a lista nevét!";
@@ -2559,7 +2485,6 @@ customNewListBtn.addEventListener("click", () => {
     const newOrder = maxOrder + 1;
     push(userListsRef, { name: fullName, category: finalCategory, order: newOrder })
       .then(() => {
-        console.log("Custom lista sikeresen hozzáadva:", fullName, "order:", newOrder);
         
         // XP hozzáadása új lista létrehozásáért
         addXP(10);
@@ -2782,7 +2707,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ha diák target group-ot találunk vagy elértük a max ellenőrzést, leállítjuk
     if (document.body.classList.contains('target-group-student') || checkCount >= maxChecks) {
       clearInterval(checkInterval);
-      console.log(`✅ Student-only sections check completed after ${checkCount} attempts`);
     }
   }, 500);
 });
@@ -2800,10 +2724,8 @@ function updateTimetableTabVisibility() {
   if (timetableTab) {
     if (isStudentGroup) {
       timetableTab.style.display = '';
-      console.log('👨‍🎓 Timetable tab shown for student group');
   } else {
       timetableTab.style.display = 'none';
-      console.log('🚫 Timetable tab hidden for non-student group');
       // Ha nem diák, akkor elrejtjük a szekciót is és deaktiváljuk
       if (timetableSection) {
         timetableSection.style.display = 'none';
@@ -2815,10 +2737,8 @@ function updateTimetableTabVisibility() {
   if (examCalendarTab) {
     if (isStudentGroup) {
       examCalendarTab.style.display = '';
-      console.log('📚 Exam calendar tab shown for student group');
     } else {
       examCalendarTab.style.display = 'none';
-      console.log('🚫 Exam calendar tab hidden for non-student group');
       // Ha nem diák, akkor elrejtjük a szekciót is és deaktiváljuk
       if (examCalendarSection) {
         examCalendarSection.style.display = 'none';
@@ -2841,20 +2761,17 @@ function updateTimetableTabVisibility() {
       tab.style.display = 'none';
     });
     
-    console.log('🚫 All student-only sections and tabs hidden for non-student group');
   } else {
     // Ha diák, akkor megjelenítjük a student-only tabokat
     const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
     studentOnlyTabs.forEach(tab => {
       tab.style.display = '';
     });
-    console.log('👨‍🎓 Student-only tabs shown for student group');
   }
 }
 
 // Listen for target group changes to update timetable tab visibility
 document.addEventListener('targetGroupChanged', (event) => {
-  console.log('🔄 Target group changed, updating tab visibility, UI texts and quests');
   updateTimetableTabVisibility();
   updateStudentOnlyVisibilityCSS();
   hideStudentOnlySectionsForNonStudents();
@@ -2862,7 +2779,6 @@ document.addEventListener('targetGroupChanged', (event) => {
   // Frissítsük az UI szövegeket is az új target group alapján
   setTimeout(() => {
     updateUITexts();
-    console.log('🔄 UI texts updated after target group change');
   }, 200);
   
   // Frissítsük a küldetéseket is az új target group alapján
@@ -2876,7 +2792,6 @@ document.addEventListener('targetGroupChanged', (event) => {
 
 // Listen for target group system initialization
 document.addEventListener('advancedTargetGroupReady', (event) => {
-  console.log('🎯 Advanced target group system ready');
   updateTimetableTabVisibility();
   updateStudentOnlyVisibilityCSS();
   hideStudentOnlySectionsForNonStudents();
@@ -2884,7 +2799,6 @@ document.addEventListener('advancedTargetGroupReady', (event) => {
   // Frissítsük az UI szövegeket is a target group rendszer inicializálása után
   setTimeout(() => {
     updateUITexts();
-    console.log('🔄 UI texts updated after target group system ready');
   }, 150);
 });
 
@@ -2905,7 +2819,6 @@ if (window.auth) {
 function hideStudentOnlySectionsForNonStudents() {
   const isStudentGroup = document.body.classList.contains('target-group-student');
   
-  console.log(`🔍 Checking student-only sections visibility. Is student: ${isStudentGroup}`);
   
   if (!isStudentGroup) {
     // Elrejtjük a student-only szekciókat
@@ -2937,12 +2850,10 @@ function hideStudentOnlySectionsForNonStudents() {
           dashboardTab.classList.add('active');
           dashboardSection.style.display = 'block';
           dashboardSection.classList.add('active');
-          console.log('🔄 Redirected to dashboard from student-only section');
         }
       }
     }
     
-    console.log('🚫 Student-only sections and tabs hidden for non-student user');
   } else {
     // Ha diák, akkor biztosítsuk, hogy a student-only tabok láthatóak és működnek
     const studentOnlyTabs = document.querySelectorAll('.nav-tab.student-only');
@@ -2951,7 +2862,6 @@ function hideStudentOnlySectionsForNonStudents() {
       tab.style.pointerEvents = ''; // Visszaállítjuk a kattinthatóságot
       tab.removeAttribute('disabled');
     });
-    console.log('👨‍🎓 Student-only tabs made available for student user');
   }
 }
 
@@ -3007,7 +2917,6 @@ function updateStudentOnlyVisibilityCSS() {
   }
   
   document.head.appendChild(style);
-  console.log(`🔄 Updated CSS rules for student-only sections (isStudent: ${isStudentGroup})`);
 }
 
 // Immediate execution
@@ -3022,17 +2931,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Debug functions for managers
 window.debugManagers = function() {
-  console.log('🔍 Manager Debug Info:');
-  console.log('  - examCalendarManager:', typeof window.examCalendarManager, window.examCalendarManager ? '✅' : '❌');
-  console.log('  - timetableManager:', typeof window.timetableManager, window.timetableManager ? '✅' : '❌');
-  console.log('  - Firebase auth:', firebase.auth().currentUser ? '✅' : '❌');
-  console.log('  - Target group:', document.body.classList.contains('target-group-student') ? 'student' : 'other');
-  console.log('💡 Available commands: testTimetableSave(), testExamSave()');
 };
 
 window.testTimetableSave = function() {
   if (window.timetableManager) {
-    console.log('🧪 Testing timetable save functionality...');
     // Fill test data
     const testData = {
       subject: 'Test Tantárgy',
@@ -3046,13 +2948,11 @@ window.testTimetableSave = function() {
       const element = document.getElementById(`timetable-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
       if (element) {
         element.value = testData[key];
-        console.log(`✅ Set ${key}: ${testData[key]}`);
       } else {
         console.warn(`❌ Element not found: timetable-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
       }
     });
     
-    console.log('📝 Test data filled, call timetableManager.saveTimetableEntry() manually');
   } else {
     console.error('❌ Timetable manager not available');
   }
@@ -3060,7 +2960,6 @@ window.testTimetableSave = function() {
 
 window.testExamSave = function() {
   if (window.examCalendarManager) {
-    console.log('🧪 Testing exam save functionality...');
     const testData = {
       subject: 'Test Tantárgy',
       type: 'dolgozat',
@@ -3074,13 +2973,11 @@ window.testExamSave = function() {
       const element = document.getElementById(`exam-${key}`);
       if (element) {
         element.value = testData[key];
-        console.log(`✅ Set ${key}: ${testData[key]}`);
       } else {
         console.warn(`❌ Element not found: exam-${key}`);
       }
     });
     
-    console.log('📝 Test data filled, call examCalendarManager.saveExam() manually');
   } else {
     console.error('❌ Exam calendar manager not available');
   }
@@ -3154,7 +3051,6 @@ function initScrollableNavigation() {
     }
   });
   
-  console.log('🎯 Scrollable navigation initialized');
 }
 
 // Service Worker regisztráció (PWA támogatás)
@@ -3162,7 +3058,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then(registration => {
-        console.log('ServiceWorker regisztrálva:', registration.scope);
       })
       .catch(err => {
         console.error('ServiceWorker regisztrációs hiba:', err);
@@ -3185,29 +3080,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Debug információ a konzolban
-console.log('Todo & Shopping List App initialized');
-console.log('Language:', document.documentElement.lang || 'hu');
-console.log('Firebase config loaded:', !!firebaseConfig.apiKey);
 
 // Tab navigáció kezelése
 function initNavigation() {
   const tabs = document.querySelectorAll('.nav-tab');
   const sections = document.querySelectorAll('.tab-content');
 
-  console.log(`🔧 Navigation initialized with ${tabs.length} tabs and ${sections.length} sections`);
 
   tabs.forEach(tab => {
     tab.addEventListener('click', (event) => {
       const targetTab = tab.dataset.tab;
       
-      console.log(`🔄 Switching to tab: ${targetTab}`);
       
       // Ellenőrizzük először, hogy a tab student-only-e és jogosult-e a felhasználó
       const isStudentGroup = document.body.classList.contains('target-group-student');
       const isStudentOnlyTab = tab.classList.contains('student-only');
       
       if (isStudentOnlyTab && !isStudentGroup) {
-        console.log(`🚫 Tab ${targetTab} is student-only but user is not a student`);
         event.preventDefault();
         event.stopPropagation();
         
@@ -3234,7 +3123,6 @@ function initNavigation() {
       });
       
       // Részletes debug info
-      console.log(`🔍 Target group check: isStudentGroup=${isStudentGroup}, body classes:`, document.body.className);
       
       // Csak a kiválasztott szekciót jelenítjük meg, ha megfelel a feltételeknek
       const targetSection = document.getElementById(`${targetTab}-section`);
@@ -3242,21 +3130,17 @@ function initNavigation() {
         // Ellenőrizzük, hogy a szekció a megfelelő target group-nak szól-e
         const isStudentOnlySection = targetSection.classList.contains('student-only');
         
-        console.log(`📋 Section check: ${targetTab}-section isStudentOnly=${isStudentOnlySection}, isStudentGroup=${isStudentGroup}`);
         
         if (!isStudentOnlySection || isStudentGroup) {
           // Ha student-only szekció és a felhasználó diák, akkor explicit CSS override szükséges
           if (isStudentOnlySection && isStudentGroup) {
             targetSection.style.removeProperty('display'); // Távolítsuk el a korábbi style-okat
             targetSection.style.setProperty('display', 'block', 'important');
-            console.log(`🎓 Student-only section ${targetTab}-section activated with CSS override`);
           } else {
         targetSection.style.display = 'block';
           }
         targetSection.classList.add('active');
-          console.log(`✅ Section ${targetTab}-section activated`);
         } else {
-          console.log(`🚫 Section ${targetTab}-section is student-only but user is not a student`);
           // Ha nem megfelelő target group, visszaváltunk a dashboard-ra
           const dashboardTab = document.querySelector('.nav-tab[data-tab="dashboard"]');
           const dashboardSection = document.getElementById('dashboard-section');
@@ -3265,7 +3149,6 @@ function initNavigation() {
             dashboardTab.classList.add('active');
             dashboardSection.style.display = 'block';
             dashboardSection.classList.add('active');
-            console.log(`🔄 Redirected to dashboard - unauthorized access to ${targetTab}`);
           }
           return; // Kilépünk, hogy ne fusson le a többi logika
         }
@@ -3286,25 +3169,19 @@ function initNavigation() {
       } else if (targetTab === 'daily-quests') {
         // Daily quests fül aktiválása - biztosítsuk, hogy a manager betöltött
         if (window.dailyQuestsManager && window.dailyQuestsManager.isInitialized) {
-          console.log('✅ Daily quests tab activated, manager ready');
         } else {
-          console.log('⏳ Daily quests tab activated, waiting for manager...');
         }
       } else if (targetTab === 'timetable') {
         // Timetable fül aktiválása - rendereljük az órarendet
         if (window.timetableManager) {
-          console.log('📅 Timetable tab activated, triggering render');
           window.timetableManager.renderTimetable();
         } else {
-          console.log('⏳ Timetable tab activated, manager not ready yet');
         }
       } else if (targetTab === 'exam-calendar') {
         // Exam calendar fül aktiválása - rendereljük a vizsganaptárt
         if (window.examCalendarManager) {
-          console.log('📚 Exam calendar tab activated, triggering render');
           window.examCalendarManager.renderExams();
         } else {
-          console.log('⏳ Exam calendar tab activated, manager not ready yet');
         }
       }
     });
@@ -3778,7 +3655,6 @@ setInterval(updateCurrentTime, 1000);
 // Alkalmazás inicializálása
 document.addEventListener('DOMContentLoaded', async () => {
   // Cache refresh on startup for immediate updates
-  console.log('🔄 Checking for fresh content...');
   await refreshLanguageCache();
   
   // Nyelv rendszer inicializálása
@@ -3800,7 +3676,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setTimeout(() => {
     if (window.advancedTargetGroupSystem && window.advancedTargetGroupSystem.getCurrentTargetGroup()) {
       updateUITexts();
-      console.log('🔄 UI texts refreshed after target group system initialization');
     }
   }, 1000);
   
@@ -3836,13 +3711,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   enableAudioOnUserInteraction();
   
   // ELTÁVOLÍTVA: enableAudioOnImportantElements() - ez okozta a snooze gomb hang problémát
-  console.log('⚠️ enableAudioOnImportantElements disabled to prevent snooze button sounds');
   
   // ⚠️ NO AUTOMATIC AUDIO - Wait for user interaction
-  console.log('⚠️ No automatic audio initialization - waiting for user interaction');
   
   // NO AUTOMATIC enableAudio() call - this causes AudioContext errors!
-  console.log('🎵 Audio will be enabled on first user interaction via enableAudioOnUserInteraction()');
   
   // Közelgő értesítések ellenőrzése
   setTimeout(checkUpcomingNotifications, 2000); // 2 másodperc késleltetéssel
@@ -3864,22 +3736,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Teszt funkció a hangok ellenőrzéséhez (fejlesztői konzolból hívható)
   // ⚠️ MANUÁLIS AUDIO TESZTELŐK ELTÁVOLÍTVA
-  console.log('🧹 Manual audio test functions removed for production');
   
   // ⚠️ TESZTELŐ FUNKCIÓK ELTÁVOLÍTVA - ÉLES VERZIÓ
-  console.log('🧹 Test functions removed for production');
   
   // ⚠️ TESZT ÉRTESÍTÉSEK ELTÁVOLÍTVA - ÉLES VERZIÓ
-  console.log('✅ Production ready - Test notifications removed');
-  console.log('🔧 Audio system: User interaction safe');
-  console.log('📱 PWA notifications: Mobile compatible');
   
   // PWA Debug funkciók
-  console.log('🔧 PWA Debug Commands:');
-  console.log('  showPWAButton() - Force show install button');
-  console.log('  hidePWAButton() - Hide install button');
-  console.log('  debugPWA() - Show PWA debug info');
-  console.log('  installPWA() - Trigger install dialog');
 
 // ===== IMMEDIATE GLOBAL PWA FUNCTIONS =====
 // Ezek azonnal elérhetők lesznek, DOM betöltés nélkül is
@@ -3887,10 +3749,8 @@ window.showPWAButton = function() {
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'block';
-    console.log('🔧 IMMEDIATE: PWA button shown');
   } else {
     console.error('❌ PWA container not found! DOM might not be ready yet.');
-    console.log('💡 Try calling this function after page load');
   }
 };
 
@@ -3898,7 +3758,6 @@ window.hidePWAButton = function() {
   const container = document.getElementById('pwa-floating-install');
   if (container) {
     container.style.display = 'none';
-    console.log('🔧 IMMEDIATE: PWA button hidden');
   } else {
     console.error('❌ PWA container not found! DOM might not be ready yet.');
   }
@@ -3907,34 +3766,22 @@ window.hidePWAButton = function() {
 window.debugPWA = function() {
   const container = document.getElementById('pwa-floating-install');
   const btn = document.getElementById('pwa-install-btn');
-  console.log('🔧 IMMEDIATE PWA DEBUG:');
-  console.log('  - container found:', !!container);
-  console.log('  - button found:', !!btn);
-  console.log('  - deferredPrompt:', typeof deferredPrompt !== 'undefined' ? !!deferredPrompt : 'not defined');
-  console.log('  - display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
-  console.log('  - container display:', container ? container.style.display : 'N/A');
-  console.log('  - DOM ready:', document.readyState);
 };
 
 window.installPWA = function() {
   const installBtn = document.getElementById('pwa-install-btn');
   if (installBtn) {
     installBtn.click();
-    console.log('🔧 IMMEDIATE: PWA install triggered');
   } else {
     console.error('❌ PWA install button not found! DOM might not be ready yet.');
   }
 };
 
 // Test hogy a függvények elérhetők-e
-console.log('✅ Immediate PWA functions defined');
-console.log('🔧 Test now: debugPWA()');
   
   // ⚠️ AUDIO STATUS TESZTELŐ ELTÁVOLÍTVA
-  console.log('🧹 Audio status checker removed for production');
   
   // ⚠️ PWA ÉS AUDIO TESZTELŐK ELTÁVOLÍTVA
-  console.log('🧹 PWA and audio test functions removed for production');
 });
 
 // Gyors műveletek kezelése
@@ -4238,7 +4085,6 @@ function scheduleNotification(eventData) {
     setTimeout(() => {
       showEventNotification(eventData);
     }, timeUntilNotification);
-    console.log(`Emlékeztető beállítva ${eventData.title} eseményhez: ${new Date(notificationTime).toLocaleString()}`);
   }
 }
 
@@ -4273,9 +4119,6 @@ setInterval(() => {
 
 // Esemény értesítés megjelenítése - PWA és mobil kompatibilis
 function showEventNotification(eventData) {
-  console.log('🔔 ========== SHOWING EVENT NOTIFICATION ==========');
-  console.log('📅 Event:', eventData.title);
-  console.log('⏰ Time:', eventData.time);
   
   // MOBIL PWA NOTIFICATION - PRIORITÁS!
   if ('serviceWorker' in navigator && Notification.permission === 'granted') {
@@ -4303,7 +4146,6 @@ function showEventNotification(eventData) {
       silent: false // NE legyen silent - kell a hang
     };
     
-    console.log('📱 Creating PWA notification for mobile...');
     
     // Service Worker notification (mobil kompatibilis)
     if (navigator.serviceWorker.controller) {
@@ -4312,9 +4154,7 @@ function showEventNotification(eventData) {
           `📅 ${getText('notifications.upcoming_event')}: ${eventData.title}`,
           notificationOptions
         ).then(() => {
-          console.log('✅ PWA notification created successfully');
         }).catch(err => {
-          console.log('❌ PWA notification failed:', err);
           // Fallback to regular notification
           createRegularNotification(eventData);
         });
@@ -4325,7 +4165,6 @@ function showEventNotification(eventData) {
     }
   } else {
     // No permission or no service worker
-    console.log('⚠️ No PWA notification support, using regular methods');
     createRegularNotification(eventData);
   }
   
@@ -4333,13 +4172,11 @@ function showEventNotification(eventData) {
   showEventNotificationModal(eventData);
   
   // HANG LEJÁTSZÁSA - LOOP RENDSZERREL
-  console.log('🔊 Starting notification sound...');
   playNotificationSound();
   
   // Hagyományos értesítés is (fallback)
   showNotification(`📅 ${getText('notifications.upcoming_event')}: ${eventData.title} - ${eventData.time || getText('calendar.all_day')}`);
   
-  console.log('✅ Event notification fully displayed');
 }
 
 // Regular browser notification fallback
@@ -4358,7 +4195,6 @@ function createRegularNotification(eventData) {
       notification.close();
     };
     
-    console.log('✅ Regular browser notification created');
   }
 }
 
@@ -4413,13 +4249,11 @@ function setupEventNotificationListeners(eventData) {
     snoozeBtn.textContent = `⏰ 1 perc múlva`;
     snoozeBtn.onclick = () => {
       // HANG LEÁLLÍTÁSA AZONNAL - SEMMILYEN HANG VAGY AUDIO AKTIVÁLÁS NINCS!
-      console.log('🔇 Snooze button clicked - COMPLETELY SILENT operation');
       
       // Hang leállítása ELŐSZÖR - ez a legfontos!
       stopNotificationSound();
       
       // ⚠️ NO AUDIO FLAG MODIFICATION! Ez okozta a problémákat!
-      console.log('✅ Snooze: Sound stopped, no audio flags modified');
       
       // Snooze végrehajtása (ez már tartalmazza a modal bezárását)
       snoozeEventNotification(eventData);
@@ -4435,7 +4269,6 @@ function setupEventNotificationListeners(eventData) {
   // Modal háttérre kattintás
   modal.onclick = (e) => {
     if (e.target === modal) {
-      console.log('🖱️ Background clicked - closing modal and stopping sound');
       stopNotificationSound(); // Biztosíték
       closeEventNotificationModal();
     }
@@ -4444,7 +4277,6 @@ function setupEventNotificationListeners(eventData) {
   // ESC billentyű
   document.addEventListener('keydown', function escHandler(e) {
     if (e.key === 'Escape') {
-      console.log('⌨️ ESC pressed - closing modal and stopping sound');
       stopNotificationSound(); // Biztosíték
       closeEventNotificationModal();
       document.removeEventListener('keydown', escHandler);
@@ -4454,16 +4286,13 @@ function setupEventNotificationListeners(eventData) {
 
 // Event notification modal bezárása
 function closeEventNotificationModal() {
-  console.log('🚪 ========== CLOSING EVENT NOTIFICATION MODAL ==========');
   
   // CRITICAL: STOP AUDIO LOOP IMMEDIATELY TO PREVENT SOUNDS ON CLOSE
-  console.log('🔇 STOPPING ALL AUDIO to prevent sounds on modal close');
   stopNotificationSound();
   
   const modal = document.getElementById('event-notification-modal');
   if (modal) {
     modal.style.display = 'none';
-    console.log('✅ Modal hidden');
   }
   
   // EXTRA SAFETY: Set a short delay to ensure no audio triggers
@@ -4471,11 +4300,9 @@ function closeEventNotificationModal() {
     if (notificationInterval) {
       clearInterval(notificationInterval);
       notificationInterval = null;
-      console.log('🛑 SAFETY: Extra interval clearance');
     }
   }, 100);
   
-  console.log('✅ Event notification modal closed completely - NO SOUNDS');
 }
 
 // Audio context a hang engedélyezéséhez
@@ -4491,7 +4318,6 @@ function enableAudio() {
     try {
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioEnabled = true;
-      console.log('Audio enabled successfully');
       
       // Resume context ha suspended
       if (audioContext.state === 'suspended') {
@@ -4499,16 +4325,13 @@ function enableAudio() {
       }
       
       // NINCS TESZT HANG - csak az audio context létrehozása!
-      console.log('✅ Audio context ready (no test sound)');
     } catch (error) {
-      console.log('Audio context creation failed:', error);
     }
   }
 }
 
 // Audio előkészítése értesítésekhez
 function prepareAudioForNotifications() {
-  console.log('🎵 ========== AUDIO PREPARATION (NO AUTO-PLAY) ==========');
   try {
     // HTML audio CSAK előkészítése - NINCS AUTOMATIKUS LEJÁTSZÁS!
     const audio = document.getElementById('notification-sound');
@@ -4516,23 +4339,15 @@ function prepareAudioForNotifications() {
       audio.volume = 0.9; // Beállítjuk a megfelelő hangerőt
       audio.currentTime = 0;
       // ⚠️ NO AUTO-PLAY - ez okozta az AudioContext hibákat!
-      console.log('✅ HTML Audio configured (no auto-play)');
     }
     
     // Web Audio API - CSAK CONTEXT ELLENŐRZÉS, NINCS OSCILLATOR TESZT!
     if (audioContext) {
-      console.log('✅ Web Audio Context is available');
-      console.log('  - State:', audioContext.state);
-      console.log('  - Sample rate:', audioContext.sampleRate);
       // ⚠️ NO OSCILLATOR TEST - ez okozta az AudioContext hibákat!
-      console.log('✅ Web Audio API prepared (no test oscillator)');
     } else {
-      console.log('⚠️ No audio context available yet');
     }
     
-    console.log('✅ Audio preparation complete (silent mode - no auto-play)');
   } catch (error) {
-    console.log('❌ Audio preparation failed:', error);
   }
 }
 
@@ -4541,7 +4356,6 @@ function enableAudioOnUserInteraction() {
   const events = ['click', 'touchstart', 'keydown'];
   
   function audioHandler() {
-    console.log('🎵 First user interaction detected - enabling audio context');
     enableAudio();
     audioFullyActivated = true;
     
@@ -4550,7 +4364,6 @@ function enableAudioOnUserInteraction() {
       document.removeEventListener(event, audioHandler);
     });
     
-    console.log('✅ Audio fully activated on user interaction');
   }
   
   // Event listener-ek hozzáadása
@@ -4561,60 +4374,47 @@ function enableAudioOnUserInteraction() {
 
 // ⚠️ DISABLED - Ez okozta a snooze gomb hang problémát
 function enableAudioOnImportantElements() {
-  console.log('⚠️ enableAudioOnImportantElements is DISABLED to prevent unwanted sounds');
   // Az összes functionality ki van kapcsolva
   return;
 }
 
 // 🔊 EGYSZERŰ NOTIFICATION HANG RENDSZER
 function playNotificationSound() {
-  console.log('🔊 ========== STARTING NOTIFICATION SOUND (SIMPLE LOOP) ==========');
   
   // AUDIO ACTIVATION CHECK - CRITICAL SAFETY!
   if (!audioFullyActivated) {
-    console.log('⚠️ Audio not activated yet! Need user interaction first.');
-    console.log('💡 Audio will be enabled on first click/touch/key press');
     return;
   }
   
   // Ha már szól egy értesítés, állítsuk le előbb
   if (isNotificationPlaying) {
-    console.log('⚠️ Notification already playing - stopping previous first');
     stopNotificationSound();
   }
   
   // BIZTOSÍTSUK, HOGY AZ AUDIO CONTEXT LÉTEZIK ÉS AKTÍV
   if (!audioContext) {
-    console.log('❌ No audio context available - this should not happen after user interaction');
-    console.log('🔧 Attempting audio context creation...');
     enableAudio();
     
     // If still no context, abort
     if (!audioContext) {
-      console.log('❌ Failed to create audio context - aborting sound');
       return;
     }
   }
   
   // AUDIO CONTEXT STATE CHECK
   if (audioContext.state === 'suspended') {
-    console.log('⚠️ Audio context is suspended - trying to resume...');
     audioContext.resume().then(() => {
-      console.log('✅ Audio context resumed - starting simple sound');
       startSimpleLoop();
     }).catch(err => {
-      console.log('❌ Failed to resume audio context:', err);
     });
   } else {
     startSimpleLoop();
   }
   
   function startSimpleLoop() {
-    console.log('🔊 Starting simple notification loop...');
     
     // ÁLLÍTSUK BE A FLAG-ET
     isNotificationPlaying = true;
-    console.log('✅ isNotificationPlaying = TRUE');
     
     // ELSŐ HANG AZONNAL
     playSingleBeep();
@@ -4626,36 +4426,28 @@ function playNotificationSound() {
 
 // ⚠️ DEPRECATED FUNCTION - REPLACED BY SIMPLE LOOP IN playNotificationSound()
 function startWorkingAudioLoop() {
-  console.log('⚠️ startWorkingAudioLoop is deprecated - redirecting to startContinuousLoop');
   startContinuousLoop();
 }
 
 // 🔄 FOLYAMATOS LOOP - 3 MÁSODPERCENKÉNT
 function startContinuousLoop() {
-  console.log('🔄 ========== STARTING CONTINUOUS LOOP ==========');
   
   // ELLENŐRIZZÜK, hogy nincs-e már futó interval
   if (notificationInterval) {
-    console.log('⚠️ Clearing existing interval first');
     clearInterval(notificationInterval);
     notificationInterval = null;
   }
   
   // Loop: minden 3 másodpercben ismétlés
   notificationInterval = setInterval(() => {
-    console.log('🔄 Loop tick - isNotificationPlaying:', isNotificationPlaying);
     if (isNotificationPlaying) {
-      console.log('🔊 Playing loop beep...');
       playSingleBeep();
     } else {
-      console.log('🛑 Loop stopped - clearing interval');
       clearInterval(notificationInterval);
       notificationInterval = null;
     }
   }, 3000); // 3 másodpercenként
   
-  console.log('✅ Continuous loop started - playing every 3 seconds');
-  console.log('📊 isNotificationPlaying flag:', isNotificationPlaying);
 }
 
 // 🔊 EGYSZERŰ BEEP HANG - TISZTA ÉS EGYEDÜLÁLLÓ
@@ -4663,7 +4455,6 @@ function playSingleBeep() {
   if (!audioContext) return;
   
   try {
-    console.log('🔊 SINGLE BEEP! (880Hz)');
     
     // Egyszerű oscillator
     const oscillator = audioContext.createOscillator();
@@ -4686,33 +4477,26 @@ function playSingleBeep() {
     oscillator.stop(audioContext.currentTime + 0.6);
     
   } catch (error) {
-    console.log('❌ Single beep failed:', error);
   }
 }
 
 // ⚠️ CLEANED UP - Deprecated functions removed to simplify audio system
 // All audio functionality now goes through:
 // - playNotificationSound() -> startContinuousLoop() -> playSingleBeep()
-console.log('✅ Deprecated audio functions cleaned up for simpler system');
 
 // 🛑 EGYSZERŰ HANG LEÁLLÍTÁS
 function stopNotificationSound() {
-  console.log('🛑 ========== STOPPING NOTIFICATION SOUND ==========');
   
   // ELSŐ LÉPÉS: isNotificationPlaying = false (ez megállítja a loop-okat)
   isNotificationPlaying = false;
-  console.log('✅ isNotificationPlaying = FALSE');
   
   // Folyamatos lejátszás leállítása (Web Audio interval)
   if (notificationInterval) {
     clearInterval(notificationInterval);
     notificationInterval = null;
-    console.log('✅ Notification interval cleared');
   } else {
-    console.log('ℹ️ No notification interval to clear');
   }
   
-  console.log('✅ All notification sounds stopped completely');
 }
 
 // 5 perces elhalasztás (teszteléshez 1 perc)
@@ -4734,7 +4518,6 @@ function snoozeEventNotification(eventData) {
   snoozedEvents.push(snoozeData);
   localStorage.setItem('snoozedEvents', JSON.stringify(snoozedEvents));
   
-  console.log(`Event notification snoozed for 1 minute: ${eventData.title} until ${snoozeTime.toLocaleString()}`);
   showNotification(`⏰ ${eventData.title} - 1 perc múlva újra emlékeztetés`);
   
   // Modal bezárása
@@ -4753,7 +4536,6 @@ function checkSnoozedNotifications() {
   snoozedEvents.forEach(snoozeData => {
     if (now >= snoozeData.snoozeTime) {
       // Lejárt - megjelenítjük az értesítést
-      console.log(`Showing snoozed notification: ${snoozeData.eventData.title}`);
       showEventNotification(snoozeData.eventData);
     } else {
       // Még nem járt le - megtartjuk
@@ -4771,7 +4553,6 @@ function clearSnoozedNotifications() {
   stopNotificationSound();
   
   localStorage.removeItem('snoozedEvents');
-  console.log('All snoozed notifications cleared');
 }
 
 // ===============================================
@@ -4781,20 +4562,16 @@ function clearSnoozedNotifications() {
 // Teszteléshez - hang leállítása
 window.stopTestSound = function() {
   stopNotificationSound();
-  console.log('🔇 Test sound stopped manually');
 };
 
 // Teszteléshez - valódi loop hang tesztelése
 window.testContinuousSound = function() {
-  console.log('🔊 ========== TESTING CONTINUOUS SOUND (SAFE MODE) ==========');
   
   // SAFETY CHECK FIRST
   if (!audioFullyActivated) {
-    console.log('⚠️ Audio not yet activated! Please click somewhere on the page first.');
     return;
   }
   
-  console.log('📋 Audio status: ready');
   
   // RESET minden audio flag
   isNotificationPlaying = false;
@@ -4803,31 +4580,17 @@ window.testContinuousSound = function() {
     notificationInterval = null;
   }
   
-  console.log('🔧 Audio system reset complete');
-  console.log('🔊 Starting SIMPLE LOOP system...');
   
   // EGYSZERŰ HANG LEJÁTSZÁSA - nem dupla
   playNotificationSound();
   
-  console.log('▶️ Simple loop sound started. Use stopTestSound() to stop.');
-  console.log('📋 Expected behavior: Sound plays every 3 seconds');
 };
 
 // Új teszt funkció - teljes rendszer ellenőrzése
 window.testNotificationSystem = function() {
-  console.log('🧪 ========== TESTING COMPLETE NOTIFICATION SYSTEM (SAFE MODE) ==========');
-  console.log('📊 Current audio status:');
-  console.log('  - audioContext:', !!audioContext);
-  console.log('  - audioEnabled:', audioEnabled);
-  console.log('  - audioFullyActivated:', audioFullyActivated);
-  console.log('  - isNotificationPlaying:', isNotificationPlaying);
   
   // SAFETY CHECK - NO AUTOMATIC AUDIO ACTIVATION!
   if (!audioFullyActivated) {
-    console.log('⚠️ Audio not yet activated by user interaction!');
-    console.log('💡 Please click/touch/type somewhere on the page first.');
-    console.log('🔧 After user interaction, try this test again.');
-    console.log('📋 This prevents AudioContext browser errors.');
     return;
   }
   
@@ -4838,17 +4601,10 @@ window.testNotificationSystem = function() {
     time: new Date().toLocaleTimeString()
   };
   
-  console.log('✅ Audio is ready - testing notification...');
   
   // Értesítés megjelenítése
-  console.log('📱 Showing test notification...');
   showEventNotification(testEvent);
   
-  console.log('✅ Test notification shown (user interaction safe). Check that:');
-  console.log('   1. Modal appears');
-  console.log('   2. Sound plays every 3 seconds (loop)');
-  console.log('   3. Sound stops when modal is closed');
-  console.log('==================================================');
 };
 
 // ===============================================
@@ -4871,30 +4627,22 @@ async function initLanguageSystem() {
 // Nyelvi fájl betöltése
 async function loadLanguage(languageCode) {
   try {
-    console.log(`🔄 Attempting to load language: ${languageCode}`);
     // Force fresh fetch with cache busting
     const response = await fetch(`languages/${languageCode}.json?t=${Date.now()}`);
-    console.log(`📡 Fetch response for ${languageCode}:`, response.status, response.statusText);
     
     if (response.ok) {
       translations = await response.json();
       currentLanguage = languageCode;
       localStorage.setItem('language', languageCode);
       
-      console.log(`📦 Translations loaded for ${languageCode}:`, Object.keys(translations).length, 'sections');
-      console.log(`🌐 Current language set to: ${currentLanguage}`);
-      console.log(`🔍 Before UI update - currentLanguage: ${currentLanguage}`);
       
       // UI frissítése
       updateUITexts();
       
-      console.log(`🔍 After UI update - currentLanguage: ${currentLanguage}`);
       
       // Refresh language cache for this specific file - AFTER UI updates
       await refreshLanguageCache();
       
-      console.log(`🔍 After cache refresh - currentLanguage: ${currentLanguage}`);
-      console.log(`✅ Language loaded and cached: ${currentLanguage}`);
     } else {
       console.error(`❌ Language file ${languageCode}.json not found (${response.status}), falling back to Hungarian`);
       if (languageCode !== 'hu') {
@@ -4911,7 +4659,6 @@ async function loadLanguage(languageCode) {
 
 // Szöveg lekérése target group figyelembevételével
 function getText(key, placeholders = {}) {
-  // console.log(`🔍 Getting text for key: ${key}, current language: ${currentLanguage}`);
   // Check if we have a target group and if there's a specific translation for it
   const currentTargetGroup = window.advancedTargetGroupSystem?.getCurrentTargetGroup();
   
@@ -4991,7 +4738,6 @@ function updateNavigationTabTexts() {
     }
   });
   
-  console.log('🔄 Navigation tab texts updated with target group context');
 }
 
 // Dashboard szövegek frissítése target group figyelembevételével
@@ -5012,7 +4758,6 @@ function updateDashboardTexts() {
     }
   }
   
-  console.log('🏠 Dashboard texts updated with target group context');
 }
 
 // UI szövegek frissítése
@@ -5438,25 +5183,18 @@ function initLanguageDropdown() {
         e.stopPropagation();
         
         const languageCode = link.getAttribute('data-language') || 'hu';
-        console.log(`🖱️ Language link clicked: ${languageCode}`);
         
         // Dropdown azonnal bezárása a nyelv váltás előtt
         languageDropdown.classList.remove('show');
         
         try {
-          console.log(`🔄 Starting language change to: ${languageCode}`);
           await loadLanguage(languageCode);
           
           // Explicit debug: check current language before marking
-          console.log(`🔍 Before markCurrentLanguage - currentLanguage: ${currentLanguage}`);
-          console.log(`🔍 Before markCurrentLanguage - languageCode: ${languageCode}`);
-          console.log(`🔍 Before markCurrentLanguage - localStorage: ${localStorage.getItem('language')}`);
           
           // Add a small delay to ensure all async operations are completed
           setTimeout(() => {
-            console.log(`🔍 In setTimeout - currentLanguage: ${currentLanguage}`);
             markCurrentLanguage();
-            console.log(`✅ Language change completed to: ${currentLanguage}`);
           }, 50);
           
           // Biztonságos bezárás a nyelv váltás után is
@@ -5473,7 +5211,6 @@ function initLanguageDropdown() {
 
 // Aktuális nyelv jelölése
 function markCurrentLanguage() {
-  console.log(`🏷️ Marking current language: ${currentLanguage}`);
   const languageLinks = document.querySelectorAll('.language-dropdown a');
   const languageText = document.querySelector('.language-text');
   
@@ -5484,7 +5221,6 @@ function markCurrentLanguage() {
     const linkLang = link.getAttribute('data-language');
     if (linkLang === currentLanguage) {
       link.classList.add('current');
-      console.log(`✅ Marked ${linkLang} as current language`);
       
       // Frissítjük a hamburger menü szövegét
       if (languageText) {
@@ -5497,14 +5233,12 @@ function markCurrentLanguage() {
             break;
           case 'pl':
             languageText.textContent = 'PL';
-            console.log(`🇵🇱 Language text set to PL`);
             break;
           case 'hu':
           default:
             languageText.textContent = 'HU';
             break;
         }
-        console.log(`📝 Language button text updated to: ${languageText.textContent}`);
       }
     }
   });
@@ -5887,7 +5621,7 @@ function loadThemeCSS(themeName) {
     const link = document.createElement('link');
     link.id = 'theme-css';
     link.rel = 'stylesheet';
-    link.href = 'modern-themes.css';
+    link.href = './css/modern-themes.css';
     document.head.appendChild(link);
   }
 }
@@ -5958,8 +5692,8 @@ function updateDynamicManifest(backgroundColor, themeColor) {
     "short_name": "TodoApp",
     "description": "Comprehensive personal organizer with todos, shopping lists, notes, calendar events, and multi-language support. Featuring password-protected notes, theme customization, and real-time notifications.",
     "version": "2.0.0",
-    "start_url": "./",
-    "scope": "./",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "orientation": "any",
     "background_color": backgroundColor,
@@ -6004,21 +5738,21 @@ function updateDynamicManifest(backgroundColor, themeColor) {
         "name": "Quick Task",
         "short_name": "Add Task",
         "description": "Quickly add a new task to your lists",
-        "url": "./?action=quick-task",
+        "url": "/?action=quick-task",
         "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "New Note",
         "short_name": "Add Note",
         "description": "Create a new note",
-        "url": "./?action=quick-note",
+        "url": "/?action=quick-note",
         "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       },
       {
         "name": "Calendar",
         "short_name": "Events",
         "description": "View and add calendar events",
-        "url": "./?tab=calendar",
+        "url": "/?tab=calendar",
         "icons": [{ "src": "android-chrome-192x192.png", "sizes": "192x192" }]
       }
     ],
@@ -6053,7 +5787,6 @@ function updateDynamicManifest(backgroundColor, themeColor) {
   
   manifestLink.href = manifestURL;
   
-  console.log(`🎨 PWA manifest updated: background=${backgroundColor}, theme=${themeColor}`);
 }
 
 function updateActiveThemeCard() {
@@ -6099,7 +5832,6 @@ async function saveThemeToFirebase(themeSettings) {
     const userRef = ref(db, `users/${auth.currentUser.uid}/themeSettings`);
     await set(userRef, themeSettings);
   } catch (error) {
-    console.log('Theme save error:', error);
   }
 }
 
@@ -6118,7 +5850,6 @@ async function loadThemeFromFirebase() {
       updateActiveThemeCard();
     }
   } catch (error) {
-    console.log('Theme load error:', error);
   }
 }
 
@@ -6178,7 +5909,6 @@ function initProfileMenu() {
           }
           
           showNotification('PWA állapot törölve. A telepítési gomb mostantól látható.');
-          console.log('🧹 PWA state cleared from profile menu');
         }
       }
     });
@@ -6369,7 +6099,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // AUDIO USER INTERACTION RENDSZER INICIALIZÁLÁS
   enableAudioOnUserInteraction();
-  console.log('🎵 Audio user interaction system initialized');
   
   // PWA FLOATING INSTALL BUTTON SETUP
   function setupPWAInstallButton() {
@@ -6377,10 +6106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const installBtn = document.getElementById('pwa-install-btn');
     
     // Debug: elemek ellenőrzése
-    console.log('🔧 PWA Elements Check:');
-    console.log('  - installContainer:', !!installContainer);
-    console.log('  - installBtn:', !!installBtn);
-    console.log('  - deferredPrompt:', !!deferredPrompt);
     
     if (!installContainer || !installBtn) {
       console.error('❌ PWA install elements not found in DOM!');
@@ -6405,7 +6130,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ha 1 óránál régebben volt "telepítve", töröljük a jelölést
         if (Date.now() - installedTime > (60 * 60 * 1000)) { // 1 óra
           localStorage.removeItem('pwa-recently-installed');
-          console.log('🧹 PWA installed flag cleared after 1 hour');
         } else {
           return false;
         }
@@ -6415,7 +6139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const dismissTime = parseInt(userDismissedRecently);
         if (Date.now() > dismissTime) {
           localStorage.removeItem('pwa-user-dismissed');
-          console.log('🧹 PWA dismissed flag cleared after timeout');
         } else {
           return false;
         }
@@ -6429,45 +6152,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function showInstallButton() {
       if (canShowInstallButton()) {
         installContainer.style.display = 'block';
-        console.log('📱 PWA floating install button shown');
       } else {
-        console.log('📱 PWA install button not shown - conditions not met');
       }
     }
     
     // Gomb elrejtése
     function hideInstallButton() {
       installContainer.style.display = 'none';
-      console.log('📱 PWA install button hidden');
     }
     
     // PWA telepítés kezelése
     if (installBtn) {
       installBtn.addEventListener('click', () => {
-        console.log('📱 PWA install button clicked');
-        console.log('📱 deferredPrompt available:', !!deferredPrompt);
         
         if (deferredPrompt) {
           deferredPrompt.prompt();
           deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
-              console.log('✅ PWA installation accepted');
               showNotification('📱 App sikeresen telepítve!');
               hideInstallButton();
               // Jegyezzük meg, hogy telepítették
               localStorage.setItem('pwa-recently-installed', Date.now().toString());
             } else {
-              console.log('❌ PWA installation declined');
               // Jegyezzük meg, hogy elutasították (24 órára)
               const dismissTime = Date.now() + (24 * 60 * 60 * 1000); // 24 óra
               localStorage.setItem('pwa-user-dismissed', dismissTime.toString());
               hideInstallButton();
-              console.log('🔕 PWA gomb elrejtve 24 órára felhasználói kérésre');
             }
             deferredPrompt = null;
           });
         } else {
-          console.log('PWA telepítési prompt nem elérhető');
           
           // Ellenőrizzük a tényleges telepítési állapotot
           const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -6497,7 +6211,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const installedTime = parseInt(wasRecentlyInstalled);
         if (Date.now() - installedTime > (60 * 60 * 1000)) { // 1 óra
           localStorage.removeItem('pwa-recently-installed');
-          console.log('🧹 PWA installed flag cleared after 1 hour');
         }
       }
       
@@ -6506,7 +6219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const dismissTime = parseInt(userDismissedTime);
         if (Date.now() > dismissTime) {
           localStorage.removeItem('pwa-user-dismissed');
-          console.log('🧹 PWA dismissed flag cleared after timeout');
         }
       }
       
@@ -6516,7 +6228,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (isStandalone || isInstalled) {
         hideInstallButton();
-        console.log('📱 PWA already installed - hiding install button');
         // Jegyezzük meg, hogy telepítve van
         if (!wasRecentlyInstalled) {
           localStorage.setItem('pwa-recently-installed', Date.now().toString());
@@ -6535,7 +6246,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showPWAButton = () => {
       if (installContainer) {
         installContainer.style.display = 'block';
-        console.log('🔧 DEBUG: PWA button forced to show');
       } else {
         console.error('❌ Install container not found!');
       }
@@ -6544,35 +6254,23 @@ document.addEventListener('DOMContentLoaded', () => {
     window.hidePWAButton = () => {
       if (installContainer) {
         installContainer.style.display = 'none';
-        console.log('🔧 DEBUG: PWA button hidden');
       } else {
         console.error('❌ Install container not found!');
       }
     };
     
     window.debugPWA = () => {
-      console.log('🔧 PWA DEBUG INFO:');
-      console.log('  - installContainer:', installContainer);
-      console.log('  - installBtn:', installBtn);
-      console.log('  - deferredPrompt:', deferredPrompt);
-      console.log('  - display-mode:', window.matchMedia('(display-mode: standalone)').matches);
-      console.log('  - current display:', installContainer ? installContainer.style.display : 'N/A');
     };
     
     // Automatikus megjelenítés teszteléshez
-    console.log('🔧 PWA install button setup complete');
     setTimeout(() => {
       if (canShowInstallButton()) {
         installContainer.style.display = 'block';
-        console.log('🔧 AUTO-SHOWING PWA button');
-        console.log('📱 PWA button should now be visible in bottom-left corner (mobile)');
       } else {
-        console.log('🔕 PWA button auto-show skipped - conditions not met');
         // Debug info
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
         const wasRecentlyInstalled = localStorage.getItem('pwa-recently-installed');
         const userDismissed = localStorage.getItem('pwa-user-dismissed');
-        console.log('Debug: standalone:', isStandalone, 'recently installed:', !!wasRecentlyInstalled, 'dismissed:', !!userDismissed);
       }
     }, 2000);
     
@@ -6596,13 +6294,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clearPWAState = function() {
     localStorage.removeItem('pwa-recently-installed');
     localStorage.removeItem('pwa-user-dismissed');
-    console.log('🧹 PWA state cleared');
     
     // Show the button immediately
     const container = document.getElementById('pwa-floating-install');
     if (container) {
       container.style.display = 'block';
-      console.log('📱 PWA install button shown');
     }
     
     showNotification('PWA állapot törölve. A telepítés gomb most megjelenik.');
@@ -6614,7 +6310,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('pwa-floating-install');
       if (container) {
         container.style.display = 'block';
-        console.log('🔧 BACKUP: PWA button shown');
       } else {
         console.error('❌ PWA container not found!');
       }
@@ -6626,7 +6321,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('pwa-floating-install');
       if (container) {
         container.style.display = 'none';
-        console.log('🔧 BACKUP: PWA button hidden');
       } else {
         console.error('❌ PWA container not found!');
       }
@@ -6637,10 +6331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.debugPWA = () => {
       const container = document.getElementById('pwa-floating-install');
       const btn = document.getElementById('pwa-install-btn');
-      console.log('🔧 BACKUP PWA DEBUG:');
-      console.log('  - container:', !!container);
-      console.log('  - button:', !!btn);
-      console.log('  - display:', container ? container.style.display : 'N/A');
     };
   }
   
@@ -6672,7 +6362,6 @@ function startSnoozeMonitoring() {
     checkSnoozedNotifications();
   }, 30000); // 30 másodpercenként
   
-  console.log('Snooze monitoring started - checking every 30 seconds');
 }
 
 // Snooze monitoring leállítása
@@ -6680,7 +6369,6 @@ function stopSnoozeMonitoring() {
   if (snoozeCheckInterval) {
     clearInterval(snoozeCheckInterval);
     snoozeCheckInterval = null;
-    console.log('Snooze monitoring stopped');
   }
 }
 
@@ -6690,18 +6378,14 @@ function stopSnoozeMonitoring() {
 
 // Global cache management functions for development and debugging
 window.refreshCache = async function() {
-  console.log('🔄 Manual cache refresh triggered...');
   await refreshLanguageCache();
-  console.log('✅ Cache refreshed successfully');
 };
 
 window.clearAllCaches = async function() {
-  console.log('🗑️ Manual cache clear triggered...');
   await clearCacheAndRefresh();
 };
 
 window.forceReload = function() {
-  console.log('🔄 Force reloading with cache bust...');
   window.location.reload(true);
 };
 
@@ -6709,21 +6393,17 @@ window.forceReload = function() {
 window.checkCacheStatus = async function() {
   if ('caches' in window) {
     const cacheNames = await caches.keys();
-    console.log('📦 Current caches:', cacheNames);
     
     for (const cacheName of cacheNames) {
       const cache = await caches.open(cacheName);
       const keys = await cache.keys();
-      console.log(`📋 Cache "${cacheName}" contains ${keys.length} items:`, keys.map(req => req.url));
     }
   } else {
-    console.log('❌ Cache API not supported');
   }
 };
 
 // Force update language cache immediately 
 window.updateLanguageCache = async function() {
-  console.log('🌐 Updating language cache immediately...');
   
   // Clear old language caches
   if ('caches' in window) {
@@ -6735,29 +6415,24 @@ window.updateLanguageCache = async function() {
         await cache.delete('./languages/en.json');
         await cache.delete('./languages/de.json');
         await cache.delete('./languages/pl.json');
-        console.log(`🗑️ Cleared language files from ${cacheName}`);
       }
     }
   }
   
   // Force reload language files - keep current language instead of defaulting to Hungarian
   const currentLang = currentLanguage || localStorage.getItem('language') || 'hu';
-  console.log(`🌐 Cache update: reloading current language: ${currentLang}`);
   await loadLanguage(currentLang);
   
-  console.log('✅ Language cache updated and reloaded');
 };
 
 // Complete cache reset and language reload
 window.resetLanguageSystem = async function() {
-  console.log('🔄 Complete language system reset...');
   
   // Clear all caches
   if ('caches' in window) {
     const cacheNames = await caches.keys();
     for (const cacheName of cacheNames) {
       await caches.delete(cacheName);
-      console.log(`🗑️ Deleted cache: ${cacheName}`);
     }
   }
   
@@ -6770,13 +6445,11 @@ window.resetLanguageSystem = async function() {
   // Reload the page to start fresh
   window.location.reload(true);
   
-  console.log('✅ Language system reset completed');
 };
 
 // Auto-clear problematic caches on startup (run once per session)
 if (!sessionStorage.getItem('cache-cleaned-v2.1.5')) {
   setTimeout(async () => {
-    console.log('🧹 Auto-clearing problematic caches...');
     try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
@@ -6784,79 +6457,44 @@ if (!sessionStorage.getItem('cache-cleaned-v2.1.5')) {
           // Remove old version caches
           if (cacheName.includes('todo-app-v2.1.4') || cacheName.includes('todo-offline-v2.1.4')) {
             await caches.delete(cacheName);
-            console.log(`🗑️ Deleted old cache: ${cacheName}`);
           }
         }
       }
       sessionStorage.setItem('cache-cleaned-v2.1.5', 'true');
-      console.log('✅ Cache cleanup completed');
     } catch (error) {
       console.warn('⚠️ Cache cleanup failed:', error);
     }
   }, 1000);
 }
 
-console.log('✅ Cache management functions loaded:');
-console.log('  - refreshCache() - Refresh language cache');
-console.log('  - clearAllCaches() - Clear all caches and reload');
-console.log('  - forceReload() - Force reload with cache bust');
-console.log('  - checkCacheStatus() - Show current cache contents');
-console.log('  - updateLanguageCache() - Force update language cache');
-console.log('  - resetLanguageSystem() - Complete reset of language system');
 
 // Debug function to check target group and language system status
 window.debugUITexts = function() {
-  console.log('🔍 UI Texts Debug Status:');
-  console.log('  - Current language:', currentLanguage);
-  console.log('  - Translations loaded:', !!translations);
-  console.log('  - Advanced target group system:', !!window.advancedTargetGroupSystem);
   
   if (window.advancedTargetGroupSystem) {
     const currentTargetGroup = window.advancedTargetGroupSystem.getCurrentTargetGroup();
-    console.log('  - Current target group:', currentTargetGroup ? currentTargetGroup.id : 'none');
-    console.log('  - Target group data:', currentTargetGroup);
   }
   
   if (translations && translations.target_groups) {
-    console.log('  - Available target groups in translations:', Object.keys(translations.target_groups));
   }
   
-  console.log('🔧 Available commands:');
-  console.log('  - updateUITexts() - Force refresh UI texts');
-  console.log('  - debugUITexts() - Show this debug info');
 };
 
-console.log('🔧 Additional debug function: debugUITexts() - Check target group and language status');
 
 // Debug language switching issues
 window.debugLanguage = function() {
-  console.log('🌐 Language Debug:');
-  console.log('  - Current Language Variable:', currentLanguage);
-  console.log('  - LocalStorage Language:', localStorage.getItem('language'));
-  console.log('  - Translations Object:', translations);
-  console.log('  - Translations Keys:', Object.keys(translations));
-  console.log('  - Available Language Files:', ['hu', 'en', 'de', 'pl']);
   
   // Test Polish translations
   if (translations.navigation) {
-    console.log('  - Dashboard text:', translations.navigation.dashboard);
-    console.log('  - Lists text:', translations.lists.title);
-    console.log('  - Notes text:', translations.notes.title);
   }
 };
 
 // Quick language switch functions for testing
 window.switchToPolish = function() {
-  console.log('🇵🇱 Manually switching to Polish...');
   loadLanguage('pl');
 };
 
 window.switchToHungarian = function() {
-  console.log('🇭🇺 Manually switching to Hungarian...');
   loadLanguage('hu');
 };
 
-console.log('🔧 Language debug functions:');
-console.log('  - debugLanguage() - Show language debug info');
-console.log('  - switchToPolish() - Force switch to Polish');
-console.log('  - switchToHungarian() - Force switch to Hungarian');

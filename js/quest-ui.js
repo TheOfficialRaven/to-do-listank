@@ -554,6 +554,7 @@ class QuestUI {
   renderDailyQuests() {
     if (!this.dailyQuestContainer) return;
 
+    // Mindig a goal-templates.js-ből származó magyar napi küldetéseket használjuk
     const dailyQuests = templateManager.getDailyQuests();
     const countBadge = document.getElementById('daily-count');
     
@@ -606,20 +607,33 @@ class QuestUI {
   }
 
   createQuestCard(quest, type) {
+    // Normalize duration for display
+    let duration = quest.duration;
+    if (!duration && quest.estimatedDuration) {
+      // Try to extract number from string like "45 perc"
+      const match = String(quest.estimatedDuration).match(/\d+/);
+      if (match) duration = parseInt(match[0], 10);
+    }
+    // Fallback if still not found
+    if (!duration) duration = '';
+
+    // Normalize description
+    const description = quest.description || '';
+
     const tagText = {
       'daily': 'NAPI',
       'weekly': 'HETI',
       'event-based': 'ESEMÉNY'
-    }[quest.tag] || quest.tag.toUpperCase();
+    }[quest.tag] || (quest.tag ? quest.tag.toUpperCase() : '');
 
     return `
       <div class="quest-card ${type}-quest">
         <div class="quest-type-badge">${type === 'daily' ? 'NAPI' : 'JAVASOLT'}</div>
         <div class="quest-title">${quest.title}</div>
-        <div class="quest-description">${quest.description}</div>
+        <div class="quest-description">${description}</div>
         <div class="quest-meta">
           <span class="quest-xp">⭐ ${quest.xp} XP</span>
-          <span class="quest-duration">⏱️ ${quest.duration}p</span>
+          <span class="quest-duration">⏱️ ${duration}p</span>
           <span class="quest-tag">${tagText}</span>
         </div>
         <div class="quest-actions">
@@ -649,11 +663,17 @@ class QuestUI {
       buttonElement.disabled = true;
       buttonElement.textContent = '⏳ Importálás...';
 
-      // Find the quest
-      const quests = questType === 'daily' 
-        ? templateManager.getDailyQuests() 
-        : templateManager.getSuggestedQuests();
-      
+      // Find the quest from the correct source
+      let quests;
+      if (questType === 'daily') {
+        if (window.dailyQuestsManager && typeof window.dailyQuestsManager.getDailyQuests === 'function') {
+          quests = window.dailyQuestsManager.getDailyQuests();
+        } else {
+          quests = templateManager.getDailyQuests();
+        }
+      } else {
+        quests = templateManager.getSuggestedQuests();
+      }
       const quest = quests.find(q => q.id === questId);
       if (!quest) {
         throw new Error('Quest not found');
@@ -767,4 +787,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.questUI = questUI;
 export default questUI;
 
-console.log('✅ Quest UI module loaded successfully'); 
+console.log('✅ Quest UI module loaded successfully');

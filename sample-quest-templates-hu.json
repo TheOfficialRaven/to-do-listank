@@ -1,0 +1,202 @@
+{
+  "student": [
+    {
+      "title": "Heti tanulási terv készítése",
+      "duration": 30,
+      "xp": 50,
+      "tag": "weekly",
+      "category": "planning",
+      "description": "Készíts áttekinthető heti ütemtervet az összes tantárgyra"
+    },
+    {
+      "title": "Tanulási blokk - 2 óra fókuszált munka",
+      "duration": 120,
+      "xp": 100,
+      "tag": "daily",
+      "category": "study",
+      "description": "Koncentrált tanulás telefon nélkül"
+    },
+    {
+      "title": "Vizsgára készülés - anyag áttekintése",
+      "duration": 90,
+      "xp": 80,
+      "tag": "event-based",
+      "category": "exam",
+      "description": "Rendszerezett anyagismétlés és gyakorlás"
+    },
+    {
+      "title": "Jegyzetek átszervezése és digitalizálása",
+      "duration": 45,
+      "xp": 60,
+      "tag": "weekly",
+      "category": "organization",
+      "description": "Jegyzeteid rendezése és visszakereshetővé tétele"
+    },
+    {
+      "title": "Könyvtári kutatás projekthez",
+      "duration": 120,
+      "xp": 90,
+      "tag": "event-based",
+      "category": "research",
+      "description": "Releváns források keresése és gyűjtése"
+    },
+    {
+      "title": "Tanulmányi célok havi értékelése",
+      "duration": 60,
+      "xp": 70,
+      "tag": "weekly",
+      "category": "review",
+      "description": "Haladás értékelése és következő havi tervek"
+    }
+  ],
+  "young_professional": [
+    {
+      "title": "Networking eseményre készülés",
+      "duration": 45,
+      "xp": 80,
+      "tag": "event-based",
+      "category": "networking",
+      "description": "Bemutatkozó beszéd és kapcsolatépítési stratégia"
+    },
+    {
+      "title": "LinkedIn profil frissítése",
+      "duration": 30,
+      "xp": 50,
+      "tag": "weekly",
+      "category": "online-presence",
+      "description": "Szakmai profil karbantartása és tartalommegosztás"
+    },
+    {
+      "title": "Prezentáció készítése projektkezdéshez",
+      "duration": 90,
+      "xp": 100,
+      "tag": "event-based",
+      "category": "presentation",
+      "description": "Professzionális bemutatás összeállítása"
+    },
+    {
+      "title": "Mentor találkozó előkészítése",
+      "duration": 30,
+      "xp": 60,
+      "tag": "weekly",
+      "category": "mentoring",
+      "description": "Kérdések és célok összegyűjtése mentorral való beszélgetéshez"
+    },
+    {
+      "title": "Iparági trendek kutatása",
+      "duration": 60,
+      "xp": 70,
+      "tag": "daily",
+      "category": "research",
+      "description": "Aktuális fejlemények követése a szakmában"
+    },
+    {
+      "title": "Heti teljesítmény áttekintése",
+      "duration": 45,
+      "xp": 65,
+      "tag": "weekly",
+      "category": "review",
+      "description": "Munkám eredményeinek elemzése és tervezés"
+    }
+  ],
+  "self_improver": [
+    {
+      "title": "Reggeli meditáció és önreflexió",
+      "duration": 20,
+      "xp": 40,
+      "tag": "daily",
+      "category": "mindfulness",
+      "description": "20 perces tudatos jelenlét gyakorlása"
+    },
+    {
+      "title": "Új készség tanulása - napi lekce",
+      "duration": 45,
+      "xp": 60,
+      "tag": "daily",
+      "category": "skill-building",
+      "description": "Választott készség fejlesztése strukturált módon"
+    },
+    {
+      "title": "Gratitude journal - hálás vagyok érte",
+      "duration": 15,
+      "xp": 30,
+      "tag": "daily",
+      "category": "journaling",
+      "description": "3 dolog felírása, amiért hálás vagy ma"
+    },
+    {
+      "title": "Heti célok kiértékelése",
+      "duration": 30,
+      "xp": 50,
+      "tag": "weekly",
+      "category": "goal-setting",
+      "description": "Haladás mérése és következő hét tervezése"
+    },
+    {
+      "title": "Kreatív alkotás ideje",
+      "duration": 60,
+      "xp": 80,
+      "tag": "weekly",
+      "category": "creativity",
+      "description": "Szabad alkotás - rajzolás, írás, zene"
+    },
+    {
+      "title": "Komfortzóna kihívás",
+      "duration": 30,
+      "xp": 90,
+      "tag": "event-based",
+      "category": "challenge",
+      "description": "Valami új kipróbálása, ami kihívást jelent"
+    }
+  ],
+  "organizer": [
+    {
+      "title": "Heti eseménytervezés koordinálása",
+      "duration": 60,
+      "xp": 80,
+      "tag": "weekly",
+      "category": "event-planning",
+      "description": "Részletes eseményterv kidolgozása minden elemmel"
+    },
+    {
+      "title": "Csapat meeting szervezése",
+      "duration": 45,
+      "xp": 70,
+      "tag": "event-based",
+      "category": "team-management",
+      "description": "Napirend, résztvevők és logisztika koordinálása"
+    },
+    {
+      "title": "Projekt timeline és mérföldkövek",
+      "duration": 90,
+      "xp": 100,
+      "tag": "event-based",
+      "category": "project-management",
+      "description": "Részletes ütemterv készítése deadlineokkal"
+    },
+    {
+      "title": "Vendégmeghívások koordinálása",
+      "duration": 30,
+      "xp": 50,
+      "tag": "event-based",
+      "category": "guest-management",
+      "description": "Meghívók, RSVP kezelése és követés"
+    },
+    {
+      "title": "Költségvetés tervezése és kontrollja",
+      "duration": 75,
+      "xp": 85,
+      "tag": "weekly",
+      "category": "budget-planning",
+      "description": "Pénzügyi tervezés és kiadások nyomon követése"
+    },
+    {
+      "title": "Hosszú távú stratégiai tervezés",
+      "duration": 120,
+      "xp": 120,
+      "tag": "weekly",
+      "category": "strategic-planning",
+      "description": "3-6 hónapos tervek kidolgozása és felülvizsgálata"
+    }
+  ]
+}

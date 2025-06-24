@@ -24,6 +24,15 @@ const CACHE_RESOURCES = [
   './css/animations.css',
   './css/modals.css',
   './css/app-specific.css',
+  './css/timetable.css',
+  './css/exam-calendar.css',
+  './css/dashboard.css',
+  './css/lists.css',
+  './css/auth.css',
+  './css/achievements.css',
+  './css/accessibility.css',
+  './css/media.css',
+  './css/unmatched.css',
   './manifest.json',
   './favicon-16x16.png',
   './favicon-32x32.png',
@@ -34,10 +43,13 @@ const CACHE_RESOURCES = [
   './js/target-group-advanced.js',
   './js/quest-ui.js',
   './js/goal-templates.js',
+  './js/timetable-manager.js',
+  './js/exam-calendar-manager.js',
   './target-group-simple.js',
   './languages/hu.json',
   './languages/en.json',
-  './languages/de.json'
+  './languages/de.json',
+  './languages/pl.json'
 ];
 
 // Essential resources for offline functionality
@@ -45,7 +57,7 @@ const ESSENTIAL_RESOURCES = [
   './',
   './index.html',
   './index.js',
-  './index.css'
+  './styles.css'
 ];
 
 // ===============================================
